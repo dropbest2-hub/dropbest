@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 export const convertBadgesToCoupon = async (req: Request, res: Response) => {

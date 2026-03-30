@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabaseAdmin, supabaseUrl, supabaseKey } from '../config/supabase';
+import { supabase, supabaseAdmin, supabaseUrl, supabaseKey } from '../config/supabase';
 import { createClient } from '@supabase/supabase-js';
 
 export const getUserProfile = async (req: Request, res: Response) => {
