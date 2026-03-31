@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { supabase, supabaseAdmin } from '../config/supabase';
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 export const convertBadgesToCoupon = async (req: Request, res: Response) => {
     try {
@@ -37,7 +37,7 @@ export const convertBadgesToCoupon = async (req: Request, res: Response) => {
         }
 
         // Generate coupon code
-        const couponCode = `BBB-${uuidv4().split('-')[0].toUpperCase()}-${rewardAmount}`;
+        const couponCode = `BBB-${crypto.randomUUID().split('-')[0].toUpperCase()}-${rewardAmount}`;
 
         // Deduct badges and create reward record
         const newBadgeCount = user.badge_count - badgesToUse;
