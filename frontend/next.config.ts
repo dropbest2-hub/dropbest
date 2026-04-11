@@ -1,12 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -16,6 +10,8 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'hiutepcjueudehhufroi.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
       },
       {
         protocol: 'https',

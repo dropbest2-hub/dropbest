@@ -301,6 +301,7 @@ export default function ProductDetails() {
  alt={product.title} 
  width={500}
  height={500}
+ unoptimized
  className="w-full h-auto object-cover aspect-square group-hover:scale-105 transition-transform duration-700" 
  />
  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl text-xl font-black text-brand-700 shadow-xl">

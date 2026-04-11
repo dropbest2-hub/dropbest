@@ -32,7 +32,7 @@ interface AuthState {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     session: null,
     loading: true,
@@ -41,14 +41,25 @@ export const useAuthStore = create<AuthState>((set) => ({
     setUser: (user) => set({ user }),
 
     initializeAuth: async () => {
+        if (get().initialized && !get().loading) return;
+        
+        set({ loading: true });
         try {
             // Get session from Supabase
             const { data: { session }, error } = await supabase.auth.getSession();
 
             if (error || !session) {
                 if (error) {
+                    console.warn('Auth session error, clearing stale data:', error.message);
                     // If there's an error like invalid refresh token, clear out local storage
-                    await supabase.auth.signOut().catch(() => {});
+                    // Use a more aggressive cleanup if it's the specific refresh token error
+                    if (error.message.includes('Refresh Token Not Found')) {
+                        localStorage.removeItem('supabase.auth.token'); // Fallback for standard key
+                        // Actually signOut clears it better
+                        await supabase.auth.signOut().catch(() => {});
+                    } else {
+                        await supabase.auth.signOut().catch(() => {});
+                    }
                 }
                 set({ session: null, user: null, loading: false, initialized: true });
                 return;

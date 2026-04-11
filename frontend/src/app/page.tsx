@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '@/lib/api';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame } from 'lucide-react';
+import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search } from 'lucide-react';
+import CategoryList from '@/components/CategoryList';
 import { useAuthStore } from '@/store/authStore';
 
 interface Product {
@@ -15,6 +16,7 @@ interface Product {
     amazon_link: string;
     flipkart_link: string;
     watch_count?: number;
+    category?: string;
 }
 
 const CommunityStats = () => {
@@ -68,6 +70,8 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuthStore();
     const [watchlist, setWatchlist] = useState<string[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchProducts = useCallback(async () => {
         setLoading(true);
@@ -226,6 +230,38 @@ export default function Home() {
             {/* Product Grid */}
             <section id="trending" className="scroll-mt-24 pt-10">
                 <CommunityStats />
+                
+                <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Shop by Category</h3>
+                <CategoryList 
+                    activeCategory={selectedCategory} 
+                    onCategoryChange={(cat) => {
+                        setSelectedCategory(cat);
+                        // Optional: clear search when category changes or keep it
+                    }} 
+                />
+
+                {/* Search Bar */}
+                <div className="relative max-w-2xl mx-auto mb-12">
+                    <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                        <Search className="text-gray-400" size={20} />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search for your favorite products..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-14 pr-6 py-5 bg-white rounded-3xl border border-gray-100 shadow-sm focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all text-gray-700 font-medium placeholder:text-gray-400"
+                    />
+                    {searchQuery && (
+                        <button 
+                            onClick={() => setSearchQuery('')}
+                            className="absolute inset-y-0 right-6 flex items-center text-gray-400 hover:text-gray-600 transition-colors text-sm font-bold"
+                        >
+                            CLEAR
+                        </button>
+                    )}
+                </div>
+
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4">
                     <div>
                         <h2 className="text-4xl font-black text-gray-900 tracking-tight">Trending Now</h2>
@@ -274,7 +310,14 @@ export default function Home() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" style={{ perspective: '1000px' }}>
-                        {products.map((product, index) => (
+                        {products
+                            .filter(p => {
+                                const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+                                const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                                     p.description.toLowerCase().includes(searchQuery.toLowerCase());
+                                return matchesCategory && matchesSearch;
+                            })
+                            .map((product, index) => (
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -297,6 +340,7 @@ export default function Home() {
                                         alt={product.title}
                                         width={400}
                                         height={224}
+                                        unoptimized
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
                                     <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl text-base font-black text-brand-700 shadow-lg group-hover:bg-brand-600 group-hover:text-white transition-all">

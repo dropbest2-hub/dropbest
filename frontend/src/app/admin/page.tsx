@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { CATEGORIES } from '@/lib/categories';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -25,6 +26,7 @@ interface AdminProduct {
     description: string;
     price: number | string;
     image_url: string;
+    category?: string;
 }
 
 interface AdminUser {
@@ -52,7 +54,7 @@ export default function AdminDashboard() {
  // Forms
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
- const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '' });
+ const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
  const [isSyncing, setIsSyncing] = useState(false);
 
@@ -161,7 +163,7 @@ export default function AdminDashboard() {
  { headers: { Authorization: `Bearer ${session?.access_token}` } }
  );
  setIsAddingProduct(false);
- setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '' });
+ setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
  fetchData();
  } catch (error) {
  alert('Failed to add product');
@@ -392,6 +394,11 @@ export default function AdminDashboard() {
  <textarea required placeholder="Product Description..." className="p-3 rounded-xl border md:col-span-2" rows={3} value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
  <input required placeholder="Amazon Affiliate URL" className="p-3 rounded-xl border" value={newProduct.amazon_link} onChange={e => setNewProduct({ ...newProduct, amazon_link: e.target.value })} />
  <input placeholder="Flipkart Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.flipkart_link} onChange={e => setNewProduct({ ...newProduct, flipkart_link: e.target.value })} />
+ <select required className="p-3 rounded-xl border md:col-span-2 bg-white" value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
+     {CATEGORIES.filter(c => c.id !== 'all').map(category => (
+         <option key={category.id} value={category.id}>{category.name}</option>
+     ))}
+ </select>
  </div>
  <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl">Save Product</button>
  </form>
