@@ -3,9 +3,9 @@ import { supabase } from '../config/supabase';
 
 // Helper to determine badges based on value
 const calculateBadges = (value: number): number => {
-    if (value >= 2000) return 5;
-    if (value >= 300) return 3;
-    return 0; // The prompt states 3 badges for >=300, 5 for >=2000, max 8 total per order. Assuming base reward is 0 under 300.
+    if (value >= 2000) return 10;
+    if (value >= 300) return 8;
+    return 0; 
 };
 
 // Admin route to confirm an order after 40 days
@@ -41,8 +41,8 @@ export const confirmOrder = async (req: Request, res: Response) => {
             return;
         }
 
-        // 2. Calculate badges (Max 8)
-        const earnedBadges = Math.min(calculateBadges(purchaseValue), 8);
+        // 2. Calculate badges
+        const earnedBadges = calculateBadges(purchaseValue);
 
         // 3. Update the order
         const { error: updateError } = await supabase
@@ -112,6 +112,74 @@ export const confirmOrder = async (req: Request, res: Response) => {
                 : `Congratulations! Your purchase has been confirmed. You earned ${earnedBadges} badges!`,
             read: false
         }]);
+
+        // 7. GENERATE SCRATCH CARD FOR THE BUYER
+        const randomCoins = Math.floor(Math.random() * (20 - 5 + 1)) + 5; // 5 to 20 coins
+        await supabase
+            .from('scratch_cards')
+            .insert([{ 
+                user_id: order.user_id, 
+                order_id: id, 
+                coins_rewarded: randomCoins,
+                status: 'PENDING' 
+            }]);
+
+        // 7. Handle Referral Bonus
+        const { data: referredUser, error: refUserError } = await supabase
+            .from('users')
+            .select('referred_by_id, referral_bonus_awarded')
+            .eq('id', order.user_id)
+            .single();
+
+        if (!refUserError && referredUser?.referred_by_id && !referredUser.referral_bonus_awarded) {
+            // Count confirmed orders for this user
+            const { count, error: countError } = await supabase
+                .from('orders')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', order.user_id)
+                .eq('status', 'CONFIRMED');
+
+            if (!countError && count === 3) {
+                // Award 25 badges to the referrer
+                const referrerId = referredUser.referred_by_id;
+                
+                const { data: referrer, error: referrerError } = await supabase
+                    .from('users')
+                    .select('badge_count')
+                    .eq('id', referrerId)
+                    .single();
+
+                if (!referrerError && referrer) {
+                    const newRefBadgeCount = referrer.badge_count + 25;
+                    let newRefLevel = 'BRONZE';
+                    if (newRefBadgeCount >= 700) newRefLevel = 'PLATINUM';
+                    else if (newRefBadgeCount >= 300) newRefLevel = 'GOLD';
+                    else if (newRefBadgeCount >= 100) newRefLevel = 'SILVER';
+
+                    await supabase
+                        .from('users')
+                        .update({
+                            badge_count: newRefBadgeCount,
+                            user_level: newRefLevel
+                        })
+                        .eq('id', referrerId);
+
+                    // Mark bonus as awarded for the referred user B
+                    await supabase
+                        .from('users')
+                        .update({ referral_bonus_awarded: true })
+                        .eq('id', order.user_id);
+
+                    // Notify referrer A
+                    await supabase.from('notifications').insert([{
+                        user_id: referrerId,
+                        type: 'REWARD',
+                        message: `Referral Bonus! Your friend completed 3 purchases. You've been awarded 25 badges!`,
+                        read: false
+                    }]);
+                }
+            }
+        }
 
         res.json({ message: 'Order confirmed successfully', badges: totalEarned, reviewBonus });
     } catch (err: any) {

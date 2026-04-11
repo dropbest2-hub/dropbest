@@ -4,22 +4,50 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
-export default function AdminDashboard() {
- const { user, session } = useAuthStore();
- const router = useRouter();
- const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users'>('orders');
+interface AdminOrder {
+    id: string;
+    created_at: string;
+    purchase_value?: number;
+    users?: { email: string; name: string | null };
+    products?: { title: string };
+}
 
- // Data State
- const [pendingOrders, setPendingOrders] = useState<any[]>([]);
- const [products, setProducts] = useState<any[]>([]);
- const [usersList, setUsersList] = useState<any[]>([]);
- const [loading, setLoading] = useState(true);
+interface AdminProduct {
+    id: string;
+    title: string;
+    description: string;
+    price: number | string;
+    image_url: string;
+}
+
+interface AdminUser {
+    id: string;
+    email: string;
+    name: string | null;
+    role: string;
+    user_level: string;
+    badge_count: number;
+    created_at: string;
+    avatar_url: string | null;
+}
+
+export default function AdminDashboard() {
+  const { user, session } = useAuthStore();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users'>('orders');
+
+  // Data State
+  const [pendingOrders, setPendingOrders] = useState<AdminOrder[]>([]);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
+  const [usersList, setUsersList] = useState<AdminUser[]>([]);
+  const [loading, setLoading] = useState(true);
 
  // Forms
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
@@ -97,9 +125,10 @@ export default function AdminDashboard() {
 
  setPendingOrders(prev => prev.filter(o => o.id !== orderId));
  alert('Order confirmed and badges awarded!');
- } catch (error: any) {
- alert(error.response?.data?.error || 'Failed to confirm order');
- }
+  } catch (error: unknown) {
+  const message = error instanceof Error ? error.message : 'Failed to confirm order';
+  alert(message);
+  }
  };
 
  const handleRejectOrder = async (orderId: string) => {
@@ -117,9 +146,10 @@ export default function AdminDashboard() {
  delete updated[orderId];
  return updated;
  });
- } catch (error: any) {
- alert(error.response?.data?.error || 'Failed to reject order');
- }
+  } catch (error: unknown) {
+  const message = error instanceof Error ? error.message : 'Failed to reject order';
+  alert(message);
+  }
  };
 
  const handleAddProduct = async (e: React.FormEvent) => {
@@ -164,10 +194,10 @@ export default function AdminDashboard() {
  
  alert(`Sync Successful! Updated ${response.data.updated.length} products.`);
  fetchData();
- } catch (error: any) {
- console.error('Sync Error:', error);
- alert(error.response?.data?.error || 'Failed to sync prices');
- } finally {
+  } catch (error: unknown) {
+  const message = error instanceof Error ? error.message : 'Failed to sync prices';
+  alert(message);
+  } finally {
  setIsSyncing(false);
  }
  };
@@ -373,8 +403,7 @@ export default function AdminDashboard() {
  {products.map(product => (
  <div key={product.id} className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm group">
  <div className="h-32 bg-gray-50 relative overflow-hidden">
- {/* eslint-disable-next-line @next/next/no-img-element */}
- <img src={product.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+ <Image src={product.image_url} alt="" width={300} height={128} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
  <div className="absolute top-2 right-2 flex gap-1">
  <button onClick={() => handleDeleteProduct(product.id)} className="bg-white/90 p-1.5 rounded-lg text-red-500 hover:bg-red-50 backdrop-blur shadow"><Trash2 size={16} /></button>
  </div>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 import axios from 'axios';
 
 export interface User {
@@ -9,13 +10,16 @@ export interface User {
     avatar_url: string | null;
     role: 'USER' | 'ADMIN';
     badge_count: number;
+    coin_count: number;
     user_level: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
     notifications_enabled: boolean;
+    referral_code?: string;
+    referred_by_id?: string;
 }
 
 interface AuthState {
     user: User | null;
-    session: any | null;
+    session: Session | null;
     loading: boolean;
     initialized: boolean;
     setUser: (user: User | null) => void;
@@ -42,6 +46,10 @@ export const useAuthStore = create<AuthState>((set) => ({
             const { data: { session }, error } = await supabase.auth.getSession();
 
             if (error || !session) {
+                if (error) {
+                    // If there's an error like invalid refresh token, clear out local storage
+                    await supabase.auth.signOut().catch(() => {});
+                }
                 set({ session: null, user: null, loading: false, initialized: true });
                 return;
             }

@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS public.users (
     badge_count INTEGER DEFAULT 0,
     user_level TEXT DEFAULT 'BRONZE' CHECK (user_level IN ('BRONZE', 'SILVER', 'GOLD', 'PLATINUM')),
     notifications_enabled BOOLEAN DEFAULT true,
+    referral_code TEXT UNIQUE,
+    referred_by_id UUID REFERENCES public.users(id),
+    referral_bonus_awarded BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -77,3 +80,11 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 -- Simple Policies for Public Read
 CREATE POLICY "Allow public read for products" ON public.products FOR SELECT USING (true);
 CREATE POLICY "Allow individual read for users" ON public.users FOR SELECT USING (auth.uid() = id);
+
+-- 7. Price History Table
+CREATE TABLE IF NOT EXISTS public.price_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
+    price NUMERIC NOT NULL,
+    recorded_at TIMESTAMPTZ DEFAULT NOW()
+);

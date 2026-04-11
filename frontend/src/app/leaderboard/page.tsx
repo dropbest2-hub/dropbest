@@ -4,11 +4,23 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Crown, TrendingUp, User as UserIcon } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import Image from 'next/image';
+
+interface LeaderboardUser {
+    id: string;
+    name: string | null;
+    avatar_url: string | null;
+    user_level: string;
+    badge_count: number;
+}
+
+interface CurrentUserInfo extends LeaderboardUser {
+    rank: number;
+}
 
 export default function Leaderboard() {
-    const [top3, setTop3] = useState<any[]>([]);
-    const [currentUserRank, setCurrentUserRank] = useState<any>(null);
+    const [top3, setTop3] = useState<LeaderboardUser[]>([]);
+    const [currentUserRank, setCurrentUserRank] = useState<CurrentUserInfo | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -79,7 +91,7 @@ export default function Leaderboard() {
 
  <div className="flex-shrink-0 relative">
  {user.avatar_url ? (
- <img src={user.avatar_url} alt="" className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-sm" />
+ <Image src={user.avatar_url} alt="" width={64} height={64} className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-sm" />
  ) : (
  <div className="w-16 h-16 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center text-xl font-bold uppercase">
  {user.name?.charAt(0) || <UserIcon size={32} />}

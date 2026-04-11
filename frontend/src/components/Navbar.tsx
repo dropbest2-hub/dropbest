@@ -18,17 +18,21 @@ export default function Navbar() {
     }, []);
 
     return (
-        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-3' : 'bg-transparent py-5'}`}>
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-2' : 'bg-transparent py-4'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                        <Link href="/" className="flex items-center gap-2.5 group">
-                            <div className="bg-gradient-to-br from-violet-600 to-purple-500 text-white p-2 rounded-xl group-hover:scale-110 transition-transform shadow-lg shadow-violet-500/30">
-                                <ShoppingBag size={22} />
-                            </div>
-                            <span className="font-black text-xl tracking-tight bg-gradient-to-r from-violet-700 via-purple-600 to-pink-500 bg-clip-text text-transparent">
-                                DropBest!
-                            </span>
+                        <Link href="/" className="flex items-center gap-2.5 group hover:scale-105 transition-transform duration-300">
+                            <img 
+                                src="/logo.png" 
+                                alt="DropBest!" 
+                                className="h-16 sm:h-20 w-auto object-contain drop-shadow-md transform scale-[1.75] sm:scale-[2.2] origin-left"
+                                onError={(e) => {
+                                    // Fallback to text if image not placed yet
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.parentElement!.innerHTML = '<span class="font-black text-xl tracking-tight bg-gradient-to-r from-violet-700 via-purple-600 to-pink-500 bg-clip-text text-transparent">DropBest!</span>';
+                                }}
+                            />
                         </Link>
                     </div>
 

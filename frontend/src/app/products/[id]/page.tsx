@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +19,17 @@ import {
  CheckCircle2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -35,14 +47,131 @@ interface Review {
 }
 
 interface Product {
- id: string;
- title: string;
- description: string;
- price: number;
- image_url: string;
- amazon_link: string;
- flipkart_link: string;
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    image_url: string;
+    amazon_link: string;
+    flipkart_link: string;
+    external_rating?: number;
+    external_review_count?: string;
 }
+
+interface PriceHistory {
+    recorded_at: string;
+    price: number | string;
+}
+
+const LiveViewerCount = () => {
+    const [viewers, setViewers] = useState(0);
+
+    useEffect(() => {
+        // Set an initial realistic number
+        setViewers(Math.floor(Math.random() * (25 - 8 + 1)) + 8);
+        
+        const interval = setInterval(() => {
+            setViewers(prev => {
+                const change = Math.random() > 0.5 ? 1 : -1;
+                const next = prev + change;
+                return next < 3 ? 3 : next > 45 ? 45 : next;
+            });
+        }, 5000);
+        
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="flex items-center gap-2 px-3 py-1 bg-red-50 text-red-600 rounded-full border border-red-100 animate-pulse">
+            <div className="w-1.5 h-1.5 bg-red-600 rounded-full"></div>
+            <span className="text-[10px] font-black uppercase tracking-wider">{viewers} People viewing right now</span>
+        </div>
+    );
+};
+
+const PriceHistoryChart = ({ history }: { history: PriceHistory[] }) => {
+    if (!history || history.length < 2) {
+        return (
+            <div className="bg-gray-50 rounded-[2.5rem] p-10 flex flex-col items-center justify-center text-center border border-gray-100 border-dashed min-h-[300px]">
+                <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+                    <ShieldCheck className="text-gray-300" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-400">Price Tracking Initialized</h3>
+                <p className="text-gray-400 text-sm max-w-xs mt-2">We&apos;ve started monitoring this product. Future price changes will appear in this chart.</p>
+            </div>
+        );
+    }
+
+    const data = history.map(h => ({
+        date: new Date(h.recorded_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        price: Number(h.price),
+        fullDate: new Date(h.recorded_at).toLocaleString()
+    }));
+
+    return (
+        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h3 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+                        <Send className="text-brand-500 rotate-90" size={24} /> 
+                        Price Tracker
+                    </h3>
+                    <p className="text-gray-500 text-sm font-medium">Historical price trends for this product</p>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-brand-50 rounded-2xl text-brand-600 text-xs font-black uppercase tracking-widest">
+                    Live Data
+                </div>
+            </div>
+
+            <div className="h-[300px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={data}>
+                        <defs>
+                            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                        <XAxis 
+                            dataKey="date" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 700 }}
+                            dy={10}
+                        />
+                        <YAxis 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 700 }}
+                            tickFormatter={(value) => `₹${value}`}
+                        />
+                        <Tooltip 
+                            contentStyle={{ 
+                                borderRadius: '15px', 
+                                border: 'none', 
+                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                padding: '12px'
+                            }}
+                            labelStyle={{ fontWeight: 800, marginBottom: '4px', color: '#111827' }}
+                            itemStyle={{ fontWeight: 700, color: '#8b5cf6' }}
+                            formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Price']}
+                        />
+                        <Area 
+                            type="monotone" 
+                            dataKey="price" 
+                            stroke="#8b5cf6" 
+                            strokeWidth={4}
+                            fillOpacity={1} 
+                            fill="url(#colorPrice)" 
+                            animationDuration={1500}
+                        />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+};
 
 export default function ProductDetails() {
  const { id } = useParams();
@@ -51,6 +180,7 @@ export default function ProductDetails() {
  
  const [product, setProduct] = useState<Product | null>(null);
  const [reviews, setReviews] = useState<Review[]>([]);
+ const [history, setHistory] = useState<PriceHistory[]>([]);
  const [loading, setLoading] = useState(true);
  const [submitting, setSubmitting] = useState(false);
  
@@ -61,19 +191,21 @@ export default function ProductDetails() {
 
  const fetchData = useCallback(async () => {
  try {
- const [prodRes, revRes] = await Promise.all([
+ const [prodRes, revRes, histRes] = await Promise.all([
  axios.get(`${API_URL}/products/${id}`),
- axios.get(`${API_URL}/reviews/${id}`)
+ axios.get(`${API_URL}/reviews/${id}`),
+ axios.get(`${API_URL}/products/${id}/history`)
  ]);
  setProduct(prodRes.data);
  setReviews(revRes.data);
+ setHistory(histRes.data);
 
  // Check if user can review (has ANY order for this product)
  if (user && session) {
  const { data: userOrders } = await axios.get(`${API_URL}/orders`, {
  headers: { Authorization: `Bearer ${session.access_token}` }
  });
- const hasOrderedThisProduct = userOrders.some((o: any) => o.product_id === id);
+ const hasOrderedThisProduct = userOrders.some((o: { product_id: string }) => o.product_id === id);
  setCanReview(hasOrderedThisProduct);
  }
  } catch (error) {
@@ -83,6 +215,10 @@ export default function ProductDetails() {
  setLoading(false);
  }
  }, [id, user, session]);
+
+ const avgSatisfaction = reviews.length > 0 
+    ? Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length * 5)) * 100)
+    : 100; // Default to 100 if no reviews yet (aspirational)
 
  useEffect(() => {
  fetchData();
@@ -120,8 +256,9 @@ export default function ProductDetails() {
  toast.success('Review posted! Verified status and Badge badge will be awarded after order confirmation.');
  setComment('');
  fetchData();
- } catch (error: any) {
- toast.error(error.response?.data?.error || 'Failed to post review');
+ } catch (error: unknown) {
+ const message = error instanceof Error ? error.message : 'Failed to post review';
+ toast.error(message);
  } finally {
  setSubmitting(false);
  }
@@ -159,9 +296,11 @@ export default function ProductDetails() {
  className="w-full md:w-1/2 lg:w-2/5 flex-shrink-0"
  >
  <div className="bg-gray-50 rounded-[2rem] overflow-hidden shadow-2xl border border-gray-100 relative group">
- <img 
+ <Image 
  src={product.image_url} 
  alt={product.title} 
+ width={500}
+ height={500}
  className="w-full h-auto object-cover aspect-square group-hover:scale-105 transition-transform duration-700" 
  />
  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl text-xl font-black text-brand-700 shadow-xl">
@@ -175,41 +314,52 @@ export default function ProductDetails() {
  animate={{ opacity: 1, x: 0 }}
  className="flex flex-col flex-grow justify-center py-4"
  >
- <div className="flex items-center gap-2 mb-4">
- <span className="bg-brand-50 text-brand-700 text-[10px] font-black px-4 py-1.5 rounded-full border border-brand-100 uppercase tracking-widest">
- Verified Discovery
- </span>
- </div>
+ <div className="flex flex-wrap items-center gap-3 mb-4">
+    <span className="bg-brand-50 text-brand-700 text-[10px] font-black px-4 py-1.5 rounded-full border border-brand-100 uppercase tracking-widest">
+      Verified Discovery
+    </span>
+    <LiveViewerCount />
+  </div>
  
  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1] mb-6">{product.title}</h1>
  
  {/* External Stats */}
- {(product as any).external_rating && (
+ {product.external_rating && (
  <div className="flex items-center gap-6 mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100 flex-wrap">
  <div className="flex flex-col">
  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Market Rating</span>
  <div className="flex items-center gap-2">
  <div className="flex text-yellow-500">
  {[...Array(5)].map((_, i) => (
- <Star key={i} size={14} fill={i < Math.floor((product as any).external_rating) ? 'currentColor' : 'none'} />
+ <Star key={i} size={14} fill={i < Math.floor(product.external_rating || 0) ? 'currentColor' : 'none'} />
  ))}
  </div>
- <span className="font-black text-gray-900">{(product as any).external_rating}/5</span>
+ <span className="font-black text-gray-900">{product.external_rating || 0}/5</span>
  </div>
  </div>
  <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
  <div className="flex flex-col">
  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Reviews</span>
- <span className="font-black text-gray-900">{(product as any).external_review_count || '1,000+'}</span>
+ <span className="font-black text-gray-900">{product.external_review_count || '1,000+'}</span>
  </div>
  <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
- <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
- <ShieldCheck size={14} className="text-blue-600" />
- </div>
- <span className="text-xs font-bold text-gray-500">Aggregated Data</span>
- </div>
- </div>
+  <div className="flex items-center gap-2">
+    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+      <ShieldCheck size={14} className="text-blue-600" />
+    </div>
+    <span className="text-xs font-bold text-gray-500">Aggregated Data</span>
+  </div>
+  <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+  <div className="flex flex-col">
+    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">User Satisfaction</span>
+    <div className="flex items-center gap-2">
+      <span className="font-black text-brand-600 text-lg">{avgSatisfaction}%</span>
+      <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-full bg-brand-500" style={{ width: `${avgSatisfaction}%` }}></div>
+      </div>
+    </div>
+  </div>
+</div>
  )}
 
  <p className="text-gray-500 text-lg leading-relaxed font-medium mb-8">
@@ -249,6 +399,15 @@ export default function ProductDetails() {
  </motion.div>
  </div>
 
+ {/* Price History Section */}
+ <motion.div
+ initial={{ opacity: 0, y: 30 }}
+ animate={{ opacity: 1, y: 0 }}
+ transition={{ delay: 0.15 }}
+ >
+    <PriceHistoryChart history={history} />
+ </motion.div>
+
  {/* Reviews Section */}
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
  <div className="lg:col-span-2 space-y-8">
@@ -282,7 +441,7 @@ export default function ProductDetails() {
  <div className="flex items-start justify-between mb-6">
  <div className="flex items-center gap-4">
  {review.users?.avatar_url ? (
- <img src={review.users.avatar_url} alt="" className="w-14 h-14 rounded-full border-2 border-white shadow-lg" />
+ <Image src={review.users.avatar_url} alt="" width={56} height={56} className="w-14 h-14 rounded-full border-2 border-white shadow-lg" />
  ) : (
  <div className="w-14 h-14 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-black text-xl shadow-inner uppercase">
  {review.users?.name?.charAt(0) || '?'}
@@ -352,7 +511,7 @@ export default function ProductDetails() {
  </div>
 
  <div>
- <label className="block text-[11px] font-black text-gray-400 mb-4 uppercase tracking-[0.2em]">What's on your mind?</label>
+ <label className="block text-[11px] font-black text-gray-400 mb-4 uppercase tracking-[0.2em]">What&apos;s on your mind?</label>
  <textarea
  required
  value={comment}

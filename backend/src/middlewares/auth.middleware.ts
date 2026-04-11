@@ -50,7 +50,8 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
                     role: 'USER',
                     badge_count: 0,
                     user_level: 'BRONZE',
-                    notifications_enabled: true
+                    notifications_enabled: true,
+                    referral_code: user.id.split('-')[0].toUpperCase() // Generate code from ID
                 }])
                 .select()
                 .single();
@@ -60,10 +61,21 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
             } else if (newUser) {
                 req.user.dbData = newUser;
             }
-        } else if (dbError) {
-            console.error("Error fetching user profile:", dbError);
         } else if (dbUser) {
-            req.user.dbData = dbUser;
+            // Check if existing user has a referral code, if not, generate one
+            if (!dbUser.referral_code) {
+                const newCode = user.id.split('-')[0].toUpperCase();
+                const { data: updatedUser } = await supabaseAdmin
+                    .from('users')
+                    .update({ referral_code: newCode })
+                    .eq('id', user.id)
+                    .select()
+                    .single();
+                
+                req.user.dbData = updatedUser || dbUser;
+            } else {
+                req.user.dbData = dbUser;
+            }
         }
 
         next();

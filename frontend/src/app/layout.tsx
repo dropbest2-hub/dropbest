@@ -6,8 +6,29 @@ import RootLayoutClient from "./RootLayoutClient";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DropBest! - Review & Discover",
-  description: "Discover the best products on DropBest!, earn badges for your purchases, and convert them to coupons.",
+  title: {
+    default: "DropBest! - Discover, Review & Earn",
+    template: "%s | DropBest!"
+  },
+  description: "Discover the best products on DropBest!, review them, earn badges, and convert your badges into real coupons.",
+  keywords: ["DropBest", "buy by best", "product reviews", "earn badges", "shopping coupons", "affiliate"],
+  openGraph: {
+    title: "DropBest! - Discover, Review & Earn",
+    description: "Discover the best products on DropBest!, review them, earn badges, and convert your badges into real coupons.",
+    url: "https://dropbest.vercel.app",
+    siteName: "DropBest!",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DropBest! - Discover, Review & Earn",
+    description: "Discover the best products on DropBest!, review them, earn badges, and convert your badges into real coupons.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  }
 };
 
 export default function RootLayout({

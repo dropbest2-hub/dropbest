@@ -1,0 +1,96 @@
+﻿
+> frontend@0.1.0 lint
+> eslint
+
+
+D:\dropbest\frontend\src\app\admin\page.tsx
+    8:68  warning  'Edit2' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   19:53  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   20:43  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   21:45  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  100:18  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  120:18  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  136:11  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  149:11  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  167:18  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  430:2   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\dropbest\frontend\src\app\auth\callback\page.tsx
+  22:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\dropbest\frontend\src\app\leaderboard\page.tsx
+   7:10  warning  'useAuthStore' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  10:38  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  11:60  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  82:2   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\dropbest\frontend\src\app\page.tsx
+    6:24  warning  'Star' is defined but never used                                 @typescript-eslint/no-unused-vars
+   78:23  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   90:52  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  257:38  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\dropbest\frontend\src\app\products\[id]\layout.tsx
+  52:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\dropbest\frontend\src\app\products\[id]\page.tsx
+  23:3  warning  'LineChart' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  24:3  warning  'Line' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  71:9  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\dropbest\frontend\src\app\products\[id]\page.tsx:71:9
+  69 |     useEffect(() => {
+  70 |         // Set an initial realistic number
+> 71 |         setViewers(Math.floor(Math.random() * (25 - 8 + 1)) + 8);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  72 |         
+  73 |         const interval = setInterval(() => {
+  74 |             setViewers(prev => {  react-hooks/set-state-in-effect
+
+D:\dropbest\frontend\src\app\profile\page.tsx
+    7:18  warning  'UserIcon' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+    7:71  warning  'ChevronRight' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   52:48  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  120:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  139:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  276:53  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  286:49  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  333:55  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  343:49  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\dropbest\frontend\src\app\rewards\page.tsx
+    7:25  warning  'ArrowRight' is defined but never used         @typescript-eslint/no-unused-vars
+    7:37  warning  'CheckCircle2' is defined but never used       @typescript-eslint/no-unused-vars
+    7:51  warning  'AlertCircle' is defined but never used        @typescript-eslint/no-unused-vars
+   18:54  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   19:12  warning  'loading' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   53:54  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   78:25  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   97:18  warning  'error' is defined but never used              @typescript-eslint/no-unused-vars
+   97:25  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  116:25  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  126:11  warning  'progress' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  342:50  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+D:\dropbest\frontend\src\app\signup\page.tsx
+  4:21  warning  'useSearchParams' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\dropbest\frontend\src\components\CustomCursor.tsx
+  13:12  warning  'mousePosition' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\dropbest\frontend\src\components\Navbar.tsx
+   4:19  warning  'ShoppingBag' is defined but never used                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  26:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  70:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\dropbest\frontend\src\components\ScratchCard.tsx
+  19:11  warning  'containerRef' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 50 problems (24 errors, 26 warnings)
+

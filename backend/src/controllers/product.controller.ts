@@ -4,12 +4,23 @@ import { scrapePrice } from '../utils/scraper';
 
 export const getProducts = async (req: Request, res: Response) => {
     try {
-        const { data, error } = await supabaseAdmin.from('products').select('*');
+        // Fetch products along with their watchlist counts
+        const { data, error } = await supabaseAdmin
+            .from('products')
+            .select('*, watchlist(count)');
+            
         if (error) {
             console.error('Supabase Error:', error);
             throw error;
         }
-        res.json(data);
+
+        // Map data to include a simple watch_count property
+        const productsWithCounts = data.map(p => ({
+            ...p,
+            watch_count: p.watchlist?.[0]?.count || 0
+        }));
+
+        res.json(productsWithCounts);
     } catch (err: any) {
         console.error('Fetch Error:', err);
         res.status(500).json({ error: err.message });
@@ -110,6 +121,12 @@ export const syncPrices = async (req: Request, res: Response) => {
                         })
                         .eq('id', product.id);
 
+                    if (scrapedPrice !== oldPrice) {
+                        await supabaseAdmin
+                            .from('price_history')
+                            .insert([{ product_id: product.id, price: scrapedPrice }]);
+                    }
+
                     // Notification logic
                     if (isPriceDrop) {
                         const { data: watchers } = await supabaseAdmin
@@ -141,5 +158,26 @@ export const syncPrices = async (req: Request, res: Response) => {
     } catch (err: any) {
         console.error('Sync Error:', err);
         res.status(500).json({ error: err.message });
+    }
+};
+
+export const getProductPriceHistory = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { data, error } = await supabaseAdmin
+            .from('price_history')
+            .select('*')
+            .eq('product_id', id)
+            .order('recorded_at', { ascending: true });
+
+        if (error) {
+            console.error('Price History Fetch Error:', error);
+            res.json([]); // Return empty array if table not created yet
+            return;
+        }
+        
+        res.json(data || []);
+    } catch (err: any) {
+        res.json([]);
     }
 };

@@ -6,17 +6,21 @@ import {
     getLeaderboard, 
     getWatchlist, 
     addToWatchlist, 
-    removeFromWatchlist 
+    removeFromWatchlist,
+    getCommunityStats,
+    applyReferralCode
 } from '../controllers/user.controller';
 
 const router = Router();
 
 // Public routes
+router.get('/stats', getCommunityStats);
 router.get('/leaderboard', getLeaderboard);
 
 // Profile & Private routes
 router.get('/profile', requireAuth, getUserProfile);
 router.put('/profile', requireAuth, updateUserProfile);
+router.post('/referral/apply', requireAuth, applyReferralCode);
 
 // Watchlist routes
 router.get('/watchlist', requireAuth, getWatchlist);

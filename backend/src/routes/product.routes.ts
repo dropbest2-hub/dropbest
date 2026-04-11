@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
-import { getProducts, getProductById, createProduct, updateProduct, deleteProduct, syncPrices } from '../controllers/product.controller';
+import { getProducts, getProductById, createProduct, updateProduct, deleteProduct, syncPrices, getProductPriceHistory } from '../controllers/product.controller';
 
 const router = Router();
 
 // Public routes
 router.get('/', getProducts);
 router.get('/:id', getProductById);
+router.get('/:id/history', getProductPriceHistory);
 
 // Admin-only routes
 router.post('/', requireAdmin, createProduct);

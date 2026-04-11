@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Mail, Lock, User, Loader2 } from 'lucide-react';
@@ -8,41 +9,47 @@ import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 
 export default function AuthPage() {
- const { signInWithEmail, signUpWithEmail, loading, user } = useAuthStore();
- const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
- const [email, setEmail] = useState('');
- const [password, setPassword] = useState('');
- const [name, setName] = useState('');
+    const { signInWithEmail, signUpWithEmail, loading, user } = useAuthStore();
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
 
- if (user) {
- window.location.href = user.role === 'ADMIN' ? '/admin' : '/profile';
- return null;
- }
+    useEffect(() => {
+        if (user) {
+            router.push(user.role === 'ADMIN' ? '/admin' : '/profile');
+        }
+    }, [user, router]);
 
- const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- if (loading) return; // Prevent double submission while loading
+    if (user) {
+        return null; // Don't render the form if logged in
+    }
 
- try {
- let loggedInUser;
- if (activeTab === 'login') {
- loggedInUser = await signInWithEmail(email, password);
- toast.success('Successfully signed in!');
- } else {
- loggedInUser = await signUpWithEmail(email, password, name);
- toast.success('Account created successfully!');
- }
- 
- // The rest of the logic...
- if (loggedInUser?.role === 'ADMIN') {
- window.location.href = '/admin';
- } else if (loggedInUser) {
- window.location.href = '/profile';
- }
- } catch (error: any) {
- toast.error(error.message || 'Authentication failed');
- }
- };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (loading) return;
+
+        try {
+            let loggedInUser;
+            if (activeTab === 'login') {
+                loggedInUser = await signInWithEmail(email, password);
+                toast.success('Successfully signed in!');
+            } else {
+                loggedInUser = await signUpWithEmail(email, password, name);
+                toast.success('Account created successfully!');
+            }
+
+            if (loggedInUser?.role === 'ADMIN') {
+                router.push('/admin');
+            } else if (loggedInUser) {
+                router.push('/profile');
+            }
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Authentication failed';
+            toast.error(message);
+        }
+    };
 
  return (
  <div className="flex min-h-[90vh]">
