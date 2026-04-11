@@ -19,6 +19,40 @@ export const getUserProfile = async (req: Request, res: Response) => {
             .single();
 
         if (error) throw error;
+
+        // Ensure user has a referral code
+        if (!data.referral_code) {
+            const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const { data: updated, error: updateError } = await supabaseAdmin
+                .from('users')
+                .update({ referral_code: newCode })
+                .eq('id', userId)
+                .select()
+                .single();
+            
+            if (!updateError && updated) {
+                return res.json(updated);
+            }
+        }
+
+        res.json(data);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getReferrals = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const { data, error } = await supabaseAdmin
+            .from('users')
+            .select('id, name, avatar_url, created_at')
+            .eq('referred_by_id', userId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
         res.json(data);
     } catch (err: any) {
         res.status(500).json({ error: err.message });

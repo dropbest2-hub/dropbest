@@ -8,7 +8,8 @@ import {
     addToWatchlist, 
     removeFromWatchlist,
     getCommunityStats,
-    applyReferralCode
+    applyReferralCode,
+    getReferrals
 } from '../controllers/user.controller';
 
 const router = Router();
@@ -21,6 +22,7 @@ router.get('/leaderboard', getLeaderboard);
 router.get('/profile', requireAuth, getUserProfile);
 router.put('/profile', requireAuth, updateUserProfile);
 router.post('/referral/apply', requireAuth, applyReferralCode);
+router.get('/referrals', requireAuth, getReferrals);
 
 // Watchlist routes
 router.get('/watchlist', requireAuth, getWatchlist);

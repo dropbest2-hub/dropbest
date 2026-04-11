@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User as UserIcon, Settings, Package, ExternalLink, Calendar, ChevronRight, Eye, EyeOff, Trash2, Award, Gem } from 'lucide-react';
+import { User as UserIcon, Settings, Package, ExternalLink, Calendar, ChevronRight, Eye, EyeOff, Trash2, Award, Gem, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const BadgeCrystal3D = ({ count, level }: { count: number, level: string }) => {
@@ -52,6 +52,8 @@ export default function Profile() {
     const [watchlist, setWatchlist] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [watchingLoading, setWatchingLoading] = useState(true);
+    const [referrals, setReferrals] = useState<any[]>([]);
+    const [referralsLoading, setReferralsLoading] = useState(true);
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [editName, setEditName] = useState(user?.name || '');
@@ -90,8 +92,20 @@ export default function Profile() {
                 }
             };
 
+            const fetchReferrals = async () => {
+                try {
+                    const response = await api.get('/users/referrals');
+                    setReferrals(response.data);
+                } catch (error) {
+                    console.error('Error fetching referrals:', error);
+                } finally {
+                    setReferralsLoading(false);
+                }
+            };
+
             fetchOrders();
             fetchWatchlist();
+            fetchReferrals();
             setEditName(user.name || '');
             setEditNotifications(user.notifications_enabled ?? true);
         }
@@ -357,6 +371,62 @@ export default function Profile() {
                                             >
                                                 <Trash2 size={20} />
                                             </button>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+
+                    {/* Referrals */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
+                    >
+                        <div className="p-6 border-b border-gray-100 flex items-center gap-3 text-emerald-600">
+                            <div className="bg-emerald-100 p-2 rounded-xl">
+                                <Users size={24} />
+                            </div>
+                            <h2 className="text-xl font-bold text-gray-900">Friends Referred</h2>
+                        </div>
+
+                        {referralsLoading ? (
+                            <div className="p-8 space-y-4">
+                                <div className="h-16 bg-gray-50 rounded-xl animate-pulse"></div>
+                            </div>
+                        ) : referrals.length === 0 ? (
+                            <div className="p-12 text-center text-gray-500">
+                                <Users size={48} className="mx-auto text-gray-300 mb-4" />
+                                <p>No friends referred yet.</p>
+                                <p className="text-sm mt-2">Share your code to earn bonus badges!</p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-gray-100">
+                                {referrals.map((friend: any, idx) => (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        key={friend.id}
+                                        className="p-6 hover:bg-gray-50 transition-colors flex items-center gap-4"
+                                    >
+                                        <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 font-bold border border-emerald-100">
+                                            {friend.avatar_url ? (
+                                                <img src={friend.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                                            ) : (
+                                                friend.name?.[0] || 'U'
+                                            )}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <h3 className="font-semibold text-gray-900">{friend.name || 'Anonymous User'}</h3>
+                                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                                <Calendar size={12} /> Joined {new Date(friend.created_at).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                        <div className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase rounded-lg border border-emerald-100">
+                                            Success
                                         </div>
                                     </motion.div>
                                 ))}
