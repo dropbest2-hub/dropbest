@@ -155,7 +155,7 @@ const PriceHistoryChart = ({ history }: { history: PriceHistory[] }) => {
                             }}
                             labelStyle={{ fontWeight: 800, marginBottom: '4px', color: '#111827' }}
                             itemStyle={{ fontWeight: 700, color: '#8b5cf6' }}
-                            formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Price']}
+                            formatter={(value: any) => [`₹${Number(value).toLocaleString()}`, 'Price']}
                         />
                         <Area 
                             type="monotone" 

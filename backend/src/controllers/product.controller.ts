@@ -40,8 +40,8 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { title, description, price, image_url, amazon_link, flipkart_link } = req.body;
-        const { data, error } = await supabaseAdmin.from('products').insert([{ title, description, price, image_url, amazon_link, flipkart_link }]).select().single();
+        const { title, description, price, image_url, amazon_link, flipkart_link, category } = req.body;
+        const { data, error } = await supabaseAdmin.from('products').insert([{ title, description, price, image_url, amazon_link, flipkart_link, category }]).select().single();
         if (error) throw error;
         res.status(201).json(data);
     } catch (err: any) {
@@ -52,8 +52,8 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { title, description, price, image_url, amazon_link, flipkart_link } = req.body;
-        const { data, error } = await supabaseAdmin.from('products').update({ title, description, price, image_url, amazon_link, flipkart_link }).eq('id', id).select().single();
+        const { title, description, price, image_url, amazon_link, flipkart_link, category } = req.body;
+        const { data, error } = await supabaseAdmin.from('products').update({ title, description, price, image_url, amazon_link, flipkart_link, category }).eq('id', id).select().single();
         if (error) throw error;
         res.json(data);
     } catch (err: any) {
