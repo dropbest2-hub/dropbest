@@ -220,7 +220,7 @@ export default function Profile() {
                                     <span className="text-2xl font-black tracking-widest">{user.referral_code || '---'}</span>
                                     <button 
                                         onClick={() => {
-                                            navigator.clipboard.writeText(user.referral_code);
+                                            navigator.clipboard.writeText(user.referral_code || '');
                                             import('react-hot-toast').then(({ toast }) => toast.success('Code copied!'));
                                         }}
                                         className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
