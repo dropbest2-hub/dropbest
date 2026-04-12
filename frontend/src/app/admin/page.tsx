@@ -255,19 +255,19 @@ export default function AdminDashboard() {
  {/* Main Content */}
  <div className="flex-grow min-w-0">
  {!loading && (
- <motion.div 
- initial={{ opacity: 0, y: -10 }}
- animate={{ opacity: 1, y: 0 }}
- className="mb-6 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center justify-between"
- >
- <div>
- <h1 className="text-2xl font-black text-gray-900">Welcome back, {user.name || user.email.split('@')[0]}!</h1>
- <p className="text-sm text-gray-500 font-medium">Here&apos;s what&apos;s happening across the platform today.</p>
- </div>
- <div className="px-4 py-2 bg-violet-50 text-violet-700 rounded-xl text-xs font-bold uppercase tracking-widest border border-violet-100">
- System Admin
- </div>
- </motion.div>
+  <motion.div 
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="mb-6 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+  >
+  <div>
+  <h1 className="text-xl sm:text-2xl font-black text-gray-900">Welcome back, {user.name || user.email.split('@')[0]}!</h1>
+  <p className="text-xs sm:text-sm text-gray-500 font-medium">Here&apos;s what&apos;s happening across the platform today.</p>
+  </div>
+  <div className="px-4 py-2 bg-violet-50 text-violet-700 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-widest border border-violet-100 shrink-0">
+  System Admin
+  </div>
+  </motion.div>
  )}
 
  {loading ? (
@@ -355,25 +355,25 @@ export default function AdminDashboard() {
  exit={{ opacity: 0, x: -10 }}
  className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
  >
- <div className="flex justify-between items-center mb-8">
+ <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
  <div>
- <h3 className="text-2xl font-bold text-gray-900 mb-1">Manage Products</h3>
- <p className="text-gray-500">Add or remove products from the directory.</p>
+ <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Manage Products</h3>
+ <p className="text-sm text-gray-500">Add or remove products from the directory.</p>
  </div>
- <div className="flex gap-2">
+ <div className="flex flex-wrap gap-2 w-full sm:w-auto">
  <button
  onClick={handleSyncPrices}
  disabled={isSyncing}
- className="flex items-center gap-2 px-5 py-2.5 bg-brand-100 text-brand-700 rounded-xl font-bold hover:bg-brand-200 transition-all disabled:opacity-50"
+ className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-brand-100 text-brand-700 rounded-xl font-bold hover:bg-brand-200 transition-all disabled:opacity-50 text-sm"
  >
- <RefreshCcw size={18} className={isSyncing ? 'animate-spin' : ''} />
+ <RefreshCcw size={16} className={isSyncing ? 'animate-spin' : ''} />
  {isSyncing ? 'Syncing...' : 'Sync Prices'}
  </button>
  <button
  onClick={() => setIsAddingProduct(!isAddingProduct)}
- className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl font-medium transition-colors"
+ className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 sm:px-5 py-2.5 rounded-xl font-medium transition-colors text-sm"
  >
- {isAddingProduct ? 'Cancel' : <><Plus size={18} /> Add Product</>}
+ {isAddingProduct ? 'Cancel' : <><Plus size={16} /> Add Product</>}
  </button>
  </div>
  </div>

@@ -26,7 +26,7 @@ export default function Navbar() {
                             <img 
                                 src="/logo.png" 
                                 alt="DropBest!" 
-                                className="h-16 sm:h-20 w-auto object-contain drop-shadow-md transform scale-[1.75] sm:scale-[2.2] origin-left"
+                                className="h-12 sm:h-20 w-auto object-contain drop-shadow-md transform scale-[1.2] sm:scale-[2.2] origin-left"
                                 onError={(e) => {
                                     // Fallback to text if image not placed yet
                                     e.currentTarget.style.display = 'none';
