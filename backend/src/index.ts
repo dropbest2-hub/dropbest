@@ -8,6 +8,7 @@ import reviewRoutes from './routes/review.routes';
 import rewardRoutes from './routes/reward.routes';
 import userRoutes from './routes/user.routes';
 import adminRoutes from './routes/admin.routes';
+import contactRoutes from './routes/contact.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/rewards', rewardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contacts', contactRoutes);
 
 // Error Handler
 app.use(errorHandler);

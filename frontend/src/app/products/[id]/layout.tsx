@@ -5,9 +5,9 @@ type Props = {
 }
 
 export async function generateMetadata(
-  { params }: Props
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
   try {

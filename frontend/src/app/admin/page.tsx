@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw } from 'lucide-react';
+import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw, MessageSquare } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/categories';
 
@@ -43,13 +43,17 @@ interface AdminUser {
 export default function AdminDashboard() {
   const { user, session } = useAuthStore();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages'>('orders');
 
   // Data State
   const [pendingOrders, setPendingOrders] = useState<AdminOrder[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [usersList, setUsersList] = useState<AdminUser[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [isSendingReply, setIsSendingReply] = useState(false);
 
  // Forms
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
@@ -102,6 +106,14 @@ export default function AdminDashboard() {
  
  if (!usersError) {
  setUsersList(usersData || []);
+ }
+
+ // Fetch Messages
+ try {
+    const msgRes = await axios.get(`${API_URL}/contacts`, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+    setMessages(msgRes.data || []);
+ } catch(err) {
+    console.log('Messages table may not exist yet or failed to fetch');
  }
 
  } catch (error) {
@@ -204,6 +216,26 @@ export default function AdminDashboard() {
  }
  };
 
+  const handleSendReply = async (messageId: string, userEmail: string) => {
+    if (!replyText.trim()) return;
+    setIsSendingReply(true);
+    try {
+        await axios.post(
+            `${API_URL}/contacts/reply`,
+            { messageId, userEmail, replyText },
+            { headers: { Authorization: `Bearer ${session?.access_token}` } }
+        );
+        alert('Reply sent to user email successfully!');
+        setReplyingTo(null);
+        setReplyText('');
+        fetchData(); // Refresh to show new status
+    } catch (error) {
+        alert('Failed to send reply');
+    } finally {
+        setIsSendingReply(false);
+    }
+  };
+
  if (!user || user.role !== 'ADMIN') return null;
 
  return (
@@ -246,7 +278,13 @@ export default function AdminDashboard() {
  className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'users' ? 'bg-violet-50 text-violet-700' : 'text-gray-600 hover:bg-gray-50'}`}
  >
  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
- Registered Users
+ User Registrations
+ </button>
+ <button
+ onClick={() => setActiveTab('messages')}
+ className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'messages' ? 'bg-violet-50 text-violet-700' : 'text-gray-600 hover:bg-gray-50'}`}
+ >
+ <MessageSquare size={18} /> User Messages
  </button>
  </div>
  </div>
@@ -463,13 +501,20 @@ export default function AdminDashboard() {
  <td className="py-4 px-4">
  <div className="flex items-center gap-3">
  {usr.avatar_url ? (
- <img src={usr.avatar_url} alt="" className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200" />
+ <img src={usr.avatar_url} alt="" className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 object-cover" />
  ) : (
- <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs shadow-inner">
- {usr.name?.charAt(0) || usr.email?.charAt(0) || '?'}
+ <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm shadow-inner shrink-0">
+ {(usr.name || usr.email).charAt(0).toUpperCase()}
  </div>
  )}
- <span className="font-semibold text-gray-900">{usr.name || 'No Name'}</span>
+ <div className="flex flex-col">
+     <span className="font-extrabold text-gray-900 leading-tight">
+         {usr.name || usr.email.split('@')[0]}
+     </span>
+     <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+         {usr.email}
+     </span>
+ </div>
  </div>
  </td>
  <td className="py-4 px-4 text-gray-600 font-medium">{usr.email}</td>
@@ -499,8 +544,93 @@ export default function AdminDashboard() {
  </div>
  </motion.div>
  )}
+ {activeTab === 'messages' && (
+  <motion.div
+  key="messages"
+  initial={{ opacity: 0, x: 10 }}
+  animate={{ opacity: 1, x: 0 }}
+  exit={{ opacity: 0, x: -10 }}
+  className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
+  >
+  <div className="flex justify-between items-center mb-8">
+      <div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">User Messages</h3>
+        <p className="text-gray-500">View support requests and contact messages from users.</p>
+      </div>
+      <RefreshCcw size={20} className="text-gray-400 cursor-pointer hover:rotate-180 transition-all duration-500" onClick={fetchData} />
+  </div>
+  
+  {messages.length === 0 ? (
+      <div className="text-center py-16 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+          <MessageSquare size={48} className="mx-auto text-gray-300 mb-4" />
+          <p className="text-gray-500 font-medium">No messages found. Ensure the contact_messages table is created in Supabase.</p>
+      </div>
+  ) : (
+      <div className="space-y-6">
+          {messages.map(msg => (
+              <div key={msg.id} className="border border-gray-100 rounded-3xl p-6 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex justify-between items-start mb-4">
+                      <div>
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md mb-2 inline-block ${msg.status === 'Replied' ? 'bg-green-100 text-green-700' : 'bg-brand-100 text-brand-700'}`}>
+                              {msg.status || 'New'}
+                          </span>
+                          <h4 className="font-bold text-gray-900 text-lg">{msg.subject}</h4>
+                          <p className="text-sm text-gray-500">{msg.name} ({msg.email}) • {new Date(msg.created_at).toLocaleString()}</p>
+                      </div>
+                      {msg.status !== 'Replied' && (
+                        <button 
+                            onClick={() => setReplyingTo(replyingTo === msg.id ? null : msg.id)}
+                            className="text-xs font-bold text-brand-600 bg-brand-50 px-3 py-1.5 rounded-xl hover:bg-brand-100"
+                        >
+                            {replyingTo === msg.id ? 'Cancel' : 'Reply'}
+                        </button>
+                      )}
+                  </div>
+                  
+                  <div className="text-gray-700 bg-gray-50 p-5 rounded-2xl mb-4 text-sm leading-relaxed border border-gray-100">
+                      {msg.message}
+                  </div>
+
+                  {msg.admin_reply && (
+                      <div className="mt-4 border-l-4 border-brand-200 pl-4 py-2">
+                          <p className="text-xs font-bold text-brand-600 uppercase mb-1">Your Previous Reply:</p>
+                          <p className="text-sm text-gray-600 italic">"{msg.admin_reply}"</p>
+                      </div>
+                  )}
+
+                  <AnimatePresence>
+                      {replyingTo === msg.id && (
+                          <motion.div 
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="mt-6 space-y-3 overflow-hidden"
+                          >
+                              <textarea 
+                                placeholder="Type your response here..."
+                                className="w-full p-4 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-brand-500 outline-none min-h-[120px]"
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                              />
+                              <button 
+                                onClick={() => handleSendReply(msg.id, msg.email)}
+                                disabled={isSendingReply || !replyText.trim()}
+                                className="w-full py-3 bg-brand-600 text-white font-bold rounded-2xl hover:bg-brand-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                              >
+                                {isSendingReply ? 'Sending Email...' : 'Send Reply via Email'}
+                              </button>
+                          </motion.div>
+                      )}
+                  </AnimatePresence>
+              </div>
+          ))}
+      </div>
+  )}
+  </motion.div>
+  )}
  </AnimatePresence>
  )}
+
  </div>
  </div>
  );

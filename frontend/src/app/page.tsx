@@ -388,7 +388,7 @@ export default function Home() {
                                         </div>
 
                                         <a href={`/products/${product.id}`} className="mt-2 flex items-center justify-center gap-1 py-1 text-center text-sm text-gray-400 font-bold hover:text-brand-600 transition-colors uppercase tracking-widest">
-                                            View Reviews <ChevronRight size={14} />
+                                            Discover Product <ChevronRight size={14} />
                                         </a>
                                     </div>
                                 </div>

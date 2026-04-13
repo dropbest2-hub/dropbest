@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../store/authStore';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
     const { user, signOut } = useAuthStore();
+    const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -16,6 +18,8 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const isActive = (path: string) => pathname === path;
 
     return (
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-2' : 'bg-transparent py-4'}`}>
@@ -38,15 +42,18 @@ export default function Navbar() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <Link href="/" className="text-gray-600 hover:text-brand-600 font-medium transition-colors">
+                        <Link href="/" className={`relative py-2 font-medium transition-colors ${isActive('/') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
                             Discover
+                            {isActive('/') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                         </Link>
-                        <Link href="/leaderboard" className="text-gray-600 hover:text-brand-600 font-medium transition-colors">
+                        <Link href="/leaderboard" className={`relative py-2 font-medium transition-colors ${isActive('/leaderboard') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
                             Leaderboard
+                            {isActive('/leaderboard') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                         </Link>
                         {user?.role !== 'ADMIN' && (
-                            <Link href="/rewards" className="text-gray-600 hover:text-brand-600 font-medium transition-colors">
+                            <Link href="/rewards" className={`relative py-2 font-medium transition-colors ${isActive('/rewards') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
                                 Rewards
+                                {isActive('/rewards') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                             </Link>
                         )}
 
