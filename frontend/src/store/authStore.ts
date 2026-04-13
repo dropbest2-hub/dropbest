@@ -84,19 +84,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         // Set up auth listener
         supabase.auth.onAuthStateChange(async (event, session) => {
-            set({ loading: true });
+            // Prevent full app reload (loading screen) when switching tabs (TOKEN_REFRESHED)
+            if (!get().initialized) {
+                set({ loading: true });
+            }
+            
             if (session) {
                 try {
                     const response = await axios.get(`${API_URL}/auth/me`, {
                         headers: { Authorization: `Bearer ${session.access_token}` }
                     });
-                    set({ session, user: response.data.user, loading: false });
+                    set({ session, user: response.data.user, loading: false, initialized: true });
                 } catch (error) {
                     console.error('Error fetching user on state change', error);
-                    set({ session, user: null, loading: false });
+                    set({ session, user: null, loading: false, initialized: true });
                 }
             } else {
-                set({ session: null, user: null, loading: false });
+                set({ session: null, user: null, loading: false, initialized: true });
             }
         });
     },
