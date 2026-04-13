@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
  Star, 
  ChevronLeft, 
+ ChevronRight,
  ExternalLink, 
  ShoppingBag, 
  MessageSquare, 
