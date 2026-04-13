@@ -561,51 +561,53 @@ export default function ProductDetails() {
  </div>
  </div>
  )}
- </div>
- </div>
-  {/* Discover More Products Section */}
-  <section className="pt-12 border-t border-gray-100">
-    <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
-      <div>
-        <h2 className="text-3xl font-black text-gray-900 tracking-tight">Discover More</h2>
-        <p className="text-gray-500 font-medium">Continue your shopping discovery from our community picks.</p>
+        </div>
       </div>
-      <button 
-        onClick={() => router.push('/')}
-        className="text-brand-600 font-black flex items-center gap-1 hover:underline"
-      >
-        VIEW ALL <ChevronRight size={16} />
-      </button>
     </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {otherProducts.map((p) => (
-        <motion.div
-          key={p.id}
-          whileHover={{ y: -8 }}
-          onClick={() => {
-            router.push(`/products/${p.id}`);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+    {/* Discover More Products Section */}
+    <section className="pt-12 border-t border-gray-100">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-4">
+        <div>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Discover More</h2>
+          <p className="text-gray-500 font-medium">Continue your shopping discovery from our community picks.</p>
+        </div>
+        <button 
+          onClick={() => router.push('/')}
+          className="text-brand-600 font-black flex items-center gap-1 hover:underline"
         >
-          <div className="relative h-48 w-full bg-gray-50">
-            <Image 
-              src={p.image_url} 
-              alt={p.title} 
-              fill
-              unoptimized
-              className="object-cover group-hover:scale-110 transition-transform duration-500" 
-            />
-          </div>
-          <div className="p-5">
-            <h4 className="font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-brand-600 transition-colors">{p.title}</h4>
-            <p className="text-brand-600 font-black text-sm">₹{p.price.toLocaleString()}</p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  </section>
-</div>
+          VIEW ALL <ChevronRight size={16} />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {otherProducts.map((p) => (
+          <motion.div
+            key={p.id}
+            whileHover={{ y: -8 }}
+            onClick={() => {
+              router.push(`/products/${p.id}`);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+          >
+            <div className="relative h-48 w-full bg-gray-50">
+              <Image 
+                src={p.image_url} 
+                alt={p.title} 
+                fill
+                unoptimized
+                className="object-cover group-hover:scale-110 transition-transform duration-500" 
+              />
+            </div>
+            <div className="p-5">
+              <h4 className="font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-brand-600 transition-colors">{p.title}</h4>
+              <p className="text-brand-600 font-black text-sm">₹{p.price.toLocaleString()}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  </div>
   );
 }
