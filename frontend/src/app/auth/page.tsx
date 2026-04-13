@@ -37,7 +37,7 @@ export default function AuthPage() {
                 toast.success('Successfully signed in!');
             } else {
                 loggedInUser = await signUpWithEmail(email, password, name);
-                toast.success('Account created successfully!');
+                toast.success('Account created successfully, please check your email to confirm.', { duration: 10000 });
             }
 
             if (loggedInUser?.role === 'ADMIN') {
