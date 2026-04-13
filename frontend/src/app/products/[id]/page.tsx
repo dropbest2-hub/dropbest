@@ -606,6 +606,6 @@ export default function ProductDetails() {
       ))}
     </div>
   </section>
- </div>
- );
+</div>
+  );
 }
