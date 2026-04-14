@@ -90,6 +90,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             }
             
             if (session) {
+                const currentSession = get().session;
+                const currentUser = get().user;
+
+                // Stop redundant re-renders when switching tabs (same user and token)
+                if (
+                    currentUser && 
+                    currentUser.email === session.user.email &&
+                    currentSession &&
+                    currentSession.access_token === session.access_token
+                ) {
+                    set({ loading: false, initialized: true });
+                    return;
+                }
+
+                // If token changed but it's the same user, update session without backend call
+                if (currentUser && currentUser.email === session.user.email) {
+                    set({ session, loading: false, initialized: true });
+                    return;
+                }
+
                 try {
                     const response = await axios.get(`${API_URL}/auth/me`, {
                         headers: { Authorization: `Bearer ${session.access_token}` }

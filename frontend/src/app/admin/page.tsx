@@ -27,6 +27,8 @@ interface AdminProduct {
     price: number | string;
     image_url: string;
     category?: string;
+    amazon_link?: string;
+    flipkart_link?: string;
 }
 
 interface AdminUser {
@@ -60,6 +62,7 @@ export default function AdminDashboard() {
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
  const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
+ const [editingProductId, setEditingProductId] = useState<string | null>(null);
  const [isSyncing, setIsSyncing] = useState(false);
 
  const is40DaysPassed = (dateString: string) => {
@@ -79,7 +82,7 @@ export default function AdminDashboard() {
  if (user && user.role === 'ADMIN' && session) {
  fetchData();
  }
- }, [user, session, router]);
+ }, [user?.id, session?.access_token, router]);
 
  const fetchData = async () => {
  setLoading(true);
@@ -173,17 +176,41 @@ export default function AdminDashboard() {
      return;
  }
  try {
- await axios.post(
- `${API_URL}/products`,
- { ...newProduct, price: parseFloat(newProduct.price) },
- { headers: { Authorization: `Bearer ${session?.access_token}` } }
- );
+     if (editingProductId) {
+         await axios.put(
+             `${API_URL}/products/${editingProductId}`,
+             { ...newProduct, price: parseFloat(newProduct.price.toString()) },
+             { headers: { Authorization: `Bearer ${session?.access_token}` } }
+         );
+     } else {
+         await axios.post(
+             `${API_URL}/products`,
+             { ...newProduct, price: parseFloat(newProduct.price.toString()) },
+             { headers: { Authorization: `Bearer ${session?.access_token}` } }
+         );
+     }
  setIsAddingProduct(false);
+ setEditingProductId(null);
  setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
  fetchData();
  } catch (error) {
- alert('Failed to add product');
+ alert('Failed to save product');
  }
+ };
+
+ const handleEditProduct = (product: AdminProduct) => {
+     setNewProduct({
+         title: product.title || '',
+         description: product.description || '',
+         price: product.price ? product.price.toString() : '',
+         image_url: product.image_url || '',
+         amazon_link: product.amazon_link || '',
+         flipkart_link: product.flipkart_link || '',
+         category: product.category || 'electronics'
+     });
+     setEditingProductId(product.id);
+     setIsAddingProduct(true);
+     window.scrollTo({ top: 0, behavior: 'smooth' });
  };
 
  const handleDeleteProduct = async (productId: string) => {
@@ -412,7 +439,15 @@ export default function AdminDashboard() {
  {isSyncing ? 'Syncing...' : 'Sync Prices'}
  </button>
  <button
- onClick={() => setIsAddingProduct(!isAddingProduct)}
+ onClick={() => {
+     if (isAddingProduct) {
+         setIsAddingProduct(false);
+         setEditingProductId(null);
+         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
+     } else {
+         setIsAddingProduct(true);
+     }
+ }}
  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 sm:px-5 py-2.5 rounded-xl font-medium transition-colors text-sm"
  >
  {isAddingProduct ? 'Cancel' : <><Plus size={16} /> Add Product</>}
@@ -442,7 +477,9 @@ export default function AdminDashboard() {
      ))}
  </select>
  </div>
- <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl">Save Product</button>
+ <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl">
+     {editingProductId ? 'Update Product' : 'Save Product'}
+ </button>
  </form>
  </motion.div>
  )}
@@ -454,6 +491,7 @@ export default function AdminDashboard() {
  <div className="h-32 bg-gray-50 relative overflow-hidden">
  <Image src={product.image_url} alt="" width={300} height={128} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
  <div className="absolute top-2 right-2 flex gap-1">
+ <button onClick={() => handleEditProduct(product)} className="bg-white/90 p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 backdrop-blur shadow"><Edit2 size={16} /></button>
  <button onClick={() => handleDeleteProduct(product.id)} className="bg-white/90 p-1.5 rounded-lg text-red-500 hover:bg-red-50 backdrop-blur shadow"><Trash2 size={16} /></button>
  </div>
  </div>

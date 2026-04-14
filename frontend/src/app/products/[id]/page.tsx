@@ -220,7 +220,7 @@ export default function ProductDetails() {
  } finally {
  setLoading(false);
  }
- }, [id, user, session]);
+ }, [id, user?.id, session?.access_token]);
 
  const avgSatisfaction = reviews.length > 0 
     ? Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length * 5)) * 100)

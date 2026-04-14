@@ -30,7 +30,7 @@ export default function Rewards() {
             fetchRewards();
             fetchScratchCards();
         }
-    }, [user, session, router]);
+    }, [user?.id, session?.access_token, router]);
 
     const fetchRewards = async () => {
         try {
