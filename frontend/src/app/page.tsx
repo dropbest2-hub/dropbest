@@ -323,11 +323,9 @@ export default function Home() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 whileHover={{ 
-                                    scale: 1.02, 
-                                    rotateY: 8, 
-                                    rotateX: -4,
-                                    z: 50,
-                                    transition: { duration: 0.3 }
+                                    y: -16,
+                                    scale: 1.03,
+                                    transition: { type: "spring", stiffness: 400, damping: 10 }
                                 }}
                                 transition={{ duration: 0.5, delay: index * 0.05 }}
                                 key={product.id}

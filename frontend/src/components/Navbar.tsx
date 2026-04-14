@@ -71,15 +71,8 @@ export default function Navbar() {
                                     </Link>
                                 )}
                                 <div className="flex items-center gap-4 pl-4 border-l border-gray-200">
-                                    <Link href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                                        <span className="text-sm font-bold text-gray-700 hidden lg:inline">Hi, {user.name?.split(' ')[0] || user.email.split('@')[0]}</span>
-                                        {user.avatar_url ? (
-                                            <img src={user.avatar_url} alt="Profile" className="w-8 h-8 rounded-full border border-gray-200" />
-                                        ) : (
-                                            <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center">
-                                                <UserIcon size={16} />
-                                            </div>
-                                        )}
+                                    <Link href="/profile" className="flex items-center gap-2 hover:text-brand-600 transition-colors">
+                                        <span className="text-sm font-bold text-gray-700">Hi, {user.name?.split(' ')[0] || user.email.split('@')[0]}</span>
                                     </Link>
                                     <button onClick={signOut} className="text-gray-500 hover:text-red-500 transition-colors">
                                         <LogOut size={20} />

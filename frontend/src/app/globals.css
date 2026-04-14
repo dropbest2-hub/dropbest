@@ -53,7 +53,11 @@ body {
   }
 
   .glass {
-    @apply bg-white/80 backdrop-blur-xl border border-white/30 shadow-xl shadow-violet-100/50;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 25px -5px rgba(237, 233, 254, 0.5);
   }
 
   .animate-fade-in {
