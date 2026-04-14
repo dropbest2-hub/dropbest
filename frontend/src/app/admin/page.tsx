@@ -168,6 +168,10 @@ export default function AdminDashboard() {
 
  const handleAddProduct = async (e: React.FormEvent) => {
  e.preventDefault();
+ if (!newProduct.amazon_link && !newProduct.flipkart_link) {
+     alert("Please provide at least one link (Amazon or Flipkart).");
+     return;
+ }
  try {
  await axios.post(
  `${API_URL}/products`,
@@ -430,7 +434,7 @@ export default function AdminDashboard() {
  <input required type="number" placeholder="Price (₹)" className="p-3 rounded-xl border" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
  <input required placeholder="Image URL" className="p-3 rounded-xl border md:col-span-2" value={newProduct.image_url} onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })} />
  <textarea required placeholder="Product Description..." className="p-3 rounded-xl border md:col-span-2" rows={3} value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
- <input required placeholder="Amazon Affiliate URL" className="p-3 rounded-xl border" value={newProduct.amazon_link} onChange={e => setNewProduct({ ...newProduct, amazon_link: e.target.value })} />
+ <input placeholder="Amazon Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.amazon_link} onChange={e => setNewProduct({ ...newProduct, amazon_link: e.target.value })} />
  <input placeholder="Flipkart Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.flipkart_link} onChange={e => setNewProduct({ ...newProduct, flipkart_link: e.target.value })} />
  <select required className="p-3 rounded-xl border md:col-span-2 bg-white" value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
      {CATEGORIES.filter(c => c.id !== 'all').map(category => (
