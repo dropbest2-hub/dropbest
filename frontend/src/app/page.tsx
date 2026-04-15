@@ -330,9 +330,8 @@ export default function Home() {
                                 transition={{ duration: 0.5, delay: index * 0.05 }}
                                 key={product.id}
                                 className="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl border border-gray-100 transition-all duration-500 flex flex-col h-full relative"
-                                style={{ transformStyle: 'preserve-3d' }}
                             >
-                                <div className="relative h-56 w-full bg-gray-50 overflow-hidden" style={{ transform: 'translateZ(30px)' }}>
+                                <div className="relative h-56 w-full bg-gray-50 overflow-hidden">
                                     <Image
                                         src={product.image_url}
                                         alt={product.title}
@@ -359,7 +358,7 @@ export default function Home() {
                                     )}
                                 </div>
 
-                                <div className="p-6 flex flex-col flex-grow" style={{ transform: 'translateZ(20px)' }}>
+                                <div className="p-6 flex flex-col flex-grow">
                                     <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-brand-600 transition-colors line-clamp-1">{product.title}</h3>
                                     <p className="text-gray-500 text-sm mb-8 line-clamp-3 leading-relaxed font-medium flex-grow">
                                         {product.description}
