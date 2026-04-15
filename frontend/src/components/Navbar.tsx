@@ -46,10 +46,7 @@ export default function Navbar() {
                             Discover
                             {isActive('/') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                         </Link>
-                        <Link href="/leaderboard" className={`relative py-2 font-medium transition-colors ${isActive('/leaderboard') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
-                            Leaderboard
-                            {isActive('/leaderboard') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
-                        </Link>
+
                         {user?.role !== 'ADMIN' && (
                             <Link href="/rewards" className={`relative py-2 font-medium transition-colors ${isActive('/rewards') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
                                 Rewards
@@ -116,9 +113,7 @@ export default function Navbar() {
                             <Link href="/" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
                                 Discover Products
                             </Link>
-                            <Link href="/leaderboard" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
-                                Leaderboard
-                            </Link>
+
                             {user?.role !== 'ADMIN' && (
                                 <Link href="/rewards" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
                                     Rewards

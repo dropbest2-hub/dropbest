@@ -57,7 +57,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                                 <li><a href="/" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Home</a></li>
                                 <li><a href="/#trending" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Products</a></li>
                                 <li><a href="/rewards" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Rewards System</a></li>
-                                <li><a href="/leaderboard" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Global Leaderboard</a></li>
+
                             </ul>
                         </div>
                         <div className="space-y-4">

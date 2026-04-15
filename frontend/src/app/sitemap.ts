@@ -8,12 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1,
     },
-    {
-      url: 'https://dropbest.vercel.app/leaderboard',
-      lastModified: new Date(),
-      changeFrequency: 'always',
-      priority: 0.8,
-    },
+
     {
       url: 'https://dropbest.vercel.app/signup',
       lastModified: new Date(),
