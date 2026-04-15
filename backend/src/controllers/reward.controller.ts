@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { supabase, supabaseAdmin } from '../config/supabase';
 import crypto from 'crypto';
 
-export const convertBadgesToCoupon = async (req: Request, res: Response) => {
+export const convertCoinsToWallet = async (req: Request, res: Response) => {
     try {
-        const { badgesToUse } = req.body; // Expects 110 or 220
+        const { coinsToUse } = req.body; // Expects 110 or 200
         const userId = req.user?.id;
 
         if (!userId) {
@@ -12,17 +12,17 @@ export const convertBadgesToCoupon = async (req: Request, res: Response) => {
             return;
         }
 
-        if (badgesToUse !== 110 && badgesToUse !== 220) {
-            res.status(400).json({ error: 'You can only convert 110 or 220 badges at a time' });
+        if (coinsToUse !== 110 && coinsToUse !== 200) {
+            res.status(400).json({ error: 'You can only convert 110 or 200 coins at a time' });
             return;
         }
 
-        const rewardAmount = badgesToUse === 110 ? 10 : 20;
+        const rewardAmount = coinsToUse === 110 ? 10 : 20;
 
-        // Fetch user current badges
+        // Fetch user current coins and wallet
         const { data: user, error: userError } = await supabase
             .from('users')
-            .select('badge_count')
+            .select('coin_count, wallet_balance')
             .eq('id', userId)
             .single();
 
@@ -31,38 +31,35 @@ export const convertBadgesToCoupon = async (req: Request, res: Response) => {
             return;
         }
 
-        if (user.badge_count < badgesToUse) {
-            res.status(400).json({ error: `Not enough badges. You have ${user.badge_count} badges.` });
+        if (Number(user.coin_count || 0) < coinsToUse) {
+            res.status(400).json({ error: `Not enough coins. You have ${user.coin_count || 0} coins.` });
             return;
         }
 
-        // Generate coupon code
-        const couponCode = `BBB-${crypto.randomUUID().split('-')[0].toUpperCase()}-${rewardAmount}`;
+        // Deduct coins and create reward record
+        const newCoinCount = Number(user.coin_count || 0) - coinsToUse;
+        const newWalletBalance = Number(user.wallet_balance || 0) + rewardAmount;
 
-        // Deduct badges and create reward record
-        const newBadgeCount = user.badge_count - badgesToUse;
-
-        // Update user's count (Level doesn't downgrade based on usage according to standard gamification, only upgrades, but we'll recalculate here)
         let newLevel = 'BRONZE';
-        if (newBadgeCount >= 700) newLevel = 'PLATINUM';
-        else if (newBadgeCount >= 300) newLevel = 'GOLD';
-        else if (newBadgeCount >= 100) newLevel = 'SILVER';
+        if (newCoinCount >= 700) newLevel = 'PLATINUM';
+        else if (newCoinCount >= 300) newLevel = 'GOLD';
+        else if (newCoinCount >= 100) newLevel = 'SILVER';
 
         const { error: updateError } = await supabase
             .from('users')
-            .update({ badge_count: newBadgeCount, user_level: newLevel })
+            .update({ coin_count: newCoinCount, user_level: newLevel, wallet_balance: newWalletBalance })
             .eq('id', userId);
 
         if (updateError) throw updateError;
 
-        // Insert reward
+        // Insert reward tracking (as WALLET_CREDIT)
         const { data: reward, error: rewardError } = await supabase
             .from('rewards')
             .insert([{
                 user_id: userId,
-                badges_used: badgesToUse,
+                badges_used: coinsToUse, // Keeping DB column backward compatible if needed
                 reward_amount: rewardAmount,
-                coupon_code: couponCode
+                type: 'WALLET_CREDIT'
             }])
             .select()
             .single();
@@ -70,8 +67,8 @@ export const convertBadgesToCoupon = async (req: Request, res: Response) => {
         if (rewardError) throw rewardError;
 
         res.status(201).json({
-            message: `Successfully converted ${badgesToUse} badges to ₹${rewardAmount} coupon`,
-            reward
+            message: `Successfully converted ${coinsToUse} coins to ₹${rewardAmount} Wallet Balance`,
+            reward: { ...reward, wallet_balance: newWalletBalance }
         });
 
     } catch (err: any) {
@@ -151,37 +148,60 @@ export const claimScratchCard = async (req: Request, res: Response) => {
     }
 };
 
-export const convertCoinsToCoupon = async (req: Request, res: Response) => {
+// Request Payout
+export const requestPayout = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
-        const { coinAmount } = req.body; // Expects 1000
+        const { upiId, amount } = req.body;
 
-        if (coinAmount !== 1000) {
-            res.status(400).json({ error: 'You can only convert 1000 coins for ₹10' });
+        if (!upiId || typeof upiId !== 'string' || !upiId.includes('@')) {
+            res.status(400).json({ error: 'Please provide a valid UPI ID (e.g. dropbest@ybl)' });
             return;
         }
 
-        const { data: user } = await supabase.from('users').select('coin_count').eq('id', userId).single();
-
-        if (!user || user.coin_count < 1000) {
-            res.status(400).json({ error: 'Not enough coins' });
+        if (!amount || amount < 20) {
+            res.status(400).json({ error: 'Minimum payout amount is ₹20' });
             return;
         }
 
-        const couponCode = `COIN-${crypto.randomUUID().split('-')[0].toUpperCase()}-10`;
+        // Lock/Verify User Balance
+        const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('wallet_balance')
+            .eq('id', userId)
+            .single();
 
-        // Update user coins
-        await supabase.from('users').update({ coin_count: user.coin_count - 1000 }).eq('id', userId);
+        if (userError || !user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
 
-        // Record reward
-        const { data: reward } = await supabase.from('rewards').insert([{
-            user_id: userId,
-            badges_used: 0, // Mark 0 since it's coins
-            reward_amount: 10,
-            coupon_code: couponCode
-        }]).select().single();
+        if (Number(user.wallet_balance || 0) < amount) {
+            res.status(400).json({ error: `Insufficient wallet balance. You have ₹${user.wallet_balance || 0}` });
+            return;
+        }
 
-        res.json({ message: 'Successfully converted 1000 coins to ₹10 coupon', reward });
+        // Create Payout Request
+        const { error: payoutError } = await supabase
+            .from('payout_requests')
+            .insert([{
+                user_id: userId,
+                amount: amount,
+                upi_id: upiId,
+                status: 'PENDING'
+            }]);
+
+        if (payoutError) throw payoutError;
+
+        // Deduct from User Wallet
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ wallet_balance: Number(user.wallet_balance) - amount, upi_id: upiId }) // Save upi_id for future reference
+            .eq('id', userId);
+
+        if (updateError) throw updateError;
+
+        res.status(201).json({ message: `Withdrawal request of ₹${amount} submitted successfully! It will be processed soon.` });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

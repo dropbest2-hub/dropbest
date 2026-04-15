@@ -2,25 +2,25 @@ import { Router } from 'express';
 import { requireAuth } from '../middlewares/auth.middleware';
 import { 
     getUserRewards, 
-    convertBadgesToCoupon, 
+    convertCoinsToWallet, 
     getScratchCards, 
     claimScratchCard, 
-    convertCoinsToCoupon 
+    requestPayout
 } from '../controllers/reward.controller';
 
 const router = Router();
 
-// Get user's rewards
+// Get user's rewards (wallet credit history)
 router.get('/', requireAuth, getUserRewards);
 
-// Convert badges to coupon
-router.post('/convert', requireAuth, convertBadgesToCoupon);
+// Convert coins to wallet
+router.post('/convert', requireAuth, convertCoinsToWallet);
+
+// Withdraw via UPI
+router.post('/withdraw', requireAuth, requestPayout);
 
 // Scratch Cards
 router.get('/scratch-cards', requireAuth, getScratchCards);
 router.post('/scratch-cards/:id/claim', requireAuth, claimScratchCard);
-
-// Coin Conversion
-router.post('/convert-coins', requireAuth, convertCoinsToCoupon);
 
 export default router;

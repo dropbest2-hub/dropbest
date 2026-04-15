@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { supabase } from '../config/supabase';
 
-// Helper to determine badges based on value
-const calculateBadges = (value: number): number => {
-    if (value >= 2000) return 10;
-    if (value >= 300) return 8;
+// Helper to determine coins based on value
+const calculateCoins = (value: number): number => {
+    if (value >= 2000) return 35;
+    if (value >= 300) return 30;
     return 0; 
 };
 
@@ -41,8 +41,8 @@ export const confirmOrder = async (req: Request, res: Response) => {
             return;
         }
 
-        // 2. Calculate badges
-        const earnedBadges = calculateBadges(purchaseValue);
+        // 2. Calculate coins
+        const earnedCoins = calculateCoins(purchaseValue);
 
         // 3. Update the order
         const { error: updateError } = await supabase
@@ -50,31 +50,31 @@ export const confirmOrder = async (req: Request, res: Response) => {
             .update({
                 purchase_value: purchaseValue,
                 status: 'CONFIRMED',
-                confirmed_badges: earnedBadges,
+                confirmed_badges: earnedCoins, // Keeping column name same for DB compatibility
                 confirmation_sent_at: new Date().toISOString()
             })
             .eq('id', id);
 
         if (updateError) throw updateError;
 
-        // 4. Update the user's total badges
+        // 4. Update the user's total coins
         const { data: user, error: userError } = await supabase
             .from('users')
-            .select('badge_count')
+            .select('coin_count')
             .eq('id', order.user_id)
             .single();
 
         if (!userError && user) {
-            const newBadgeCount = user.badge_count + earnedBadges;
+            const newCoinCount = (user.coin_count || 0) + earnedCoins;
             let newLevel = 'BRONZE';
-            if (newBadgeCount >= 700) newLevel = 'PLATINUM';
-            else if (newBadgeCount >= 300) newLevel = 'GOLD';
-            else if (newBadgeCount >= 100) newLevel = 'SILVER';
+            if (newCoinCount >= 700) newLevel = 'PLATINUM';
+            else if (newCoinCount >= 300) newLevel = 'GOLD';
+            else if (newCoinCount >= 100) newLevel = 'SILVER';
 
             await supabase
                 .from('users')
                 .update({
-                    badge_count: newBadgeCount,
+                    coin_count: newCoinCount,
                     user_level: newLevel
                 })
                 .eq('id', order.user_id);
@@ -93,23 +93,24 @@ export const confirmOrder = async (req: Request, res: Response) => {
             reviewBonus = 1;
             await supabase
                 .from('reviews')
-                .update({ is_verified: true, badge_awarded: true })
+                .update({ is_verified: true, badge_awarded: true }) // keep schema compatibility
                 .eq('user_id', order.user_id)
                 .eq('product_id', order.product_id);
             
-            // Increment badge for review
-            await supabase.rpc('increment_badge', { user_id_param: order.user_id, amount: 1 });
+            // Increment coin for review
+            const { data: currentUser } = await supabase.from('users').select('coin_count').eq('id', order.user_id).single();
+            await supabase.from('users').update({ coin_count: (currentUser?.coin_count || 0) + 1 }).eq('id', order.user_id);
         }
 
-        const totalEarned = earnedBadges + reviewBonus;
+        const totalEarned = earnedCoins + reviewBonus;
 
         // 6. Create a notification
         await supabase.from('notifications').insert([{
             user_id: order.user_id,
             type: 'CONFIRMATION',
             message: reviewBonus > 0 
-                ? `Double Reward! Order confirmed (${earnedBadges} badges) + Verified Review bonus (1 badge)! Total: ${totalEarned} badges.`
-                : `Congratulations! Your purchase has been confirmed. You earned ${earnedBadges} badges!`,
+                ? `Double Reward! Order confirmed (${earnedCoins} coins) + Verified Review bonus (1 coin)! Total: ${totalEarned} coins.`
+                : `Congratulations! Your purchase has been confirmed. You earned ${earnedCoins} coins!`,
             read: false
         }]);
 
@@ -145,21 +146,21 @@ export const confirmOrder = async (req: Request, res: Response) => {
                 
                 const { data: referrer, error: referrerError } = await supabase
                     .from('users')
-                    .select('badge_count')
+                    .select('coin_count')
                     .eq('id', referrerId)
                     .single();
 
                 if (!referrerError && referrer) {
-                    const newRefBadgeCount = referrer.badge_count + 25;
+                    const newRefCoinCount = (referrer.coin_count || 0) + 25;
                     let newRefLevel = 'BRONZE';
-                    if (newRefBadgeCount >= 700) newRefLevel = 'PLATINUM';
-                    else if (newRefBadgeCount >= 300) newRefLevel = 'GOLD';
-                    else if (newRefBadgeCount >= 100) newRefLevel = 'SILVER';
+                    if (newRefCoinCount >= 700) newRefLevel = 'PLATINUM';
+                    else if (newRefCoinCount >= 300) newRefLevel = 'GOLD';
+                    else if (newRefCoinCount >= 100) newRefLevel = 'SILVER';
 
                     await supabase
                         .from('users')
                         .update({
-                            badge_count: newRefBadgeCount,
+                            coin_count: newRefCoinCount,
                             user_level: newRefLevel
                         })
                         .eq('id', referrerId);
@@ -174,7 +175,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
                     await supabase.from('notifications').insert([{
                         user_id: referrerId,
                         type: 'REWARD',
-                        message: `Referral Bonus! Your friend completed 3 purchases. You've been awarded 25 badges!`,
+                        message: `Referral Bonus! Your friend completed 3 purchases. You've been awarded 25 coins!`,
                         read: false
                     }]);
                 }
@@ -224,6 +225,58 @@ export const rejectOrder = async (req: Request, res: Response) => {
         }]);
 
         res.json({ message: 'Order rejected successfully' });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Payouts Administration
+export const getPayouts = async (req: Request, res: Response) => {
+    try {
+        const { data, error } = await supabase
+            .from('payout_requests')
+            .select('*, users ( email, name )')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json(data || []);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const approvePayout = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { utrNumber } = req.body;
+        const { error } = await supabase.from('payout_requests').update({ status: 'PAID', utr_number: utrNumber, updated_at: new Date().toISOString() }).eq('id', id);
+        if (error) throw error;
+        res.json({ message: 'Payout approved successfully' });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const rejectPayout = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { data: payout } = await supabase.from('payout_requests').select('*').eq('id', id).single();
+        if (!payout) {
+             res.status(404).json({ error: 'Payout not found' });
+             return;
+        }
+
+        if (payout.status !== 'PENDING') {
+             res.status(400).json({ error: `Cannot reject. Current status is ${payout.status}` });
+             return;
+        }
+        
+        // Refund to wallet
+        const { data: user } = await supabase.from('users').select('wallet_balance').eq('id', payout.user_id).single();
+        await supabase.from('users').update({ wallet_balance: Number(user?.wallet_balance || 0) + Number(payout.amount) }).eq('id', payout.user_id);
+        
+        // Reject request
+        await supabase.from('payout_requests').update({ status: 'REJECTED', updated_at: new Date().toISOString() }).eq('id', id);
+        res.json({ message: 'Payout rejected and refunded successfully' });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

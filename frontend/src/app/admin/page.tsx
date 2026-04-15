@@ -45,16 +45,18 @@ interface AdminUser {
 export default function AdminDashboard() {
   const { user, session } = useAuthStore();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages' | 'payouts'>('orders');
 
   // Data State
   const [pendingOrders, setPendingOrders] = useState<AdminOrder[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [usersList, setUsersList] = useState<AdminUser[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [utrInput, setUtrInput] = useState<Record<string, string>>({});
   const [isSendingReply, setIsSendingReply] = useState(false);
 
  // Forms
@@ -117,6 +119,14 @@ export default function AdminDashboard() {
     setMessages(msgRes.data || []);
  } catch(err) {
     console.log('Messages table may not exist yet or failed to fetch');
+ }
+
+ // Fetch Payouts
+ try {
+    const payRes = await axios.get(`${API_URL}/admin/payouts`, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+    setPayouts(payRes.data || []);
+ } catch(err) {
+    console.log('Payouts failed to fetch', err);
  }
 
  } catch (error) {
@@ -267,6 +277,32 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleApprovePayout = async (id: string) => {
+      const utr = utrInput[id];
+      if (!utr) {
+          alert('Please enter a UTR Number/Transaction ID to mark as paid.');
+          return;
+      }
+      try {
+          await axios.post(`${API_URL}/admin/payouts/${id}/approve`, { utrNumber: utr }, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+          alert('Payout approved successfully!');
+          fetchData();
+      } catch (e: any) {
+          alert(e.response?.data?.error || 'Failed to approve payout');
+      }
+  };
+
+  const handleRejectPayout = async (id: string) => {
+      if (!confirm('Are you sure you want to reject this payout and refund the wallet?')) return;
+      try {
+          await axios.post(`${API_URL}/admin/payouts/${id}/reject`, {}, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+          alert('Payout rejected and amount refunded to user wallet!');
+          fetchData();
+      } catch (e: any) {
+          alert(e.response?.data?.error || 'Failed to reject payout');
+      }
+  };
+
  if (!user || user.role !== 'ADMIN') return null;
 
  return (
@@ -316,6 +352,15 @@ export default function AdminDashboard() {
  className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'messages' ? 'bg-violet-50 text-violet-700' : 'text-gray-600 hover:bg-gray-50'}`}
  >
  <MessageSquare size={18} /> User Messages
+ </button>
+ <button
+ onClick={() => setActiveTab('payouts')}
+ className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'payouts' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}
+ >
+ <span className="flex items-center gap-2">💰 Payout Requests</span>
+ {payouts.filter(p => p.status === 'PENDING').length > 0 && (
+ <span className="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">{payouts.filter(p => p.status === 'PENDING').length}</span>
+ )}
  </button>
  </div>
  </div>
@@ -669,6 +714,75 @@ export default function AdminDashboard() {
       </div>
   )}
   </motion.div>
+  )}
+
+  {activeTab === 'payouts' && (
+      <motion.div
+        key="payouts"
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -10 }}
+        className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
+      >
+        <div className="flex justify-between items-center mb-8">
+            <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Payout Requests</h3>
+                <p className="text-gray-500">Manage manual UPI withdrawal requests from users.</p>
+            </div>
+            <RefreshCcw size={20} className="text-gray-400 cursor-pointer hover:rotate-180 transition-all duration-500" onClick={fetchData} />
+        </div>
+
+        {payouts.length === 0 ? (
+            <div className="text-center py-16 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+                <span className="text-4xl text-gray-300">💸</span>
+                <p className="text-gray-500 font-medium mt-4">No payout requests found.</p>
+            </div>
+        ) : (
+            <div className="space-y-4">
+                {payouts.map(payout => (
+                    <div key={payout.id} className="border border-gray-200 rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between hover:border-green-100 transition-colors bg-white">
+                        <div>
+                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md mb-2 inline-block ${payout.status === 'PAID' ? 'bg-green-100 text-green-700' : payout.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                {payout.status}
+                            </span>
+                            <h4 className="font-black text-gray-900 text-2xl mb-1">₹{payout.amount}</h4>
+                            <p className="text-sm text-gray-500">UPI: <span className="font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded cursor-copy" title="Copy UPI" onClick={() => navigator.clipboard.writeText(payout.upi_id)}>{payout.upi_id}</span></p>
+                            <p className="text-xs text-gray-400 mt-2">Requested by: {payout.users?.email} • {new Date(payout.created_at).toLocaleString()}</p>
+                            {payout.status === 'PAID' && <p className="text-xs text-green-600 mt-1 font-bold">UTR: {payout.utr_number}</p>}
+                        </div>
+
+                        {payout.status === 'PENDING' && (
+                            <div className="flex flex-col gap-3 w-full lg:w-96 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest text-center mb-1">Make payment via UPI app then verify</p>
+                                <input
+                                    type="text"
+                                    placeholder="Enter UTR / Txn ID"
+                                    className="border border-gray-200 bg-white rounded-xl px-4 py-2 w-full focus:ring-2 focus:ring-green-500/20 outline-none transition-all font-medium text-sm"
+                                    value={utrInput[payout.id] || ''}
+                                    onChange={(e) => setUtrInput(prev => ({ ...prev, [payout.id]: e.target.value }))}
+                                />
+                                <div className="flex gap-2 w-full">
+                                    <button
+                                        onClick={() => handleApprovePayout(payout.id)}
+                                        disabled={!utrInput[payout.id]}
+                                        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white font-bold py-2 px-4 rounded-xl transition-all text-sm"
+                                    >
+                                        Mark as Paid
+                                    </button>
+                                    <button
+                                        onClick={() => handleRejectPayout(payout.id)}
+                                        className="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-2 px-4 rounded-xl transition-all text-sm border border-red-100"
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        )}
+      </motion.div>
   )}
  </AnimatePresence>
  )}

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
-import { confirmOrder, rejectOrder } from '../controllers/admin.controller';
+import { confirmOrder, rejectOrder, getPayouts, approvePayout, rejectPayout } from '../controllers/admin.controller';
 
 const router = Router();
 
@@ -8,7 +8,9 @@ const router = Router();
 router.post('/orders/:id/confirm', requireAdmin, confirmOrder);
 router.post('/orders/:id/reject', requireAdmin, rejectOrder);
 
-// In a real app we would add user management, full product management, analytics here
-// We'll trust the product.routes.ts for basic products, but this is the primary 40-day mechanics.
+// Payouts management
+router.get('/payouts', requireAdmin, getPayouts);
+router.post('/payouts/:id/approve', requireAdmin, approvePayout);
+router.post('/payouts/:id/reject', requireAdmin, rejectPayout);
 
 export default router;

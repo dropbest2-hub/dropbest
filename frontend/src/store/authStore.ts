@@ -11,6 +11,7 @@ export interface User {
     role: 'USER' | 'ADMIN';
     badge_count: number;
     coin_count: number;
+    wallet_balance: number;
     user_level: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
     notifications_enabled: boolean;
     referral_code?: string;

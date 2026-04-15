@@ -17,8 +17,12 @@ export default function Rewards() {
     const [rewards, setRewards] = useState([]);
     const [scratchCards, setScratchCards] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [converting, setConverting] = useState(false);
     const [activeTab, setActiveTab] = useState<'shop' | 'history'>('shop');
+
+    const [upiId, setUpiId] = useState('');
+    const [withdrawAmount, setWithdrawAmount] = useState<number | ''>('');
+    const [withdrawing, setWithdrawing] = useState(false);
+    const [converting, setConverting] = useState(false);
 
     useEffect(() => {
         if (!user && !useAuthStore.getState().loading) {
@@ -56,18 +60,18 @@ export default function Rewards() {
         }
     };
 
-    const handleConvert = async (amount: 110 | 220) => {
+    const handleConvert = async (amount: 110 | 200) => {
         try {
             setConverting(true);
             const token = useAuthStore.getState().session?.access_token;
 
             await axios.post(
                 `${API_URL}/rewards/convert`,
-                { badgesToUse: amount },
+                { coinsToUse: amount },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            toast.success(`Successfully redeemed ${amount} badges!`, {
+            toast.success(`Successfully redeemed ${amount} coins!`, {
                 icon: '🎉',
                 style: { borderRadius: '15px', background: '#333', color: '#fff' }
             });
@@ -76,7 +80,7 @@ export default function Rewards() {
             await fetchRewards();
             setActiveTab('history');
         } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Failed to redeem badges');
+            toast.error(error.response?.data?.error || 'Failed to redeem coins');
         } finally {
             setConverting(false);
         }
@@ -99,31 +103,33 @@ export default function Rewards() {
         }
     };
 
-    const handleCoinRedeem = async () => {
+    const handleWithdraw = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!withdrawAmount || Number(withdrawAmount) < 20) return;
         try {
-            setConverting(true);
+            setWithdrawing(true);
             const token = useAuthStore.getState().session?.access_token;
-            await axios.post(
-                `${API_URL}/rewards/convert-coins`,
-                { coinAmount: 1000 },
+            const response = await axios.post(
+                `${API_URL}/rewards/withdraw`,
+                { upiId, amount: Number(withdrawAmount) },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            toast.success('Converted 1000 coins to ₹10 coupon!');
+            toast.success(response.data.message, { duration: 5000 });
+            setUpiId('');
+            setWithdrawAmount('');
             await initializeAuth();
-            await fetchRewards();
-            setActiveTab('history');
         } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Failed to convert coins');
+            toast.error(error.response?.data?.error || 'Failed to request withdrawal');
         } finally {
-            setConverting(false);
+            setWithdrawing(false);
         }
     };
 
     if (!user) return null;
 
-    const nextMilestone = user.badge_count < 100 ? 100 : user.badge_count < 300 ? 300 : user.badge_count < 700 ? 700 : 1000;
-    const progress = (user.badge_count / nextMilestone) * 100;
+    const nextMilestone = (user.coin_count || 0) < 100 ? 100 : (user.coin_count || 0) < 300 ? 300 : (user.coin_count || 0) < 700 ? 700 : 1000;
+    const progress = ((user.coin_count || 0) / nextMilestone) * 100;
 
     return (
         <div className="max-w-6xl mx-auto px-4 pb-20 animate-fade-in">
@@ -141,25 +147,22 @@ export default function Rewards() {
                         </motion.div>
                         <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Reward Shop</h1>
                         <p className="text-violet-100 text-lg max-w-md font-medium">
-                            Your style has value. Convert your earned badges and coins into real-world shopping power.
+                            Your style has value. Convert your earned coins into real-world shopping power.
                         </p>
                     </div>
 
                     <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-8 border border-white/20 shadow-inner flex flex-col items-center min-w-[280px]">
-                        <p className="text-violet-200 text-sm font-bold uppercase tracking-widest mb-1">Badge Count</p>
-                        <div className="flex items-center gap-3 mb-4">
-                            <Award className="text-yellow-400" size={32} />
-                            <span className="text-4xl font-black tracking-tighter">{user.badge_count}</span>
-                        </div>
-                        
-                        <div className="w-full h-px bg-white/20 mb-4" />
-
                         <p className="text-violet-200 text-sm font-bold uppercase tracking-widest mb-1">Coin Balance</p>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 mb-4">
                             <Gem className="text-brand-300" size={32} />
                             <span className="text-4xl font-black tracking-tighter">{user.coin_count || 0}</span>
                         </div>
-                        <p className="text-[10px] text-white/50 font-bold mt-1 uppercase">100 Coins = ₹1</p>
+                        <div className="w-full h-px bg-white/20 my-4" />
+                        <p className="text-violet-200 text-sm font-bold uppercase tracking-widest mb-1">Wallet Balance</p>
+                        <div className="flex items-center gap-3">
+                            <span className="text-brand-300 font-bold text-3xl">₹</span>
+                            <span className="text-4xl font-black tracking-tighter">{user.wallet_balance || 0}</span>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -226,65 +229,72 @@ export default function Rewards() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                        className="flex flex-col gap-8"
                     >
-                        {/* Coin Redeem Tier */}
-                        <div className="group relative bg-white rounded-[2.5rem] p-8 border-2 border-brand-500 shadow-xl scale-105 z-10">
-                            <div className="absolute top-6 right-6 text-brand-100">
-                                <Gem size={80} />
-                            </div>
-                            <div className="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mb-6 flex items-center justify-center">
-                                <Sparkles size={32} />
-                            </div>
-                            <h3 className="text-2xl font-black text-gray-900 mb-2">Coin Wallet Redeem</h3>
-                            <p className="text-gray-500 font-medium mb-8">Exchange your scratch card winnings for shopping power.</p>
-                            
-                            <div className="flex items-center justify-between py-6 border-y border-gray-50 mb-8">
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Value</p>
-                                    <p className="text-3xl font-black text-gray-900">₹10 OFF</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Cost</p>
-                                    <p className="text-3xl font-black text-brand-600">1000 <span className="text-sm uppercase">coins</span></p>
+                        {/* Withdraw Section */}
+                        <div className="w-full bg-white rounded-[2.5rem] p-8 border-2 border-green-500 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 z-20">
+                            <div className="w-full md:w-1/2">
+                                <h3 className="text-2xl font-black text-gray-900 mb-2">Withdraw to Bank 🏦</h3>
+                                <p className="text-gray-500 font-medium mb-4">Transfer your wallet balance easily via UPI.</p>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="bg-green-100 text-green-700 font-black px-4 py-2 rounded-xl text-lg shadow-inner">Available Balance: ₹{user.wallet_balance || 0}</span>
                                 </div>
                             </div>
-
-                            <button
-                                onClick={handleCoinRedeem}
-                                disabled={converting || (user.coin_count || 0) < 1000}
-                                className="w-full py-4 rounded-2xl bg-brand-600 text-white font-black hover:bg-brand-700 transition-all disabled:bg-gray-100 disabled:text-gray-400 flex items-center justify-center gap-3"
-                            >
-                                {converting ? 'Processing...' : (user.coin_count || 0) < 1000 ? 'Need more coins' : 'Redeem 1000 Coins'}
-                                <ChevronRight size={20} />
-                            </button>
+                            <form onSubmit={handleWithdraw} className="w-full md:w-1/2 flex flex-col gap-4">
+                                <input 
+                                    required 
+                                    type="text" 
+                                    placeholder="Enter UPI ID (e.g. name@okhdfc)" 
+                                    value={upiId} 
+                                    onChange={(e) => setUpiId(e.target.value)} 
+                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-green-500/10 outline-none font-medium"
+                                />
+                                <div className="flex gap-4">
+                                    <input 
+                                        required 
+                                        type="number" 
+                                        min="20" 
+                                        placeholder="Amount (Min ₹20)" 
+                                        value={withdrawAmount} 
+                                        onChange={(e) => setWithdrawAmount(e.target.value === '' ? '' : Number(e.target.value))} 
+                                        className="w-1/2 px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-green-500/10 outline-none font-medium"
+                                    />
+                                    <button 
+                                        disabled={withdrawing || (user.wallet_balance || 0) < 20} 
+                                        type="submit" 
+                                        className="w-1/2 bg-green-600 text-white font-black py-4 rounded-2xl hover:bg-green-700 transition-all disabled:opacity-50"
+                                    >
+                                        {withdrawing ? 'Wait...' : 'Withdraw'}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-
-                        {/* Badge Tier 1 */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-3xl mx-auto">
+                        {/* Coin Tier 1 */}
                         <div className="group relative bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                             <div className="w-16 h-16 bg-green-50 text-green-600 rounded-2xl mb-6 flex items-center justify-center">
                                 <Gift size={32} />
                             </div>
-                            <h3 className="text-2xl font-black text-gray-900 mb-2">Basic Voucher</h3>
-                            <p className="text-gray-500 font-medium mb-8">Standard badge redemption for quick savings.</p>
+                            <h3 className="text-2xl font-black text-gray-900 mb-2">Basic Credit</h3>
+                            <p className="text-gray-500 font-medium mb-8">Standard badge redemption for wallet balance.</p>
                             
                             <div className="flex items-center justify-between py-6 border-y border-gray-50 mb-8">
                                 <div>
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Value</p>
-                                    <p className="text-3xl font-black text-gray-900">₹10 OFF</p>
+                                    <p className="text-3xl font-black text-gray-900">₹10 INR</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Cost</p>
-                                    <p className="text-3xl font-black text-green-600">110 <span className="text-sm">badges</span></p>
+                                    <p className="text-3xl font-black text-green-600">110 <span className="text-sm">coins</span></p>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => handleConvert(110)}
-                                disabled={converting || user.badge_count < 110}
+                                disabled={converting || Number(user.coin_count || 0) < 110}
                                 className="w-full py-4 rounded-2xl bg-gray-900 text-white font-black hover:bg-black transition-all disabled:bg-gray-100 disabled:text-gray-400 flex items-center justify-center gap-3"
                             >
-                                {converting ? 'Processing...' : user.badge_count < 110 ? 'Need 110 Badges' : 'Redeem Now'}
+                                {converting ? 'Processing...' : Number(user.coin_count || 0) < 110 ? 'Need 110 Coins' : 'Redeem Now'}
                                 <ChevronRight size={20} />
                             </button>
                         </div>
@@ -297,28 +307,29 @@ export default function Rewards() {
                             <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl mb-6 flex items-center justify-center">
                                 <Zap size={32} />
                             </div>
-                            <h3 className="text-2xl font-black mb-2">Elite Savings</h3>
+                            <h3 className="text-2xl font-black mb-2">Elite Credit</h3>
                             <p className="text-violet-100 font-medium mb-8">The most efficient way to use your earned badges.</p>
                             
                             <div className="flex items-center justify-between py-6 border-y border-white/20 mb-8">
                                 <div>
                                     <p className="text-xs font-bold text-violet-200 uppercase tracking-widest text-opacity-70">Value</p>
-                                    <p className="text-3xl font-black">₹20 OFF</p>
+                                    <p className="text-3xl font-black">₹20 INR</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs font-bold text-violet-200 uppercase tracking-widest text-opacity-70">Cost</p>
-                                    <p className="text-3xl font-black text-yellow-300">220 <span className="text-sm">badges</span></p>
+                                    <p className="text-3xl font-black text-yellow-300">200 <span className="text-sm">coins</span></p>
                                 </div>
                             </div>
 
                             <button
-                                onClick={() => handleConvert(220)}
-                                disabled={converting || user.badge_count < 220}
+                                onClick={() => handleConvert(200)}
+                                disabled={converting || Number(user.coin_count || 0) < 200}
                                 className="w-full py-4 rounded-2xl bg-white text-violet-700 font-black hover:bg-violet-50 transition-all disabled:bg-white/30 disabled:text-white/50 flex items-center justify-center gap-3 shadow-xl"
                             >
-                                {converting ? 'Processing...' : user.badge_count < 220 ? 'Need 220 Badges' : 'Redeem Now'}
+                                {converting ? 'Processing...' : Number(user.coin_count || 0) < 200 ? 'Need 200 Coins' : 'Redeem Now'}
                                 <ChevronRight size={20} />
                             </button>
+                        </div>
                         </div>
                     </motion.div>
                 ) : (
@@ -352,9 +363,9 @@ export default function Rewards() {
                                             <div>
                                                 <div className="flex items-center gap-2 text-violet-600 font-black text-lg mb-1">
                                                     <Ticket size={24} />
-                                                    SHOPPING COUPON
+                                                    {reward.type === 'WALLET_CREDIT' ? 'WALLET CREDIT' : 'SHOPPING COUPON'}
                                                 </div>
-                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Level Reward - ₹{reward.reward_amount} Credit</p>
+                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Level Reward - ₹{reward.reward_amount} {reward.type === 'WALLET_CREDIT' ? 'Added' : 'Credit'}</p>
                                             </div>
                                             <div className="p-3 bg-gray-50 rounded-2xl text-gray-400 group-hover:text-violet-600 transition-colors">
                                                 <Copy 
@@ -385,7 +396,7 @@ export default function Rewards() {
                                         </div>
                                         
                                         <p className="text-center text-[10px] font-bold text-gray-400 mt-4 uppercase tracking-[0.2em]">
-                                            {reward.badges_used > 0 ? `Deducted ${reward.badges_used} Badges` : 'Exchanged Coins'} • {new Date(reward.created_at).toLocaleDateString()}
+                                            Exchanged {reward.badges_used} Coins • {new Date(reward.created_at).toLocaleDateString()}
                                         </p>
                                     </div>
                                     
