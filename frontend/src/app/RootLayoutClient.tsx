@@ -29,7 +29,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
             <CustomCursor />
             <Toaster position="top-right" />
             <Navbar />
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
                 <motion.main 
                     key={pathname}
                     initial={{ opacity: 0, rotateX: 10, y: 20 }}
@@ -42,7 +42,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                     {children}
                 </motion.main>
             </AnimatePresence>
-            <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
+            <footer className="bg-brand-50 border-t border-brand-100 pt-16 pb-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
                         <div className="space-y-4">
@@ -71,8 +71,8 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                             </ul>
                         </div>
                     </div>
-                    <div className="pt-8 border-t border-gray-100 text-center">
-                        <p className="text-gray-400 font-bold text-sm">© {new Date().getFullYear()} DropBest! All rights reserved.</p>
+                    <div className="pt-8 border-t border-brand-200/50 text-center">
+                        <p className="text-gray-500 font-bold text-sm">© {new Date().getFullYear()} DropBest! All rights reserved.</p>
                         <p className="mt-2 text-[10px] text-gray-300 font-black uppercase tracking-[0.3em]">Built for the Smart Shopper Community</p>
                     </div>
                 </div>
