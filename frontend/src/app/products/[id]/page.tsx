@@ -379,7 +379,7 @@ export default function ProductDetails() {
  Platform Benefits
  </h3>
  <ul className="text-sm text-gray-600 space-y-2 font-medium">
- <li className="flex items-start gap-2">🚀 Earn up to 8 coins on confirmation</li>
+ <li className="flex items-start gap-2">🚀 Earn up to 35 coins on confirmation</li>
  <li className="flex items-start gap-2">🛡️ Early Review system enabled</li>
  <li className="flex items-start gap-2">💎 +1 extra coin for verified reviews</li>
  </ul>
