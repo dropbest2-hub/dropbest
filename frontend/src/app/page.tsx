@@ -19,22 +19,8 @@ interface Product {
     category?: string;
 }
 
-const CommunityStats = () => {
-    const [stats, setStats] = useState<{ totalUsers: number } | null>(null);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await api.get('/users/stats');
-                setStats(response.data);
-            } catch (err) {
-                console.error('Error fetching stats:', err);
-            }
-        };
-        fetchStats();
-    }, []);
-
-    if (!stats) return null;
+const ProductStats = ({ count }: { count: number }) => {
+    if (count === 0) return null;
 
     return (
         <div className="flex flex-wrap items-center gap-4 mb-10">
@@ -44,20 +30,15 @@ const CommunityStats = () => {
                 className="inline-flex items-center gap-4 px-8 py-4 bg-white/80 backdrop-blur-md rounded-[2rem] border border-gray-100 shadow-sm"
             >
                 <div className="flex -space-x-3">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="w-10 h-10 rounded-full border-4 border-white bg-brand-100 flex items-center justify-center text-xs font-black text-brand-700 shadow-sm">
-                            {String.fromCharCode(64 + i)}
-                        </div>
-                    ))}
-                    <div className="w-10 h-10 rounded-full border-4 border-white bg-brand-600 flex items-center justify-center text-xs font-black text-white shadow-sm ring-1 ring-brand-600/20">
-                        ✓
+                    <div className="w-10 h-10 rounded-full border-4 border-white bg-brand-100 flex items-center justify-center text-xs font-black text-brand-700 shadow-sm">
+                        <ShoppingCart size={18} />
                     </div>
                 </div>
                 <div className="flex flex-col">
                     <span className="text-xl font-black text-gray-900 tracking-tight leading-none">
-                        {stats.totalUsers.toLocaleString()}
+                        {count.toLocaleString()}
                     </span>
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1.5">Trusted Shoppers</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1.5">Total Products</span>
                 </div>
             </motion.div>
         </div>
@@ -229,7 +210,7 @@ export default function Home() {
 
             {/* Product Grid */}
             <section id="trending" className="scroll-mt-24 pt-10">
-                <CommunityStats />
+                <ProductStats count={products.length} />
                 
                 <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Shop by Category</h3>
                 <CategoryList 
