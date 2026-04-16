@@ -42,13 +42,13 @@ export default function AuthPage() {
  <span className="bg-gradient-to-r from-violet-300 to-pink-300 bg-clip-text text-transparent">Reward.</span>
  </h2>
  <p className="text-violet-200 leading-relaxed font-medium">
- Join thousands of smart shoppers who earn badges and redeem exclusive coupons.
+ Join thousands of smart shoppers who earn coins and redeem exclusive coupons.
  </p>
  </div>
 
  <div className="relative z-10 flex flex-col gap-4">
  {[
- { icon: '🏅', text: 'Earn badges on every purchase' },
+ { icon: '🏅', text: 'Earn coins on every purchase' },
  { icon: '🎁', text: 'Redeem rewards as coupons' },
  { icon: '⭐', text: 'Write verified product reviews' },
  ].map(item => (

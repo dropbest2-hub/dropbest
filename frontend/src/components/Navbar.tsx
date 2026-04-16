@@ -59,7 +59,7 @@ export default function Navbar() {
                                 {user.role !== 'ADMIN' && (
                                     <Link href="/rewards" className="flex items-center gap-1 text-gray-600 hover:text-brand-600 font-medium transition-colors">
                                         <Award size={18} />
-                                        <span>{user.badge_count} Badges</span>
+                                        <span>{user.badge_count} Coins</span>
                                     </Link>
                                 )}
                                 {user.role === 'ADMIN' && (
@@ -124,7 +124,7 @@ export default function Navbar() {
                                 <>
                                 {user.role !== 'ADMIN' && (
                                     <Link href="/rewards" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
-                                        My Rewards ({user.badge_count} Badges)
+                                        My Rewards ({user.badge_count} Coins)
                                     </Link>
                                 )}
                                     <Link href="/profile" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">

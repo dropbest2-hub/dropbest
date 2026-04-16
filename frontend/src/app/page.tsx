@@ -197,7 +197,7 @@ export default function Home() {
                         <span className="bg-gradient-to-r from-violet-300 via-pink-300 to-fuchsia-300 bg-clip-text text-transparent">Exclusive Rewards.</span>
                     </h1>
                     <p className="text-xl text-violet-100 mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
-                        Shop smarter with our verified discovery engine. Earn badges for your style and convert them into shopping coupons.
+                        Shop smarter with our verified discovery engine. Earn coins for your style and convert them into shopping coupons.
                     </p>
 
                     <div className="flex flex-wrap items-center justify-center gap-4">

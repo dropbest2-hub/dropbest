@@ -20,7 +20,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
         }
 
         if (purchaseValue < 300) {
-            res.status(400).json({ error: 'Purchase value must be at least ₹300 to earn badges' });
+            res.status(400).json({ error: 'Purchase value must be at least ₹300 to earn coins' });
             return;
         }
 
@@ -141,7 +141,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
                 .eq('status', 'CONFIRMED');
 
             if (!countError && count === 3) {
-                // Award 25 badges to the referrer
+                // Award 25 coins to the referrer
                 const referrerId = referredUser.referred_by_id;
                 
                 const { data: referrer, error: referrerError } = await supabase

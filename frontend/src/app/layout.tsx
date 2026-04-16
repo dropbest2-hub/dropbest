@@ -10,11 +10,11 @@ export const metadata: Metadata = {
     default: "DropBest! - Discover, Review & Earn",
     template: "%s | DropBest!"
   },
-  description: "Discover the best products on DropBest!, review them, earn badges, and convert your badges into real coupons.",
-  keywords: ["DropBest", "buy by best", "product reviews", "earn badges", "shopping coupons", "affiliate"],
+  description: "Discover the best products on DropBest!, review them, earn coins, and convert your coins into real coupons.",
+  keywords: ["DropBest", "buy by best", "product reviews", "earn coins", "shopping coupons", "affiliate"],
   openGraph: {
     title: "DropBest! - Discover, Review & Earn",
-    description: "Discover the best products on DropBest!, review them, earn badges, and convert your badges into real coupons.",
+    description: "Discover the best products on DropBest!, review them, earn coins, and convert your coins into real coupons.",
     url: "https://dropbest.vercel.app",
     siteName: "DropBest!",
     locale: "en_IN",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "DropBest! - Discover, Review & Earn",
-    description: "Discover the best products on DropBest!, review them, earn badges, and convert your badges into real coupons.",
+    description: "Discover the best products on DropBest!, review them, earn coins, and convert your coins into real coupons.",
   },
   robots: {
     index: true,

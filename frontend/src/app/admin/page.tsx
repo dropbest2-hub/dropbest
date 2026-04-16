@@ -140,7 +140,7 @@ export default function AdminDashboard() {
  try {
  const val = parseFloat(purchaseValue[orderId]);
  if (isNaN(val) || val < 300) {
- alert("Purchase value must be at least ₹300 to earn badges. If it's less, the system technically rejects it or gives 0 badges.");
+ alert("Purchase value must be at least ₹300 to earn coins. If it's less, the system technically rejects it or gives 0 coins.");
  return;
  }
 
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
  );
 
  setPendingOrders(prev => prev.filter(o => o.id !== orderId));
- alert('Order confirmed and badges awarded!');
+ alert('Order confirmed and coins awarded!');
   } catch (error: unknown) {
   const message = error instanceof Error ? error.message : 'Failed to confirm order';
   alert(message);
@@ -399,7 +399,7 @@ export default function AdminDashboard() {
  className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
  >
  <h3 className="text-2xl font-bold text-gray-900 mb-2">40-Day Purchase Confirmations</h3>
- <p className="text-gray-500 mb-8">Review pending affiliate clicks. If 40 days have passed and a purchase is confirmed, award badges by entering the purchase value.</p>
+ <p className="text-gray-500 mb-8">Review pending affiliate clicks. If 40 days have passed and a purchase is confirmed, award coins by entering the purchase value.</p>
 
  {pendingOrders.length === 0 ? (
  <div className="text-center py-16 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
@@ -561,7 +561,7 @@ export default function AdminDashboard() {
  className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
  >
  <h3 className="text-2xl font-bold text-gray-900 mb-2">Registered Users</h3>
- <p className="text-gray-500 mb-8">View all active users on the platform, their roles, and current badge counts.</p>
+ <p className="text-gray-500 mb-8">View all active users on the platform, their roles, and current coin counts.</p>
 
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse">
@@ -571,7 +571,7 @@ export default function AdminDashboard() {
  <th className="py-4 px-4 font-bold text-gray-900">Email</th>
  <th className="py-4 px-4 font-bold text-gray-900">Role</th>
  <th className="py-4 px-4 font-bold text-gray-900">Level</th>
- <th className="py-4 px-4 font-bold text-gray-900">Badges</th>
+ <th className="py-4 px-4 font-bold text-gray-900">Coins</th>
  <th className="py-4 px-4 font-bold text-gray-900">Joined</th>
  </tr>
  </thead>

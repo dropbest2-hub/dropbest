@@ -276,7 +276,7 @@ export default function Rewards() {
                                 <Gift size={32} />
                             </div>
                             <h3 className="text-2xl font-black text-gray-900 mb-2">Basic Credit</h3>
-                            <p className="text-gray-500 font-medium mb-8">Standard badge redemption for wallet balance.</p>
+                            <p className="text-gray-500 font-medium mb-8">Standard coin redemption for wallet balance.</p>
                             
                             <div className="flex items-center justify-between py-6 border-y border-gray-50 mb-8">
                                 <div>
@@ -308,7 +308,7 @@ export default function Rewards() {
                                 <Zap size={32} />
                             </div>
                             <h3 className="text-2xl font-black mb-2">Elite Credit</h3>
-                            <p className="text-violet-100 font-medium mb-8">The most efficient way to use your earned badges.</p>
+                            <p className="text-violet-100 font-medium mb-8">The most efficient way to use your earned coins.</p>
                             
                             <div className="flex items-center justify-between py-6 border-y border-white/20 mb-8">
                                 <div>
@@ -346,7 +346,7 @@ export default function Rewards() {
                                     <Ticket size={48} className="text-gray-300" />
                                 </div>
                                 <h3 className="text-2xl font-black text-gray-900">Your wallet is empty</h3>
-                                <p className="text-gray-500 mt-2 max-w-sm mx-auto">Convert your badges or coins to see your exclusive coupon codes here.</p>
+                                <p className="text-gray-500 mt-2 max-w-sm mx-auto">Convert your coins to see your exclusive coupon codes here.</p>
                                 <button onClick={() => setActiveTab('shop')} className="mt-8 text-violet-600 font-black uppercase tracking-widest text-sm hover:underline">Go to Shop</button>
                             </div>
                         ) : (

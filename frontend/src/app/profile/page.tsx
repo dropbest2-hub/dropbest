@@ -212,7 +212,7 @@ export default function Profile() {
                         </div>
                         <div className="relative z-10 flex flex-col items-center text-center">
                             <h3 className="text-xl font-black mb-2 flex items-center gap-2">Refer & Earn! 🎁</h3>
-                            <p className="text-brand-50 text-xs font-medium mb-6">Refer 1 friend who completes 3 purchases to get 25 badges!</p>
+                            <p className="text-brand-50 text-xs font-medium mb-6">Refer 1 friend who completes 3 purchases to get 25 coins!</p>
                             
                             <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 w-full border border-white/20 mb-6 group-hover:scale-105 transition-transform">
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-brand-100 mb-2">Your Referral Code</p>
@@ -400,7 +400,7 @@ export default function Profile() {
                             <div className="p-12 text-center text-gray-500">
                                 <Users size={48} className="mx-auto text-gray-300 mb-4" />
                                 <p>No friends referred yet.</p>
-                                <p className="text-sm mt-2">Share your code to earn bonus badges!</p>
+                                <p className="text-sm mt-2">Share your code to earn bonus coins!</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-gray-100">

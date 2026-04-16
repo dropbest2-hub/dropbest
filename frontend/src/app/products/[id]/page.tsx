@@ -259,7 +259,7 @@ export default function ProductDetails() {
  headers: { Authorization: `Bearer ${session.access_token}` }
  });
  
- toast.success('Review posted! Verified status and Badge badge will be awarded after order confirmation.');
+ toast.success('Review posted! Verified status and Coin bonus will be awarded after order confirmation.');
  setComment('');
  fetchData();
  } catch (error: unknown) {
@@ -379,9 +379,9 @@ export default function ProductDetails() {
  Platform Benefits
  </h3>
  <ul className="text-sm text-gray-600 space-y-2 font-medium">
- <li className="flex items-start gap-2">🚀 Earn up to 8 badges on confirmation</li>
+ <li className="flex items-start gap-2">🚀 Earn up to 8 coins on confirmation</li>
  <li className="flex items-start gap-2">🛡️ Early Review system enabled</li>
- <li className="flex items-start gap-2">💎 +1 extra badge for verified reviews</li>
+ <li className="flex items-start gap-2">💎 +1 extra coin for verified reviews</li>
  </ul>
  </div>
 
@@ -538,7 +538,7 @@ export default function ProductDetails() {
  </button>
  </form>
  <p className="mt-6 text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
- EARN 1 BADGE BONUS ONCE YOUR PURCHASE IS CONFIRMED BY ADMIN
+ EARN 1 COIN BONUS ONCE YOUR PURCHASE IS CONFIRMED BY ADMIN
  </p>
  </div>
  ) : (
@@ -550,7 +550,7 @@ export default function ProductDetails() {
  </div>
  <h3 className="text-2xl font-black mb-3">Wait a moment!</h3>
  <p className="text-violet-100 text-sm font-medium leading-relaxed mb-8">
- You need to have tracked this product via our links to leave a review and earn badges.
+ You need to have tracked this product via our links to leave a review and earn coins.
  </p>
  <button 
  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
