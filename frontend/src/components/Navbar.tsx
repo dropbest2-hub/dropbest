@@ -39,7 +39,7 @@ export default function Navbar() {
     const isActive = (path: string) => pathname === path;
 
     return (
-        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-2' : 'bg-transparent py-4'}`}>
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-2' : 'bg-transparent py-2'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -47,7 +47,7 @@ export default function Navbar() {
                              <img 
                                 src="/logo.png" 
                                 alt="DropBest!" 
-                                className="h-24 sm:h-32 w-auto object-contain drop-shadow-md"
+                                className="h-12 sm:h-16 w-auto object-contain drop-shadow-md"
                             />
                         </Link>
                     </div>
