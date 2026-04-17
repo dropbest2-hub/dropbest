@@ -40,14 +40,14 @@ export default function Navbar() {
 
     return (
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-0' : 'bg-transparent py-0'}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-full mx-auto px-2">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center">
                         <Link href="/" className="flex items-center gap-2 group hover:scale-105 transition-transform duration-300">
                              <img 
                                 src="/logo.png" 
                                 alt="DropBest!" 
-                                className="h-12 sm:h-20 w-64 sm:w-[500px] object-contain object-left drop-shadow-md"
+                                className="h-10 sm:h-16 w-80 sm:w-[600px] object-contain object-left drop-shadow-md"
                             />
                         </Link>
                     </div>
