@@ -40,7 +40,7 @@ export default function Navbar() {
 
     return (
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'glass py-0' : 'bg-transparent py-0'}`}>
-            <div className="max-w-full mx-auto px-2">
+            <div className="max-w-full mx-auto px-4 sm:px-8">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center">
                         <Link href="/" className="flex items-center gap-2 group hover:scale-105 transition-transform duration-300">
