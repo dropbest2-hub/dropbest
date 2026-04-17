@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import CustomCursor from '@/components/CustomCursor';
+import PWAInstall from '@/components/PWAInstall';
 
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
     const { initializeAuth, initialized, loading } = useAuthStore();
@@ -29,6 +30,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
             <CustomCursor />
             <Toaster position="top-right" />
             <Navbar />
+            <PWAInstall />
             <AnimatePresence>
                 <motion.main 
                     key={pathname}

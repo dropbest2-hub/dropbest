@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../store/authStore';
 import { Menu, X, ShoppingBag, User as UserIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import InstallPwaButton from './InstallPwaButton';
 
 const GoldCoinIcon = ({ className = "" }: { className?: string }) => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={`w-5 h-5 drop-shadow-sm ${className}`}>
@@ -81,7 +80,6 @@ export default function Navbar() {
                                         Admin Panel
                                     </Link>
                                 )}
-                                <InstallPwaButton />
                                 <div className="flex items-center gap-4 pl-4 border-l border-gray-200">
                                     <Link href="/profile" className="flex items-center gap-2 hover:text-brand-600 transition-colors">
                                         <span className="text-sm font-bold text-gray-700">Hi, {user.name?.split(' ')[0] || user.email.split('@')[0]}</span>
@@ -96,7 +94,6 @@ export default function Navbar() {
                                 <Link href="/auth" className="text-gray-600 hover:text-brand-600 font-medium transition-colors">
                                     Sign In
                                 </Link>
-                                <InstallPwaButton />
                                 <Link href="/auth" className="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 rounded-full font-medium transition-colors shadow-lg shadow-brand-500/30">
                                     Join Now
                                 </Link>
@@ -148,9 +145,6 @@ export default function Navbar() {
                                             Admin Panel
                                         </Link>
                                     )}
-                                    <div className="px-3 py-2 w-full">
-                                        <InstallPwaButton className="w-full" />
-                                    </div>
                                     <button
                                         onClick={signOut}
                                         className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
@@ -159,14 +153,9 @@ export default function Navbar() {
                                     </button>
                                 </>
                             ) : (
-                                <>
-                                    <Link href="/auth" className="block px-3 py-3 rounded-md text-base font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 mt-4">
-                                        Sign In / Register
-                                    </Link>
-                                    <div className="px-3 py-2 w-full mt-2">
-                                        <InstallPwaButton className="w-full" />
-                                    </div>
-                                </>
+                                <Link href="/auth" className="block px-3 py-3 rounded-md text-base font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 mt-4">
+                                    Sign In / Register
+                                </Link>
                             )}
                         </div>
                     </motion.div>
