@@ -47,7 +47,7 @@ export default function Navbar() {
                              <img 
                                 src="/logo.png" 
                                 alt="DropBest!" 
-                                className="h-14 sm:h-20 w-auto object-contain drop-shadow-sm"
+                                className="h-24 sm:h-32 w-auto object-contain drop-shadow-md"
                             />
                         </Link>
                     </div>
