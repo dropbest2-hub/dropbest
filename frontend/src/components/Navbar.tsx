@@ -2,8 +2,25 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../store/authStore';
-import { Menu, X, ShoppingBag, User as UserIcon, LogOut, Award } from 'lucide-react';
+import { Menu, X, ShoppingBag, User as UserIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const GoldCoinIcon = ({ className = "" }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={`w-5 h-5 drop-shadow-sm ${className}`}>
+        <circle cx="12" cy="12" r="10" fill="url(#goldGradient)" stroke="#D4AF37" strokeWidth="1"/>
+        <circle cx="12" cy="12" r="7" fill="none" stroke="#FFE066" strokeWidth="1"/>
+        <path d="M12 7V17" stroke="#996515" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M10 10H14" stroke="#996515" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M10 14H14" stroke="#996515" strokeWidth="1.5" strokeLinecap="round"/>
+        <defs>
+            <linearGradient id="goldGradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#FFE066" />
+                <stop offset="0.5" stopColor="#F5B700" />
+                <stop offset="1" stopColor="#D4AF37" />
+            </linearGradient>
+        </defs>
+    </svg>
+);
 
 export default function Navbar() {
     const { user, signOut } = useAuthStore();
@@ -47,21 +64,17 @@ export default function Navbar() {
                             {isActive('/') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                         </Link>
 
-                        {user?.role !== 'ADMIN' && (
-                            <Link href="/rewards" className={`relative py-2 font-medium transition-colors ${isActive('/rewards') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
-                                Rewards
-                                {isActive('/rewards') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
-                            </Link>
-                        )}
+                        <Link href="/rewards" className={`relative py-2 font-medium transition-colors ${isActive('/rewards') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
+                            Rewards
+                            {isActive('/rewards') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
+                        </Link>
 
                         {user ? (
                             <>
-                                {user.role !== 'ADMIN' && (
-                                    <Link href="/rewards" className="flex items-center gap-1 text-gray-600 hover:text-brand-600 font-medium transition-colors">
-                                        <Award size={18} />
-                                        <span>{user.badge_count} Coins</span>
-                                    </Link>
-                                )}
+                                <Link href="/rewards" className="flex items-center gap-1.5 text-gray-600 hover:text-brand-600 font-medium transition-colors">
+                                    <GoldCoinIcon />
+                                    <span className="font-bold text-gray-800">{user.badge_count || 0} Coins</span>
+                                </Link>
                                 {user.role === 'ADMIN' && (
                                     <Link href="/admin" className="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 rounded-full font-medium transition-colors shadow-lg shadow-brand-500/30">
                                         Admin Panel
@@ -114,19 +127,16 @@ export default function Navbar() {
                                 Discover Products
                             </Link>
 
-                            {user?.role !== 'ADMIN' && (
-                                <Link href="/rewards" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
-                                    Rewards
-                                </Link>
-                            )}
+                            <Link href="/rewards" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
+                                Rewards
+                            </Link>
 
                             {user ? (
                                 <>
-                                {user.role !== 'ADMIN' && (
-                                    <Link href="/rewards" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
-                                        My Rewards ({user.badge_count} Coins)
+                                    <Link href="/rewards" className="flex items-center gap-2 px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
+                                        <GoldCoinIcon />
+                                        <span className="font-bold text-gray-800">{user.badge_count || 0} Coins</span>
                                     </Link>
-                                )}
                                     <Link href="/profile" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
                                         Profile & Orders
                                     </Link>
