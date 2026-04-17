@@ -22,43 +22,6 @@ const GoldCoinIcon = ({ className = "" }: { className?: string }) => (
     </svg>
 );
 
-const Diamond3DLogo = () => (
-    <div className="flex items-center gap-3 group">
-        <div className="relative">
-            {/* Lavender Base Shadow/Glow */}
-            <div className="absolute -inset-3 bg-violet-400/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            
-            {/* 3D Diamond on Lavender Base */}
-            <div className="relative w-11 h-11 bg-gradient-to-br from-violet-50 to-violet-100 p-1.5 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.05),-4px_-4px_10px_rgba(255,255,255,0.9)] border border-white/60 transform group-hover:-translate-y-1 group-hover:rotate-3 transition-all duration-500 overflow-hidden">
-                {/* Internal Shine */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-                
-                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full drop-shadow-[0_2px_5px_rgba(139,92,246,0.3)]">
-                    <path d="M12 3L5 10L12 21L19 10L12 3Z" fill="url(#diamond-grad)" />
-                    <path d="M5 10H19L12 13L5 10Z" fill="white" fillOpacity="0.4" />
-                    <path d="M12 3L8.5 10L12 13L15.5 10L12 3Z" fill="white" fillOpacity="0.5" />
-                    <path d="M5 10L12 13V21L5 10Z" fill="black" fillOpacity="0.05" />
-                    <path d="M19 10L12 13V21L19 10Z" fill="black" fillOpacity="0.1" />
-                    <defs>
-                        <linearGradient id="diamond-grad" x1="5" y1="3" x2="19" y2="21" gradientUnits="userSpaceOnUse">
-                            <stop stopColor="#DDD6FE" />
-                            <stop offset="0.5" stopColor="#8B5CF6" />
-                            <stop offset="1" stopColor="#6D28D9" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-        </div>
-        
-        <div className="flex flex-col -space-y-1">
-            <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-gray-900 via-violet-900 to-indigo-900 bg-clip-text text-transparent leading-none">
-                DropBest<span className="text-brand-600 italic">!</span>
-            </span>
-            <span className="text-[10px] font-black text-brand-500 uppercase tracking-widest pl-0.5 opacity-80">Discover & Earn</span>
-        </div>
-    </div>
-);
-
 export default function Navbar() {
     const { user, signOut } = useAuthStore();
     const pathname = usePathname();
@@ -80,8 +43,12 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                        <Link href="/" className="hover:scale-105 transition-transform duration-300">
-                            <Diamond3DLogo />
+                        <Link href="/" className="flex items-center gap-2 group hover:scale-105 transition-transform duration-300">
+                             <img 
+                                src="/logo.png" 
+                                alt="DropBest!" 
+                                className="h-10 sm:h-12 w-auto object-contain drop-shadow-sm"
+                            />
                         </Link>
                     </div>
 
