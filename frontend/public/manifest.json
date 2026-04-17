@@ -1,0 +1,16 @@
+{
+  "name": "DropBest! - Discover, Review & Earn",
+  "short_name": "DropBest",
+  "description": "Discover the best products on DropBest!, review them, earn coins, and convert your coins into real coupons.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}

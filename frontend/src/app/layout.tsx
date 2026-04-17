@@ -1,11 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import RootLayoutClient from "./RootLayoutClient";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  themeColor: "#8b5cf6",
+};
+
 export const metadata: Metadata = {
+  manifest: "/manifest.json",
   title: {
     default: "DropBest! - Discover, Review & Earn",
     template: "%s | DropBest!"
