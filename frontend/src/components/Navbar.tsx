@@ -47,13 +47,13 @@ export default function Navbar() {
                              <img 
                                 src="/logo.png" 
                                 alt="DropBest!" 
-                                className="h-20 sm:h-32 w-auto object-contain object-left drop-shadow-md"
+                                className="h-20 sm:h-32 w-auto object-contain object-left drop-shadow-md -mt-4 sm:-mt-8"
                             />
                         </Link>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden md:flex items-center space-x-8 -mt-4 sm:-mt-8">
                         <Link href="/" className={`relative py-2 font-medium transition-colors ${isActive('/') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
                             Discover
                             {isActive('/') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
@@ -97,7 +97,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile menu button */}
-                    <div className="md:hidden flex items-center">
+                    <div className="md:hidden flex items-center -mt-4">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             className="text-gray-600 hover:text-brand-600 focus:outline-none"
