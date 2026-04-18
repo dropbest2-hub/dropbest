@@ -17,7 +17,8 @@ import {
  Award, 
  AlertCircle,
  Send,
- CheckCircle2
+ CheckCircle2,
+ Package
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { 
@@ -418,7 +419,7 @@ export default function ProductDetails() {
  </div>
 
  <AnimatePresence>
-  {(showTrackerPrompt || (lastOrderId && !product.external_order_id)) && (
+  {(showTrackerPrompt || lastOrderId) && (
   <motion.div 
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
