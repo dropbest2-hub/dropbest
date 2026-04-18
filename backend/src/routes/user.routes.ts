@@ -9,7 +9,9 @@ import {
     removeFromWatchlist,
     getCommunityStats,
     applyReferralCode,
-    getReferrals
+    getReferrals,
+    getNotifications,
+    markNotificationsRead
 } from '../controllers/user.controller';
 
 const router = Router();
@@ -23,6 +25,8 @@ router.get('/profile', requireAuth, getUserProfile);
 router.put('/profile', requireAuth, updateUserProfile);
 router.post('/referral/apply', requireAuth, applyReferralCode);
 router.get('/referrals', requireAuth, getReferrals);
+router.get('/notifications', requireAuth, getNotifications);
+router.put('/notifications/read', requireAuth, markNotificationsRead);
 
 // Watchlist routes
 router.get('/watchlist', requireAuth, getWatchlist);

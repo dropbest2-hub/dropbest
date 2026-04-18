@@ -260,3 +260,36 @@ export const applyReferralCode = async (req: Request, res: Response) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const getNotifications = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const { data, error } = await supabaseAdmin
+            .from('notifications')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+        if (error) throw error;
+        res.json(data || []);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const markNotificationsRead = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const { error } = await supabaseAdmin
+            .from('notifications')
+            .update({ read: true })
+            .eq('user_id', userId)
+            .eq('read', false);
+
+        if (error) throw error;
+        res.json({ message: 'Notifications marked as read' });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User as UserIcon, Settings, Package, ExternalLink, Calendar, ChevronRight, Eye, EyeOff, Trash2, Award, Gem, Users } from 'lucide-react';
+import { User as UserIcon, Settings, Package, ExternalLink, Calendar, ChevronRight, Eye, EyeOff, Trash2, Award, Gem, Users, Bell, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const BadgeCrystal3D = ({ count, level }: { count: number, level: string }) => {
@@ -52,8 +52,10 @@ export default function Profile() {
     const [watchlist, setWatchlist] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [watchingLoading, setWatchingLoading] = useState(true);
-    const [referrals, setReferrals] = useState<any[]>([]);
+    const [referrals, setReferrals] = useState([]);
     const [referralsLoading, setReferralsLoading] = useState(true);
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const [notificationsLoading, setNotificationsLoading] = useState(true);
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [editName, setEditName] = useState(user?.name || '');
@@ -109,9 +111,21 @@ export default function Profile() {
                 }
             };
 
+            const fetchNotifications = async () => {
+                try {
+                    const response = await api.get('/users/notifications');
+                    setNotifications(response.data);
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                } finally {
+                    setNotificationsLoading(false);
+                }
+            };
+
             fetchOrders();
             fetchWatchlist();
             fetchReferrals();
+            fetchNotifications();
             setEditName(user.name || '');
             setEditNotifications(user.notifications_enabled ?? true);
         }
@@ -290,7 +304,53 @@ export default function Profile() {
 
                 {/* Right Column - Activity */}
                 <div className="md:col-span-2 space-y-8">
-                    {/* Orders */}
+                    {/* Notifications Section */}
+                    {notifications.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
+                        >
+                            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-brand-100 text-brand-600 p-2 rounded-xl">
+                                        <Bell size={24} />
+                                    </div>
+                                    <h2 className="text-xl font-black text-gray-900 leading-tight">Notifications 🔔</h2>
+                                </div>
+                                {notifications.some(n => !n.read) && (
+                                    <button 
+                                        onClick={async () => {
+                                            await api.put('/users/notifications/read');
+                                            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+                                        }}
+                                        className="text-[10px] font-black text-brand-600 uppercase tracking-widest hover:underline"
+                                    >
+                                        Mark all as read
+                                    </button>
+                                )}
+                            </div>
+                            <div className="divide-y divide-gray-100 max-h-60 overflow-y-auto">
+                                {notifications.map((notif, idx) => (
+                                    <div key={notif.id} className={`p-4 flex gap-4 ${!notif.read ? 'bg-brand-50/30' : ''}`}>
+                                        <div className={`mt-1 ${notif.type === 'ALERT' ? 'text-red-500' : 'text-brand-500'}`}>
+                                            {notif.type === 'ALERT' ? <AlertTriangle size={18} /> : <Award size={18} />}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <p className={`text-sm ${!notif.read ? 'font-bold text-gray-900' : 'text-gray-600'}`}>
+                                                {notif.message}
+                                            </p>
+                                            <p className="text-[10px] text-gray-400 mt-1 font-medium">
+                                                {new Date(notif.created_at).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Orders tracker */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -323,7 +383,7 @@ export default function Profile() {
                             </div>
                         ) : (
                             <div className="divide-y divide-gray-100">
-                                {orders.map((order: any, idx) => (
+                                {orders.filter((o: any) => o.status !== 'REJECTED').map((order: any, idx) => (
                                     <motion.div
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
