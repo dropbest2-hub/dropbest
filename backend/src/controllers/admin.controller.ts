@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 
 // Helper to determine coins based on value
 const calculateCoins = (value: number): number => {
@@ -183,6 +183,25 @@ export const confirmOrder = async (req: Request, res: Response) => {
         }
 
         res.json({ message: 'Order confirmed successfully', badges: totalEarned, reviewBonus });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getAdminOrders = async (req: Request, res: Response) => {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from('orders')
+            .select(`
+                *,
+                products ( title ),
+                users ( email, name )
+            `)
+            .eq('status', 'PENDING')
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        res.json(data || []);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

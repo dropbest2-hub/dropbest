@@ -95,15 +95,9 @@ export default function AdminDashboard() {
  const prodRes = await axios.get(`${API_URL}/products`);
  setProducts(prodRes.data);
 
- // Fetch Pending Orders (using Supabase directly for Admin since we didn't expose a dedicated GET pending route in the Express backend blueprint, though we can query the public table or add a route. Actually, for speed, we query Supabase directly for Admin pending orders).
- const { data: ordersData, error: ordersError } = await supabase
- .from('orders')
- .select(`*, users ( email, name ), products ( title )`)
- .eq('status', 'PENDING')
- .order('created_at', { ascending: true });
-
- if (ordersError) throw ordersError;
- setPendingOrders(ordersData || []);
+ // Fetch Pending Orders
+ const ordersRes = await axios.get(`${API_URL}/admin/orders`, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+ setPendingOrders(ordersRes.data || []);
 
  // Fetch All Users (Requires new DB policy)
  const { data: usersData, error: usersError } = await supabase
