@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import axios from 'axios';
+import api, { API_URL } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -33,7 +33,7 @@ import {
   Area
 } from 'recharts';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+
 
 interface Review {
  id: string;
@@ -198,10 +198,10 @@ export default function ProductDetails() {
   const fetchData = useCallback(async () => {
     try {
       const [prodRes, revRes, histRes, moreRes] = await Promise.all([
-        axios.get(`${API_URL}/products/${id}`),
-        axios.get(`${API_URL}/reviews/${id}`),
-        axios.get(`${API_URL}/products/${id}/history`),
-        axios.get(`${API_URL}/products`)
+        api.get(`/products/${id}`),
+        api.get(`/reviews/${id}`),
+        api.get(`/products/${id}/history`),
+        api.get(`/products`)
       ]);
       setProduct(prodRes.data);
       setReviews(revRes.data);
@@ -212,9 +212,7 @@ export default function ProductDetails() {
 
  // Check if user can review (has ANY order for this product)
  if (user && session) {
- const { data: userOrders } = await axios.get(`${API_URL}/orders`, {
- headers: { Authorization: `Bearer ${session.access_token}` }
- });
+ const { data: userOrders } = await api.get('/orders');
  const hasOrderedThisProduct = userOrders.some((o: { product_id: string }) => o.product_id === id);
  setCanReview(hasOrderedThisProduct);
  }
@@ -237,10 +235,9 @@ export default function ProductDetails() {
  const handleRedirect = async (link: string) => {
  if (user && session && product) {
  try {
- const response = await axios.post(
- `${API_URL}/orders/redirect`,
- { productId: product.id },
- { headers: { Authorization: `Bearer ${session.access_token}` } }
+ const response = await api.post(
+ '/orders/redirect',
+ { productId: product.id }
  );
  setLastOrderId(response.data.id || response.data.order?.id);
  setShowTrackerPrompt(true);
@@ -257,13 +254,11 @@ export default function ProductDetails() {
  
  setSubmitting(true);
  try {
- await axios.post(`${API_URL}/reviews`, {
- productId: id,
- rating,
- comment
- }, {
- headers: { Authorization: `Bearer ${session.access_token}` }
- });
+    await api.post('/reviews', {
+      productId: id,
+      rating,
+      comment
+    });
  
  toast.success('Review posted! Verified status and Coin bonus will be awarded after order confirmation.');
  setComment('');

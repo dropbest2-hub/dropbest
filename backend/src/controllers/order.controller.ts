@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 
 export const trackRedirect = async (req: Request, res: Response) => {
     try {
@@ -12,7 +12,7 @@ export const trackRedirect = async (req: Request, res: Response) => {
         }
 
         // Check if an order already exists for this user and product that is pending
-        const { data: existingOrder } = await supabase
+        const { data: existingOrder } = await supabaseAdmin
             .from('orders')
             .select('id')
             .eq('user_id', userId)
@@ -26,7 +26,7 @@ export const trackRedirect = async (req: Request, res: Response) => {
         }
 
         // Create a new PENDING order representing the affiliate click
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
             .from('orders')
             .insert([{
                 user_id: userId,
@@ -46,7 +46,7 @@ export const trackRedirect = async (req: Request, res: Response) => {
 export const getUserOrders = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
             .from('orders')
             .select(`
         *,

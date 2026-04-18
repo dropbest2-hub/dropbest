@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search } from 'lucide-react';
+import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search, Package } from 'lucide-react';
 import CategoryList from '@/components/CategoryList';
 import { useAuthStore } from '@/store/authStore';
 
@@ -47,11 +48,13 @@ const ProductStats = ({ count }: { count: number }) => {
 };
 
 export default function Home() {
+    const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuthStore();
     const [watchlist, setWatchlist] = useState<string[]>([]);
+    const [showTrackerPrompt, setShowTrackerPrompt] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -90,6 +93,7 @@ export default function Home() {
         if (user) {
             try {
                 await api.post('/orders/redirect', { productId });
+                setShowTrackerPrompt(true);
             } catch (error) {
                 console.error('Error tracking redirect:', error);
             }
@@ -446,6 +450,43 @@ export default function Home() {
                     </div>
                 )}
             </section>
+        {/* Tracker Prompt */}
+            <AnimatePresence>
+                {showTrackerPrompt && (
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9, y: 100 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 100 }}
+                        className="fixed bottom-8 left-0 right-0 z-[60] px-6 flex justify-center pointer-events-none"
+                    >
+                        <div className="bg-gray-900 border border-white/10 rounded-[2rem] p-6 shadow-2xl flex flex-col sm:flex-row items-center gap-6 pointer-events-auto max-w-2xl bg-blur-md">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-brand-500/20 text-brand-400 p-3 rounded-2xl">
+                                    <Package size={32} />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="text-white font-black text-lg leading-none mb-1">Mark Order Tracker? 🛒</h4>
+                                    <p className="text-gray-400 text-xs font-medium">Just placed an order? Track your coins now!</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                <button 
+                                    onClick={() => router.push('/profile')}
+                                    className="flex-1 sm:flex-none bg-brand-500 hover:bg-brand-600 text-white font-black text-xs px-8 py-3 rounded-2xl shadow-lg shadow-brand-500/20 transition-all active:scale-95"
+                                >
+                                    YES, TRACK IT!
+                                </button>
+                                <button 
+                                    onClick={() => setShowTrackerPrompt(false)}
+                                    className="p-3 text-gray-500 hover:text-white"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
