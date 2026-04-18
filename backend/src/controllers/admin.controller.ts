@@ -193,6 +193,7 @@ export const getAdminOrders = async (req: Request, res: Response) => {
                 users ( email, name )
             `)
             .eq('status', 'PENDING')
+            .not('external_order_id', 'is', null)
             .order('created_at', { ascending: true });
 
         if (error) throw error;
