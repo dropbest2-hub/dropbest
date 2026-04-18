@@ -403,8 +403,19 @@ export default function Profile() {
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: idx * 0.1 }}
                                         key={order.id}
-                                        className="p-6 hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0"
+                                        className="p-6 hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0 relative group"
                                     >
+                                        {/* Quick Delete Option (Top Right) */}
+                                        {order.status !== 'CONFIRMED' && (
+                                            <button 
+                                                onClick={() => handleRemoveTracker(order.id)}
+                                                className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100 sm:opacity-100"
+                                                title="Remove from tracker"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        )}
+
                                         <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
                                             {/* Product Info Left */}
                                             <div className="flex items-center gap-4 min-w-[200px]">
@@ -446,33 +457,15 @@ export default function Profile() {
                                             {/* Action Right */}
                                             <div className="shrink-0 flex items-center justify-end w-full sm:w-auto">
                                                 {order.status === 'PENDING' && !order.external_order_id ? (
-                                                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                                                        <button 
-                                                            onClick={() => setClaimingOrderId(order.id)}
-                                                            className="flex-grow bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
-                                                        >
-                                                            I'VE ORDERED THIS
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => handleRemoveTracker(order.id)}
-                                                            className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                                                            title="Remove from tracker"
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
-                                                    </div>
+                                                    <button 
+                                                        onClick={() => setClaimingOrderId(order.id)}
+                                                        className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-black px-6 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
+                                                    >
+                                                        I'VE ORDERED THIS
+                                                    </button>
                                                 ) : order.status === 'PENDING' && order.external_order_id ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex items-center gap-1.5 text-amber-500 font-black text-[10px] uppercase tracking-wider animate-pulse">
-                                                            Verifying...
-                                                        </div>
-                                                        <button 
-                                                            onClick={() => handleRemoveTracker(order.id)}
-                                                            className="p-2 text-gray-300 hover:text-red-500 transition-all text-xs"
-                                                            title="Cancel verification request"
-                                                        >
-                                                            Cancel
-                                                        </button>
+                                                    <div className="flex items-center gap-1.5 text-amber-500 font-black text-[10px] uppercase tracking-wider animate-pulse">
+                                                        Verifying Purchase...
                                                     </div>
                                                 ) : order.status === 'CONFIRMED' ? (
                                                     <div className="flex items-center gap-1.5 text-brand-600 font-black text-xs">
