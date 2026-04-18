@@ -61,3 +61,28 @@ export const getUserOrders = async (req: Request, res: Response) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const claimOrder = async (req: Request, res: Response) => {
+    try {
+        const { orderId } = req.params;
+        const { externalOrderId, purchaseValue } = req.body;
+        const userId = req.user?.id;
+
+        const { data, error } = await supabase
+            .from('orders')
+            .update({ 
+                external_order_id: externalOrderId,
+                purchase_value: purchaseValue,
+                status: 'PENDING' // Keep it pending but with data for admin
+            })
+            .eq('id', orderId)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        res.json(data);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};

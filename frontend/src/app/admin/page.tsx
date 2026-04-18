@@ -18,6 +18,7 @@ interface AdminOrder {
     purchase_value?: number;
     users?: { email: string; name: string | null };
     products?: { title: string };
+    external_order_id?: string;
 }
 
 interface AdminProduct {
@@ -417,6 +418,12 @@ export default function AdminDashboard() {
  <h4 className="font-bold text-gray-900 text-lg mb-1">{order.products?.title}</h4>
  <p className="text-sm text-gray-500">User: <span className="font-medium text-gray-700">{order.users?.email}</span></p>
  <p className="text-sm text-gray-500">Tracked On: {new Date(order.created_at).toLocaleDateString()}</p>
+ {order.external_order_id && (
+      <div className="mt-2 bg-brand-50 border border-brand-100 px-3 py-1.5 rounded-lg">
+          <p className="text-[10px] font-black text-brand-700 uppercase tracking-widest leading-none mb-1">User Provided Order ID</p>
+          <p className="text-sm font-bold text-gray-900">{order.external_order_id}</p>
+      </div>
+  )}
  </div>
 
  <div className="flex flex-col gap-3 w-full lg:w-auto">

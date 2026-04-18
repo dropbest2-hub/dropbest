@@ -63,6 +63,12 @@ export default function Profile() {
     const [referralCodeInput, setReferralCodeInput] = useState('');
     const [applyingReferral, setApplyingReferral] = useState(false);
 
+    // Claim Modal State
+    const [claimingOrderId, setClaimingOrderId] = useState<string | null>(null);
+    const [externalOrderId, setExternalOrderId] = useState('');
+    const [claimValue, setClaimValue] = useState('');
+    const [submittingClaim, setSubmittingClaim] = useState(false);
+
     useEffect(() => {
         if (!user && !useAuthStore.getState().loading) {
             router.push('/auth');
@@ -167,6 +173,31 @@ export default function Profile() {
         }
     };
 
+    const handleSubmitClaim = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!claimingOrderId) return;
+        setSubmittingClaim(true);
+        try {
+            await api.put(`/orders/${claimingOrderId}/claim`, {
+                externalOrderId: externalOrderId,
+                purchaseValue: parseFloat(claimValue)
+            });
+            const { toast } = await import('react-hot-toast');
+            toast.success('Order details submitted! Admin will verify and award coins soon.');
+            setClaimingOrderId(null);
+            setExternalOrderId('');
+            setClaimValue('');
+            // Refresh orders
+            const response = await api.get('/orders');
+            setOrders(response.data);
+        } catch (error: any) {
+            const { toast } = await import('react-hot-toast');
+            toast.error(error.response?.data?.error || 'Failed to submit claim');
+        } finally {
+            setSubmittingClaim(false);
+        }
+    };
+
     if (!user) return null;
 
     return (
@@ -266,11 +297,16 @@ export default function Profile() {
                         transition={{ delay: 0.1 }}
                         className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
                     >
-                        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                            <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
-                                <Package size={24} />
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
+                                    <Package size={24} />
+                                </div>
+                                <h2 className="text-xl font-black text-gray-900 leading-tight">Live Order Tracker 📦</h2>
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900">Purchase History</h2>
+                            <div className="hidden sm:block text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Real-time Status
+                            </div>
                         </div>
 
                         {loading ? (
@@ -289,26 +325,67 @@ export default function Profile() {
                             <div className="divide-y divide-gray-100">
                                 {orders.map((order: any, idx) => (
                                     <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: idx * 0.05 }}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1 }}
                                         key={order.id}
-                                        className="p-6 hover:bg-gray-50 transition-colors flex items-center gap-4"
+                                        className="p-6 hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0"
                                     >
-                                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                            {order.products?.image_url && (
-                                                <img src={order.products.image_url} alt="" className="w-full h-full object-cover" />
-                                            )}
-                                        </div>
-                                        <div className="flex-grow">
-                                            <h3 className="font-semibold text-gray-900 line-clamp-1">{order.products?.title || 'Unknown Product'}</h3>
-                                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                                                <span className="flex items-center gap-1"><Calendar size={14} /> {new Date(order.created_at).toLocaleDateString()}</span>
-                                                {order.status === 'PENDING' && (
-                                                    <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded text-xs font-semibold tracking-wider">PENDING</span>
-                                                )}
-                                                {order.status === 'CONFIRMED' && (
-                                                    <span className="text-brand-600 bg-brand-50 px-2 py-0.5 rounded text-xs font-semibold tracking-wider">CONFIRMED (+{order.confirmed_badges})</span>
+                                        <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                                            {/* Product Info Left */}
+                                            <div className="flex items-center gap-4 min-w-[200px]">
+                                                <div className="w-16 h-16 bg-white border border-gray-100 rounded-2xl overflow-hidden flex-shrink-0 shadow-sm p-1">
+                                                    {order.products?.image_url && (
+                                                        <img src={order.products.image_url} alt="" className="w-full h-full object-contain" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-grow">
+                                                    <h3 className="font-bold text-gray-900 line-clamp-1 text-sm">{order.products?.title || 'Unknown Product'}</h3>
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Tracked on {new Date(order.created_at).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Progress Tracker Center */}
+                                            <div className="flex-grow w-full">
+                                                <div className="relative h-1 bg-gray-100 rounded-full mb-4">
+                                                    {/* Progress Fill */}
+                                                    <motion.div 
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: order.status === 'CONFIRMED' ? '100%' : order.external_order_id ? '50%' : '15%' }}
+                                                        className={`absolute top-0 left-0 h-full rounded-full ${order.status === 'CONFIRMED' ? 'bg-brand-500' : 'bg-amber-400'}`}
+                                                    />
+                                                    
+                                                    {/* Step Dots */}
+                                                    <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full flex justify-between px-0.5 pointer-events-none">
+                                                        <div className={`w-3 h-3 rounded-full border-2 border-white shadow-sm ${order.status ? 'bg-brand-500' : 'bg-gray-200'}`} />
+                                                        <div className={`w-3 h-3 rounded-full border-2 border-white shadow-sm ${order.external_order_id ? 'bg-amber-400' : 'bg-gray-200'}`} />
+                                                        <div className={`w-3 h-3 rounded-full border-2 border-white shadow-sm ${order.status === 'CONFIRMED' ? 'bg-brand-500' : 'bg-gray-200'}`} />
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest px-1">
+                                                    <span className="text-brand-600">Ordered</span>
+                                                    <span className={order.external_order_id ? 'text-amber-500' : 'text-gray-300'}>Verifying</span>
+                                                    <span className={order.status === 'CONFIRMED' ? 'text-brand-600' : 'text-gray-300'}>Coins Released</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Action Right */}
+                                            <div className="shrink-0 flex items-center justify-end w-full sm:w-auto">
+                                                {order.status === 'PENDING' && !order.external_order_id ? (
+                                                    <button 
+                                                        onClick={() => setClaimingOrderId(order.id)}
+                                                        className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
+                                                    >
+                                                        I'VE ORDERED THIS
+                                                    </button>
+                                                ) : order.status === 'CONFIRMED' ? (
+                                                    <div className="flex items-center gap-1.5 text-brand-600 font-black text-xs">
+                                                        <Gem size={14} /> +{order.confirmed_badges} EARNED
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 text-amber-500 font-black text-[10px] uppercase tracking-wider animate-pulse">
+                                                        In Progress...
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -504,6 +581,75 @@ export default function Profile() {
                                         className="flex-1 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-md shadow-brand-500/20 disabled:opacity-70"
                                     >
                                         {saving ? 'Saving...' : 'Save Changes'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Claim Reward Modal */}
+            <AnimatePresence>
+                {claimingOrderId && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100"
+                        >
+                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                                <div>
+                                    <h2 className="text-xl font-black text-gray-900 leading-tight">Claim Coins 🤑</h2>
+                                    <p className="text-xs text-gray-500 font-medium">Have you purchased this product?</p>
+                                </div>
+                                <button onClick={() => setClaimingOrderId(null)} className="text-gray-400 hover:text-gray-600">
+                                    ✕
+                                </button>
+                            </div>
+                            <form onSubmit={handleSubmitClaim} className="p-6 space-y-5">
+                                <div className="p-4 bg-brand-50 rounded-2xl border border-brand-100">
+                                    <p className="text-xs text-brand-700 leading-relaxed font-medium">
+                                        Enter your Order ID from Amazon/Flipkart/Myntra so we can verify with the merchant and award your coins!
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Order ID / Transaction ID</label>
+                                    <input 
+                                        required
+                                        type="text" 
+                                        placeholder="Paste your order ID here"
+                                        value={externalOrderId}
+                                        onChange={(e) => setExternalOrderId(e.target.value)}
+                                        className="w-full bg-gray-50 border border-gray-100 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 rounded-xl px-4 py-3 outline-none transition-all font-medium"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Purchase Amount (₹)</label>
+                                    <input 
+                                        required
+                                        type="number" 
+                                        placeholder="Exact amount paid"
+                                        value={claimValue}
+                                        onChange={(e) => setClaimValue(e.target.value)}
+                                        className="w-full bg-gray-50 border border-gray-100 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 rounded-xl px-4 py-3 outline-none transition-all font-medium"
+                                    />
+                                </div>
+                                <div className="pt-2 flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setClaimingOrderId(null)}
+                                        className="flex-1 px-4 py-3 border border-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-50 text-sm transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={submittingClaim || !externalOrderId || !claimValue}
+                                        className="flex-1 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-black shadow-lg shadow-brand-500/20 disabled:opacity-70 transition-all text-sm"
+                                    >
+                                        {submittingClaim ? 'Submitting...' : 'Submit Claim'}
                                     </button>
                                 </div>
                             </form>

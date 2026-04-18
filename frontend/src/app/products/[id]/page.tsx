@@ -186,6 +186,8 @@ export default function ProductDetails() {
   const [otherProducts, setOtherProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showTrackerPrompt, setShowTrackerPrompt] = useState(false);
+  const [lastOrderId, setLastOrderId] = useState<string | null>(null);
  
  // Form State
  const [rating, setRating] = useState(5);
@@ -232,13 +234,15 @@ export default function ProductDetails() {
  }, [fetchData]);
 
  const handleRedirect = async (link: string) => {
- if (user && session) {
+ if (user && session && product) {
  try {
- await axios.post(
+ const response = await axios.post(
  `${API_URL}/orders/redirect`,
- { productId: id },
+ { productId: product.id },
  { headers: { Authorization: `Bearer ${session.access_token}` } }
  );
+ setLastOrderId(response.data.id || response.data.order?.id);
+ setShowTrackerPrompt(true);
  } catch (error) {
  console.error('Error tracking redirect:', error);
  }
@@ -412,6 +416,30 @@ export default function ProductDetails() {
  </button>
  )}
  </div>
+
+ <AnimatePresence>
+  {(showTrackerPrompt || (lastOrderId && !product.external_order_id)) && (
+  <motion.div 
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="mt-6 p-6 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden group"
+  >
+  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+  <Package size={80} className="text-white" />
+  </div>
+  <div className="relative z-10">
+  <h4 className="text-white font-black text-lg mb-2">Did you just order this? 🛒</h4>
+  <p className="text-gray-400 text-xs font-medium mb-4 max-w-[280px]">Great! Mark it as ordered now to start tracking your rewards immediately.</p>
+  <button 
+  onClick={() => router.push('/profile')}
+  className="bg-brand-500 hover:bg-brand-600 text-white font-black text-xs px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-brand-500/20 active:scale-95"
+  >
+  YES, I ORDERED! <ChevronRight size={16} />
+  </button>
+  </div>
+  </motion.div>
+  )}
+  </AnimatePresence>
  </motion.div>
  </div>
 
