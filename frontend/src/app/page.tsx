@@ -218,9 +218,66 @@ export default function Home() {
                     activeCategory={selectedCategory} 
                     onCategoryChange={(cat) => {
                         setSelectedCategory(cat);
-                        // Optional: clear search when category changes or keep it
                     }} 
                 />
+
+                {/* Official Brand Filters */}
+                <div className="mb-12">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 text-center">Shop official Stores</h3>
+                    <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+                        {[
+                            { id: 'amazon', name: 'Amazon', color: '#FF9900', lightColor: 'bg-[#FF9900]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+                            { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: 'https://www.vectorlogo.zone/logos/flipkart/flipkart-icon.svg' },
+                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: 'https://www.vectorlogo.zone/logos/myntra/myntra-icon.svg' }
+                        ].map((brand) => (
+                            <motion.button
+                                key={brand.id}
+                                whileHover={{ 
+                                    y: -8, 
+                                    scale: 1.05,
+                                    rotateY: 10,
+                                    transition: { type: "spring", stiffness: 400, damping: 10 }
+                                }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setSelectedCategory(selectedCategory === brand.id ? 'all' : brand.id)}
+                                className={`group relative flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 border-2 overflow-hidden
+                                    ${selectedCategory === brand.id 
+                                        ? `border-[${brand.color}] shadow-xl scale-105` 
+                                        : 'border-transparent bg-white shadow-sm hover:shadow-md'}`}
+                                style={{ 
+                                    borderColor: selectedCategory === brand.id ? brand.color : 'transparent',
+                                    perspective: '1000px'
+                                }}
+                            >
+                                {selectedCategory === brand.id && (
+                                    <div className="absolute inset-0 opacity-10" style={{ backgroundColor: brand.color }} />
+                                )}
+                                <div className="w-8 h-8 relative shrink-0">
+                                    <Image 
+                                        src={brand.logo} 
+                                        alt={brand.name} 
+                                        fill 
+                                        className={`object-contain transition-transform duration-500 group-hover:scale-110 ${selectedCategory === brand.id ? 'brightness-110' : 'grayscale group-hover:grayscale-0'}`} 
+                                    />
+                                </div>
+                                <span className={`font-black uppercase tracking-widest text-xs transition-colors
+                                    ${selectedCategory === brand.id ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'}`}
+                                    style={{ color: selectedCategory === brand.id ? brand.color : '' }}
+                                >
+                                    {brand.name}
+                                </span>
+
+                                {selectedCategory === brand.id && (
+                                    <motion.div 
+                                        layoutId="brand-indicator"
+                                        className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                                        style={{ backgroundColor: brand.color }}
+                                    />
+                                )}
+                            </motion.button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Search Bar */}
                 <div className="relative max-w-2xl mx-auto mb-12">

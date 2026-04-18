@@ -29,6 +29,7 @@ interface AdminProduct {
     category?: string;
     amazon_link?: string;
     flipkart_link?: string;
+    myntra_link?: string;
 }
 
 interface AdminUser {
@@ -62,7 +63,7 @@ export default function AdminDashboard() {
  // Forms
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
- const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
+ const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
  const [editingProductId, setEditingProductId] = useState<string | null>(null);
  const [isSyncing, setIsSyncing] = useState(false);
@@ -181,8 +182,8 @@ export default function AdminDashboard() {
 
  const handleAddProduct = async (e: React.FormEvent) => {
  e.preventDefault();
- if (!newProduct.amazon_link && !newProduct.flipkart_link) {
-     alert("Please provide at least one link (Amazon or Flipkart).");
+ if (!newProduct.amazon_link && !newProduct.flipkart_link && !newProduct.myntra_link) {
+     alert("Please provide at least one link (Amazon, Flipkart, or Myntra).");
      return;
  }
  try {
@@ -201,7 +202,7 @@ export default function AdminDashboard() {
      }
  setIsAddingProduct(false);
  setEditingProductId(null);
- setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
+ setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
  fetchData();
  } catch (error) {
  alert('Failed to save product');
@@ -216,6 +217,7 @@ export default function AdminDashboard() {
          image_url: product.image_url || '',
          amazon_link: product.amazon_link || '',
          flipkart_link: product.flipkart_link || '',
+         myntra_link: product.myntra_link || '',
          category: product.category || 'electronics'
      });
      setEditingProductId(product.id);
@@ -488,7 +490,7 @@ export default function AdminDashboard() {
      if (isAddingProduct) {
          setIsAddingProduct(false);
          setEditingProductId(null);
-         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', category: 'electronics' });
+         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
      } else {
          setIsAddingProduct(true);
      }
@@ -516,6 +518,7 @@ export default function AdminDashboard() {
  <textarea required placeholder="Product Description..." className="p-3 rounded-xl border md:col-span-2" rows={3} value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
  <input placeholder="Amazon Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.amazon_link} onChange={e => setNewProduct({ ...newProduct, amazon_link: e.target.value })} />
  <input placeholder="Flipkart Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.flipkart_link} onChange={e => setNewProduct({ ...newProduct, flipkart_link: e.target.value })} />
+ <input placeholder="Myntra Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.myntra_link} onChange={e => setNewProduct({ ...newProduct, myntra_link: e.target.value })} />
  <select required className="p-3 rounded-xl border md:col-span-2 bg-white" value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
      {CATEGORIES.filter(c => c.id !== 'all').map(category => (
          <option key={category.id} value={category.id}>{category.name}</option>
