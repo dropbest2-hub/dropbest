@@ -25,7 +25,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
         }
 
         // 1. Get the order
-        const { data: order, error: orderError } = await supabase
+        const { data: order, error: orderError } = await supabaseAdmin
             .from('orders')
             .select('*')
             .eq('id', id)
@@ -45,7 +45,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
         const earnedCoins = calculateCoins(purchaseValue);
 
         // 3. Update the order
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseAdmin
             .from('orders')
             .update({
                 purchase_value: purchaseValue,
@@ -98,14 +98,14 @@ export const confirmOrder = async (req: Request, res: Response) => {
                 .eq('product_id', order.product_id);
             
             // Increment coin for review
-            const { data: currentUser } = await supabase.from('users').select('coin_count').eq('id', order.user_id).single();
-            await supabase.from('users').update({ coin_count: (currentUser?.coin_count || 0) + 1 }).eq('id', order.user_id);
+            const { data: currentUser } = await supabaseAdmin.from('users').select('coin_count').eq('id', order.user_id).single();
+            await supabaseAdmin.from('users').update({ coin_count: (currentUser?.coin_count || 0) + 1 }).eq('id', order.user_id);
         }
 
         const totalEarned = earnedCoins + reviewBonus;
 
         // 6. Create a notification
-        await supabase.from('notifications').insert([{
+        await supabaseAdmin.from('notifications').insert([{
             user_id: order.user_id,
             type: 'CONFIRMATION',
             message: reviewBonus > 0 
@@ -172,7 +172,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
                         .eq('id', order.user_id);
 
                     // Notify referrer A
-                    await supabase.from('notifications').insert([{
+                    await supabaseAdmin.from('notifications').insert([{
                         user_id: referrerId,
                         type: 'REWARD',
                         message: `Referral Bonus! Your friend completed 3 purchases. You've been awarded 25 coins!`,
@@ -211,7 +211,7 @@ export const rejectOrder = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const { data: order, error: orderError } = await supabase
+        const { data: order, error: orderError } = await supabaseAdmin
             .from('orders')
             .select('*')
             .eq('id', id)
@@ -225,7 +225,7 @@ export const rejectOrder = async (req: Request, res: Response) => {
         const { message: customMessage } = req.body;
 
         // Update order status
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseAdmin
             .from('orders')
             .update({
                 status: 'REJECTED',
@@ -236,7 +236,7 @@ export const rejectOrder = async (req: Request, res: Response) => {
         if (updateError) throw updateError;
 
         // Create a notification for the user
-        await supabase.from('notifications').insert([{
+        await supabaseAdmin.from('notifications').insert([{
             user_id: order.user_id,
             type: 'ALERT',
             message: customMessage || 'Better luck next time. Your recent tracked purchase was not confirmed.',
@@ -267,7 +267,7 @@ export const approvePayout = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { utrNumber } = req.body;
-        const { error } = await supabase.from('payout_requests').update({ status: 'PAID', utr_number: utrNumber, updated_at: new Date().toISOString() }).eq('id', id);
+        const { error } = await supabaseAdmin.from('payout_requests').update({ status: 'PAID', utr_number: utrNumber, updated_at: new Date().toISOString() }).eq('id', id);
         if (error) throw error;
         res.json({ message: 'Payout approved successfully' });
     } catch (err: any) {
@@ -278,7 +278,7 @@ export const approvePayout = async (req: Request, res: Response) => {
 export const rejectPayout = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { data: payout } = await supabase.from('payout_requests').select('*').eq('id', id).single();
+        const { data: payout } = await supabaseAdmin.from('payout_requests').select('*').eq('id', id).single();
         if (!payout) {
              res.status(404).json({ error: 'Payout not found' });
              return;
@@ -290,11 +290,11 @@ export const rejectPayout = async (req: Request, res: Response) => {
         }
         
         // Refund to wallet
-        const { data: user } = await supabase.from('users').select('wallet_balance').eq('id', payout.user_id).single();
-        await supabase.from('users').update({ wallet_balance: Number(user?.wallet_balance || 0) + Number(payout.amount) }).eq('id', payout.user_id);
+        const { data: user } = await supabaseAdmin.from('users').select('wallet_balance').eq('id', payout.user_id).single();
+        await supabaseAdmin.from('users').update({ wallet_balance: Number(user?.wallet_balance || 0) + Number(payout.amount) }).eq('id', payout.user_id);
         
         // Reject request
-        await supabase.from('payout_requests').update({ status: 'REJECTED', updated_at: new Date().toISOString() }).eq('id', id);
+        await supabaseAdmin.from('payout_requests').update({ status: 'REJECTED', updated_at: new Date().toISOString() }).eq('id', id);
         res.json({ message: 'Payout rejected and refunded successfully' });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
