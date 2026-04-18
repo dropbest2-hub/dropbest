@@ -15,6 +15,7 @@ interface Product {
     image_url: string;
     amazon_link: string;
     flipkart_link: string;
+    myntra_link?: string;
     watch_count?: number;
     category?: string;
 }
@@ -293,6 +294,11 @@ export default function Home() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" style={{ perspective: '1000px' }}>
                         {products
                             .filter(p => {
+                                // Store-based filtering logic
+                                if (selectedCategory === 'amazon') return !!p.amazon_link;
+                                if (selectedCategory === 'flipkart') return !!p.flipkart_link;
+                                if (selectedCategory === 'myntra') return !!p.myntra_link;
+
                                 const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
                                 const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                                                      p.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -361,6 +367,14 @@ export default function Home() {
                                                     className="flex-1 flex items-center justify-center gap-2 bg-[#2874F0] hover:bg-[#2874F0]/90 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#2874F0]/10"
                                                 >
                                                     Flipkart <ExternalLink size={16} />
+                                                </button>
+                                            )}
+                                            {product.myntra_link && (
+                                                <button
+                                                    onClick={() => handleRedirect(product.id, product.myntra_link!)}
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-[#ff3f6c] hover:bg-[#ff3f6c]/90 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#ff3f6c]/10"
+                                                >
+                                                    Myntra <ExternalLink size={16} />
                                                 </button>
                                             )}
                                         </div>

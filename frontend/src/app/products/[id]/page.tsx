@@ -55,6 +55,7 @@ interface Product {
     image_url: string;
     amazon_link: string;
     flipkart_link: string;
+    myntra_link?: string;
     external_rating?: number;
     external_review_count?: string;
 }
@@ -400,6 +401,14 @@ export default function ProductDetails() {
  className="flex items-center justify-center gap-2 bg-[#2874F0] text-white py-4 rounded-2xl font-black shadow-lg shadow-[#2874F0]/20 hover:-translate-y-1 transition-all"
  >
  Buy on Flipkart <ExternalLink size={20} />
+ </button>
+ )}
+ {product.myntra_link && (
+ <button 
+ onClick={() => handleRedirect(product.myntra_link!)}
+ className="flex items-center justify-center gap-2 bg-[#ff3f6c] text-white py-4 rounded-2xl font-black shadow-lg shadow-[#ff3f6c]/20 hover:-translate-y-1 transition-all"
+ >
+ Buy on Myntra <ExternalLink size={20} />
  </button>
  )}
  </div>

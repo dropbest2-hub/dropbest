@@ -28,7 +28,8 @@ import {
     Car,
     Trophy,
     Briefcase,
-    Beaker
+    Beaker,
+    ShoppingBag
 } from 'lucide-react';
 
 export interface Category {
@@ -41,6 +42,11 @@ export interface Category {
 
 export const CATEGORIES: Category[] = [
     { id: 'all', name: 'All', icon: <Zap size={24} />, color: 'bg-violet-100 text-violet-600', group: 'All' },
+    
+    // Store Categories (Special)
+    { id: 'amazon', name: 'Amazon', icon: <ShoppingBag size={24} />, color: 'bg-orange-100 text-[#FF9900]', group: 'Stores' },
+    { id: 'flipkart', name: 'Flipkart', icon: <ShoppingBag size={24} />, color: 'bg-blue-100 text-[#2874F0]', group: 'Stores' },
+    { id: 'myntra', name: 'Myntra', icon: <ShoppingBag size={24} />, color: 'bg-pink-100 text-[#ff3f6c]', group: 'Stores' },
     
     // Electronics & Tech
     { id: 'electronics', name: 'Electronics', icon: <Smartphone size={24} />, color: 'bg-blue-100 text-blue-600', group: 'Electronics' },
