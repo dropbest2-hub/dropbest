@@ -231,8 +231,8 @@ export default function Home() {
                     <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
                         {[
                             { id: 'amazon', name: 'Amazon', color: '#FF9900', lightColor: 'bg-[#FF9900]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
-                            { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: 'https://www.vectorlogo.zone/logos/flipkart/flipkart-icon.svg' },
-                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: 'https://www.vectorlogo.zone/logos/myntra/myntra-icon.svg' }
+                            { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: 'https://cdn.iconscout.com/icon/free/png-512/free-flipkart-logo-icon-download-in-svg-png-gif-file-formats--shopping-brand-e-commerce-online-pack-logo-icons-226594.png?f=webp&w=256' },
+                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: 'https://cdn.iconscout.com/icon/free/png-512/free-myntra-logo-icon-download-in-svg-png-gif-file-formats--brand-shopping-software-social-media-pack-logos-icons-226615.png?f=webp&w=256' }
                         ].map((brand) => (
                             <motion.button
                                 key={brand.id}
