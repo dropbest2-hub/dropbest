@@ -97,3 +97,22 @@ export const claimOrder = async (req: Request, res: Response) => {
         res.status(500).json({ error: err.message || 'Internal Server Error' });
     }
 };
+
+export const deleteOrder = async (req: Request, res: Response) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user?.id;
+
+        const { error } = await supabaseAdmin
+            .from('orders')
+            .delete()
+            .eq('id', orderId)
+            .eq('user_id', userId)
+            .eq('status', 'PENDING'); // Can only delete pending orders
+
+        if (error) throw error;
+        res.json({ message: 'Order removed successfully' });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};

@@ -64,6 +64,7 @@ export default function AdminDashboard() {
  // Forms
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
+ const [manualCoins, setManualCoins] = useState<Record<string, string>>({});
  const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
  const [editingProductId, setEditingProductId] = useState<string | null>(null);
@@ -132,19 +133,21 @@ export default function AdminDashboard() {
  }
  };
 
- const handleConfirmOrder = async (orderId: string) => {
- try {
- const val = parseFloat(purchaseValue[orderId]);
- if (isNaN(val) || val < 300) {
- alert("Purchase value must be at least ₹300 to earn coins. If it's less, the system technically rejects it or gives 0 coins.");
- return;
- }
+  const handleConfirmOrder = async (orderId: string) => {
+  try {
+  const val = parseFloat(purchaseValue[orderId]);
+  const coinsVal = manualCoins[orderId] ? parseInt(manualCoins[orderId]) : null;
 
- await axios.post(
- `${API_URL}/admin/orders/${orderId}/confirm`,
- { purchaseValue: val },
- { headers: { Authorization: `Bearer ${session?.access_token}` } }
- );
+  if (isNaN(val)) {
+  alert("Please enter a valid Purchase value.");
+  return;
+  }
+
+  await axios.post(
+  `${API_URL}/admin/orders/${orderId}/confirm`,
+  { purchaseValue: val, coins: coinsVal },
+  { headers: { Authorization: `Bearer ${session?.access_token}` } }
+  );
 
  setPendingOrders(prev => prev.filter(o => o.id !== orderId));
  alert('Order confirmed and coins awarded!');
@@ -429,6 +432,13 @@ export default function AdminDashboard() {
  className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
  value={purchaseValue[order.id] || ''}
  onChange={(e) => setPurchaseValue(prev => ({ ...prev, [order.id]: e.target.value }))}
+ />
+ <input
+ type="number"
+ placeholder="Coins (Optional Override)"
+ className="border border-gray-200 bg-white rounded-xl px-4 py-2.5 w-full focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all mt-1"
+ value={manualCoins[order.id] || ''}
+ onChange={(e) => setManualCoins(prev => ({ ...prev, [order.id]: e.target.value }))}
  />
  {is40DaysPassed(order.created_at) && (
  <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-md font-bold text-center">Ready for Confirmation (40+ Days)</span>

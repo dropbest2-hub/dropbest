@@ -12,15 +12,10 @@ const calculateCoins = (value: number): number => {
 export const confirmOrder = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { purchaseValue } = req.body;
+        const { purchaseValue, coins } = req.body;
 
         if (purchaseValue === undefined) {
             res.status(400).json({ error: 'Purchase value is required' });
-            return;
-        }
-
-        if (purchaseValue < 300) {
-            res.status(400).json({ error: 'Purchase value must be at least ₹300 to earn coins' });
             return;
         }
 
@@ -41,8 +36,8 @@ export const confirmOrder = async (req: Request, res: Response) => {
             return;
         }
 
-        // 2. Calculate coins
-        const earnedCoins = calculateCoins(purchaseValue);
+        // 2. Calculate coins (use manual override if provided)
+        const earnedCoins = (coins !== undefined && coins !== null) ? Number(coins) : calculateCoins(purchaseValue);
 
         // 3. Update the order
         const { error: updateError } = await supabaseAdmin

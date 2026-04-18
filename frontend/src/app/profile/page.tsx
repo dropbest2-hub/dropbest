@@ -160,6 +160,20 @@ export default function Profile() {
         }
     };
 
+    const handleRemoveTracker = async (orderId: string) => {
+        if (!confirm('Are you sure you want to remove this tracked item?')) return;
+        try {
+            await api.delete(`/orders/${orderId}`);
+            setOrders(prev => prev.filter((o: any) => o.id !== orderId));
+            const { toast } = await import('react-hot-toast');
+            toast.success('Tracker removed');
+        } catch (error: any) {
+            console.error('Failed to remove tracker', error);
+            const { toast } = await import('react-hot-toast');
+            toast.error('Failed to remove tracker');
+        }
+    };
+
     const handleApplyReferral = async () => {
         if (!referralCodeInput) return;
         setApplyingReferral(true);
@@ -432,12 +446,34 @@ export default function Profile() {
                                             {/* Action Right */}
                                             <div className="shrink-0 flex items-center justify-end w-full sm:w-auto">
                                                 {order.status === 'PENDING' && !order.external_order_id ? (
-                                                    <button 
-                                                        onClick={() => setClaimingOrderId(order.id)}
-                                                        className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
-                                                    >
-                                                        I'VE ORDERED THIS
-                                                    </button>
+                                                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                                                        <button 
+                                                            onClick={() => setClaimingOrderId(order.id)}
+                                                            className="flex-grow bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
+                                                        >
+                                                            I'VE ORDERED THIS
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleRemoveTracker(order.id)}
+                                                            className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                            title="Remove from tracker"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                ) : order.status === 'PENDING' && order.external_order_id ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex items-center gap-1.5 text-amber-500 font-black text-[10px] uppercase tracking-wider animate-pulse">
+                                                            Verifying...
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => handleRemoveTracker(order.id)}
+                                                            className="p-2 text-gray-300 hover:text-red-500 transition-all text-xs"
+                                                            title="Cancel verification request"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
                                                 ) : order.status === 'CONFIRMED' ? (
                                                     <div className="flex items-center gap-1.5 text-brand-600 font-black text-xs">
                                                         <Gem size={14} /> +{order.confirmed_badges} EARNED
