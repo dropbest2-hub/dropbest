@@ -231,8 +231,8 @@ export default function Home() {
                     <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
                         {[
                             { id: 'amazon', name: 'Amazon', color: '#FF9900', lightColor: 'bg-[#FF9900]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg' },
-                            { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: 'https://img.icons8.com/color/512/flipkart.png' },
-                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: 'https://img.icons8.com/color/512/myntra.png' }
+                            { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Flipkart-brand.png' },
+                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Myntra_Logo.png' }
                         ].map((brand) => (
                             <motion.button
                                 key={brand.id}
