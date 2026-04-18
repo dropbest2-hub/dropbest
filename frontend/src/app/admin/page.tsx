@@ -31,6 +31,7 @@ interface AdminProduct {
     amazon_link?: string;
     flipkart_link?: string;
     myntra_link?: string;
+    search_keywords?: string;
 }
 
 interface AdminUser {
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
  const [manualCoins, setManualCoins] = useState<Record<string, string>>({});
- const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
+ const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics', search_keywords: '' });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
  const [editingProductId, setEditingProductId] = useState<string | null>(null);
  const [isSyncing, setIsSyncing] = useState(false);
@@ -200,7 +201,7 @@ export default function AdminDashboard() {
      }
  setIsAddingProduct(false);
  setEditingProductId(null);
- setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
+ setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics', search_keywords: '' });
  fetchData();
  } catch (error) {
  alert('Failed to save product');
@@ -216,7 +217,8 @@ export default function AdminDashboard() {
          amazon_link: product.amazon_link || '',
          flipkart_link: product.flipkart_link || '',
          myntra_link: product.myntra_link || '',
-         category: product.category || 'electronics'
+         category: product.category || 'electronics',
+         search_keywords: product.search_keywords || ''
      });
      setEditingProductId(product.id);
      setIsAddingProduct(true);
@@ -501,7 +503,7 @@ export default function AdminDashboard() {
      if (isAddingProduct) {
          setIsAddingProduct(false);
          setEditingProductId(null);
-         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics' });
+         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics', search_keywords: '' });
      } else {
          setIsAddingProduct(true);
      }
@@ -524,6 +526,7 @@ export default function AdminDashboard() {
  <form onSubmit={handleAddProduct} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
  <input required placeholder="Product Title" className="p-3 rounded-xl border" value={newProduct.title} onChange={e => setNewProduct({ ...newProduct, title: e.target.value })} />
+ <input required placeholder="Searching Product Name (Keywords)" className="p-3 rounded-xl border" value={newProduct.search_keywords} onChange={e => setNewProduct({ ...newProduct, search_keywords: e.target.value })} />
  <input required type="number" placeholder="Price (₹)" className="p-3 rounded-xl border" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
  <input required placeholder="Image URL" className="p-3 rounded-xl border md:col-span-2" value={newProduct.image_url} onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })} />
  <textarea required placeholder="Product Description..." className="p-3 rounded-xl border md:col-span-2" rows={3} value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />

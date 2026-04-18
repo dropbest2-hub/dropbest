@@ -19,6 +19,7 @@ interface Product {
     myntra_link?: string;
     watch_count?: number;
     category?: string;
+    search_keywords?: string;
 }
 
 const ProductStats = ({ count }: { count: number }) => {
@@ -362,7 +363,8 @@ export default function Home() {
 
                                 const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
                                 const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                                     p.description.toLowerCase().includes(searchQuery.toLowerCase());
+                                                     p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                     (p.search_keywords && p.search_keywords.toLowerCase().includes(searchQuery.toLowerCase()));
                                 return matchesCategory && matchesSearch;
                             })
                             .map((product, index) => (
