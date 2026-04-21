@@ -1,10 +1,11 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import api from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search, Package } from 'lucide-react';
+import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search, Package, HelpCircle } from 'lucide-react';
 import CategoryList from '@/components/CategoryList';
 import { useAuthStore } from '@/store/authStore';
 
@@ -486,7 +487,12 @@ export default function Home() {
                                 </div>
                                 <div className="text-left">
                                     <h4 className="text-white font-black text-lg leading-none mb-1">Mark Order Tracker? 🛒</h4>
-                                    <p className="text-gray-400 text-xs font-medium">Just placed an order? Track your coins now!</p>
+                                    <div className="flex flex-col">
+                                        <p className="text-gray-400 text-xs font-medium">Just placed an order? Track your coins now!</p>
+                                        <Link href="/how-to-track" className="text-brand-400 text-[10px] font-bold hover:underline mt-1 flex items-center gap-1">
+                                            How to find Order ID? <HelpCircle size={10} />
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 w-full sm:w-auto">
