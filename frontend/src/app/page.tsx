@@ -17,6 +17,7 @@ interface Product {
     amazon_link: string;
     flipkart_link: string;
     myntra_link?: string;
+    shopify_link?: string;
     watch_count?: number;
     category?: string;
     search_keywords?: string;
@@ -56,6 +57,7 @@ export default function Home() {
     const { user } = useAuthStore();
     const [watchlist, setWatchlist] = useState<string[]>([]);
     const [showTrackerPrompt, setShowTrackerPrompt] = useState(false);
+    const [selectedBrand, setSelectedBrand] = useState('all');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -218,14 +220,6 @@ export default function Home() {
             <section id="trending" className="scroll-mt-24 pt-10">
                 <ProductStats count={products.length} />
                 
-                <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Shop by Category</h3>
-                <CategoryList 
-                    activeCategory={selectedCategory} 
-                    onCategoryChange={(cat) => {
-                        setSelectedCategory(cat);
-                    }} 
-                />
-
                 {/* Official Brand Filters */}
                 <div className="mb-12">
                     <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 text-center">Shop official Stores</h3>
@@ -233,7 +227,8 @@ export default function Home() {
                         {[
                             { id: 'amazon', name: 'Amazon', color: '#FF9900', lightColor: 'bg-[#FF9900]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg' },
                             { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: '/flipkart.png' },
-                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: '/myntra.jpg' }
+                            { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: '/myntra.jpg' },
+                            { id: 'shopify', name: 'Shopify', color: '#96bf48', lightColor: 'bg-[#96bf48]/10', logo: '/shopify.png' }
                         ].map((brand) => (
                             <motion.button
                                 key={brand.id}
@@ -244,17 +239,20 @@ export default function Home() {
                                     transition: { type: "spring", stiffness: 400, damping: 10 }
                                 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => setSelectedCategory(selectedCategory === brand.id ? 'all' : brand.id)}
+                                onClick={() => {
+                                    setSelectedBrand(selectedBrand === brand.id ? 'all' : brand.id);
+                                    setSelectedCategory('all'); // Reset category on brand change
+                                }}
                                 className={`group relative flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 border-2 overflow-hidden
-                                    ${selectedCategory === brand.id 
+                                    ${selectedBrand === brand.id 
                                         ? `border-[${brand.color}] shadow-xl scale-105` 
                                         : 'border-transparent bg-white shadow-sm hover:shadow-md'}`}
                                 style={{ 
-                                    borderColor: selectedCategory === brand.id ? brand.color : 'transparent',
+                                    borderColor: selectedBrand === brand.id ? brand.color : 'transparent',
                                     perspective: '1000px'
                                 }}
                             >
-                                {selectedCategory === brand.id && (
+                                {selectedBrand === brand.id && (
                                     <div className="absolute inset-0 opacity-10" style={{ backgroundColor: brand.color }} />
                                 )}
                                 <div className="w-8 h-8 relative shrink-0">
@@ -262,17 +260,17 @@ export default function Home() {
                                         src={brand.logo} 
                                         alt={brand.name} 
                                         fill 
-                                        className={`object-contain transition-transform duration-500 group-hover:scale-110 ${selectedCategory === brand.id ? 'brightness-110' : 'grayscale group-hover:grayscale-0'}`} 
+                                        className={`object-contain transition-transform duration-500 group-hover:scale-110 ${selectedBrand === brand.id ? 'brightness-110' : 'grayscale group-hover:grayscale-0'}`} 
                                     />
                                 </div>
                                 <span className={`font-black uppercase tracking-widest text-xs transition-colors
-                                    ${selectedCategory === brand.id ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'}`}
-                                    style={{ color: selectedCategory === brand.id ? brand.color : '' }}
+                                    ${selectedBrand === brand.id ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'}`}
+                                    style={{ color: selectedBrand === brand.id ? brand.color : '' }}
                                 >
                                     {brand.name}
                                 </span>
 
-                                {selectedCategory === brand.id && (
+                                {selectedBrand === brand.id && (
                                     <motion.div 
                                         layoutId="brand-indicator"
                                         className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
@@ -283,6 +281,16 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
+
+                <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-4">
+                    {selectedBrand === 'all' ? 'Browse All Categories' : `Browse ${selectedBrand} Categories`}
+                </h3>
+                <CategoryList 
+                    activeCategory={selectedCategory} 
+                    onCategoryChange={(cat) => {
+                        setSelectedCategory(cat);
+                    }} 
+                />
 
                 {/* Search Bar */}
                 <div className="relative max-w-2xl mx-auto mb-12">
@@ -357,9 +365,10 @@ export default function Home() {
                         {products
                             .filter(p => {
                                 // Store-based filtering logic
-                                if (selectedCategory === 'amazon') return !!p.amazon_link;
-                                if (selectedCategory === 'flipkart') return !!p.flipkart_link;
-                                if (selectedCategory === 'myntra') return !!p.myntra_link;
+                                if (selectedBrand === 'amazon' && !p.amazon_link) return false;
+                                if (selectedBrand === 'flipkart' && !p.flipkart_link) return false;
+                                if (selectedBrand === 'myntra' && !p.myntra_link) return false;
+                                if (selectedBrand === 'shopify' && !p.shopify_link) return false;
 
                                 const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
                                 const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -440,6 +449,14 @@ export default function Home() {
                                                     Myntra <ExternalLink size={16} />
                                                 </button>
                                             )}
+                                            {product.shopify_link && (
+                                                <button
+                                                    onClick={() => handleRedirect(product.id, product.shopify_link!)}
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-[#96bf48] hover:bg-[#96bf48]/90 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#96bf48]/10"
+                                                >
+                                                    Shopify <ExternalLink size={16} />
+                                                </button>
+                                            )}
                                         </div>
 
                                         <a href={`/products/${product.id}`} className="mt-2 flex items-center justify-center gap-1 py-1 text-center text-sm text-gray-400 font-bold hover:text-brand-600 transition-colors uppercase tracking-widest">
@@ -452,6 +469,7 @@ export default function Home() {
                     </div>
                 )}
             </section>
+
         {/* Tracker Prompt */}
             <AnimatePresence>
                 {showTrackerPrompt && (

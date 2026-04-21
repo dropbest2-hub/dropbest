@@ -31,6 +31,7 @@ interface AdminProduct {
     amazon_link?: string;
     flipkart_link?: string;
     myntra_link?: string;
+    shopify_link?: string;
     search_keywords?: string;
 }
 
@@ -66,7 +67,7 @@ export default function AdminDashboard() {
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
  const [manualCoins, setManualCoins] = useState<Record<string, string>>({});
- const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics', search_keywords: '' });
+ const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopify_link: '', category: 'electronics', search_keywords: '' });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
  const [editingProductId, setEditingProductId] = useState<string | null>(null);
  const [isSyncing, setIsSyncing] = useState(false);
@@ -181,8 +182,8 @@ export default function AdminDashboard() {
 
  const handleAddProduct = async (e: React.FormEvent) => {
  e.preventDefault();
- if (!newProduct.amazon_link && !newProduct.flipkart_link && !newProduct.myntra_link) {
-     alert("Please provide at least one link (Amazon, Flipkart, or Myntra).");
+ if (!newProduct.amazon_link && !newProduct.flipkart_link && !newProduct.myntra_link && !newProduct.shopify_link) {
+     alert("Please provide at least one link (Amazon, Flipkart, Myntra, or Shopify).");
      return;
  }
  try {
@@ -201,7 +202,7 @@ export default function AdminDashboard() {
      }
  setIsAddingProduct(false);
  setEditingProductId(null);
- setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics', search_keywords: '' });
+ setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopify_link: '', category: 'electronics', search_keywords: '' });
  fetchData();
  } catch (error) {
  alert('Failed to save product');
@@ -217,6 +218,7 @@ export default function AdminDashboard() {
          amazon_link: product.amazon_link || '',
          flipkart_link: product.flipkart_link || '',
          myntra_link: product.myntra_link || '',
+         shopify_link: product.shopify_link || '',
          category: product.category || 'electronics',
          search_keywords: product.search_keywords || ''
      });
@@ -503,7 +505,7 @@ export default function AdminDashboard() {
      if (isAddingProduct) {
          setIsAddingProduct(false);
          setEditingProductId(null);
-         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', category: 'electronics', search_keywords: '' });
+         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopify_link: '', category: 'electronics', search_keywords: '' });
      } else {
          setIsAddingProduct(true);
      }
@@ -533,6 +535,7 @@ export default function AdminDashboard() {
  <input placeholder="Amazon Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.amazon_link} onChange={e => setNewProduct({ ...newProduct, amazon_link: e.target.value })} />
  <input placeholder="Flipkart Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.flipkart_link} onChange={e => setNewProduct({ ...newProduct, flipkart_link: e.target.value })} />
  <input placeholder="Myntra Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.myntra_link} onChange={e => setNewProduct({ ...newProduct, myntra_link: e.target.value })} />
+ <input placeholder="Shopify Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.shopify_link} onChange={e => setNewProduct({ ...newProduct, shopify_link: e.target.value })} />
  <select required className="p-3 rounded-xl border md:col-span-2 bg-white" value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
      {CATEGORIES.filter(c => c.id !== 'all').map(category => (
          <option key={category.id} value={category.id}>{category.name}</option>
