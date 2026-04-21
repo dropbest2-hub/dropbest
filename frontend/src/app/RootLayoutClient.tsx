@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import CustomCursor from '@/components/CustomCursor';
 import PWAInstall from '@/components/PWAInstall';
+import Link from 'next/link';
+import { HelpCircle } from 'lucide-react';
 
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
     const { initializeAuth, initialized, loading } = useAuthStore();
@@ -44,6 +46,22 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                     {children}
                 </motion.main>
             </AnimatePresence>
+
+            {/* Global Floating Help Button */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <Link 
+                        href="/how-to-track" 
+                        className="flex items-center gap-2 bg-white/80 backdrop-blur-md text-brand-600 px-5 py-3 rounded-2xl shadow-xl border border-brand-100 font-extrabold text-sm hover:bg-white hover:shadow-brand-500/10 transition-all"
+                    >
+                        <HelpCircle size={20} className="animate-pulse" /> Tracking Help?
+                    </Link>
+                </motion.div>
+            </div>
+
             <footer className="bg-brand-50 border-t border-brand-100 pt-16 pb-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">

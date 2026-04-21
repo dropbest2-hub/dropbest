@@ -24,7 +24,7 @@ export default function GuidePage() {
                 </p>
             </header>
 
-            <div className="space-y-24">
+            <div className="space-y-32">
                 {/* Step 1 */}
                 <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <motion.div 
@@ -34,15 +34,16 @@ export default function GuidePage() {
                         className="space-y-6"
                     >
                         <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center font-black text-xl">1</div>
-                        <h2 className="text-3xl font-black text-gray-900">Click the Product Link</h2>
+                        <h2 className="text-3xl font-black text-gray-900">Click the Store Link</h2>
                         <p className="text-gray-500 font-medium text-lg leading-relaxed">
-                            Always click the "Amazon" or "Flipkart" button on DropBest before you buy. This ensures our community gets the referral and you get rewarded with coins!
+                            Always click the store button (Amazon, Flipkart, etc.) on DropBest before you buy. This ensures our community gets the referral and you get rewarded with coins!
                         </p>
                     </motion.div>
                     <div className="bg-brand-50 rounded-[2.5rem] p-8 border border-brand-100 flex items-center justify-center">
-                         <div className="flex gap-2">
+                         <div className="flex flex-wrap gap-2 justify-center">
                              <div className="bg-[#FF9900] text-white px-6 py-3 rounded-xl font-bold">Amazon</div>
                              <div className="bg-[#2874F0] text-white px-6 py-3 rounded-xl font-bold">Flipkart</div>
+                             <div className="bg-[#ff3f6c] text-white px-6 py-3 rounded-xl font-bold">Myntra</div>
                          </div>
                     </div>
                 </section>
@@ -66,13 +67,13 @@ export default function GuidePage() {
                         className="space-y-6 order-1 md:order-2"
                     >
                         <div className="w-12 h-12 bg-[#FF9900] text-white rounded-2xl flex items-center justify-center font-black text-xl">2</div>
-                        <h2 className="text-3xl font-black text-gray-900">Find Order ID on Amazon</h2>
+                        <h2 className="text-3xl font-black text-gray-900">Amazon Orders</h2>
                         <ul className="space-y-4">
                             {[
                                 "Complete your purchase normally.",
                                 "Go to 'Your Orders' in the Amazon app.",
-                                "Click on the item you just bought.",
-                                "Find the 'Order ID' (Format: 405-xxxx-xxxx)."
+                                "Find the 'Order ID' (Format: 405-xxxx-xxxx).",
+                                "Long press and Copy the full number."
                             ].map((text, i) => (
                                 <li key={i} className="flex gap-3 text-gray-500 font-medium">
                                     <CheckCircle size={20} className="text-green-500 shrink-0 mt-1" /> {text}
@@ -91,13 +92,13 @@ export default function GuidePage() {
                         className="space-y-6"
                     >
                         <div className="w-12 h-12 bg-[#2874F0] text-white rounded-2xl flex items-center justify-center font-black text-xl">3</div>
-                        <h2 className="text-3xl font-black text-gray-900">Find Order ID on Flipkart</h2>
+                        <h2 className="text-3xl font-black text-gray-900">Flipkart Orders</h2>
                         <ul className="space-y-4">
                             {[
                                 "Go to 'Account' > 'My Orders'.",
                                 "Select your latest purchase.",
                                 "Locate the 'Order ID' (Format: OD1234567890).",
-                                "Long press and Copy it."
+                                "Copy it and paste it in our tracker."
                             ].map((text, i) => (
                                 <li key={i} className="flex gap-3 text-gray-500 font-medium">
                                     <CheckCircle size={20} className="text-green-500 shrink-0 mt-1" /> {text}
@@ -117,24 +118,90 @@ export default function GuidePage() {
                     </div>
                 </section>
 
+                {/* Step 4 - Myntra */}
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div className="order-2 md:order-1 relative group">
+                        <div className="absolute inset-0 bg-pink-500 blur-3xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                        <Image 
+                            src="/guide/myntra-guide.png" 
+                            alt="Myntra Guide" 
+                            width={500} 
+                            height={600} 
+                            className="relative rounded-[2.5rem] shadow-2xl border border-gray-100 group-hover:scale-[1.02] transition-transform"
+                        />
+                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, x: 30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="space-y-6 order-1 md:order-2"
+                    >
+                        <div className="w-12 h-12 bg-[#ff3f6c] text-white rounded-2xl flex items-center justify-center font-black text-xl">4</div>
+                        <h2 className="text-3xl font-black text-gray-900">Myntra Orders</h2>
+                        <ul className="space-y-4">
+                            {[
+                                "Go to your Profile > 'Orders'.",
+                                "Select the product you purchased.",
+                                "Copy the 'Order ID' shown at the top.",
+                                "Example: 1234567-8901234567890."
+                            ].map((text, i) => (
+                                <li key={i} className="flex gap-3 text-gray-500 font-medium">
+                                    <CheckCircle size={20} className="text-green-500 shrink-0 mt-1" /> {text}
+                                </li>
+                            ))}
+                        </ul>
+                    </motion.div>
+                </section>
+
+                {/* Step 5 - Shopify */}
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <motion.div 
+                        initial={{ opacity: 0, x: -30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="space-y-6"
+                    >
+                        <div className="w-12 h-12 bg-[#96bf48] text-white rounded-2xl flex items-center justify-center font-black text-xl">5</div>
+                        <h2 className="text-3xl font-black text-gray-900">Shopify / Global Stores</h2>
+                        <ul className="space-y-4">
+                            {[
+                                "After purchase, check your Confirmation Email.",
+                                "Store will provide an 'Order Number'.",
+                                "Example: #1001 or #ORD-5678.",
+                                "Enter the full number with hash (#) if applicable."
+                            ].map((text, i) => (
+                                <li key={i} className="flex gap-3 text-gray-500 font-medium">
+                                    <CheckCircle size={20} className="text-green-500 shrink-0 mt-1" /> {text}
+                                </li>
+                            ))}
+                        </ul>
+                    </motion.div>
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-green-500 blur-3xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                        <Image 
+                            src="/guide/shopify-guide.png" 
+                            alt="Shopify Guide" 
+                            width={500} 
+                            height={600} 
+                            className="relative rounded-[2.5rem] shadow-2xl border border-gray-100 group-hover:scale-[1.02] transition-transform"
+                        />
+                    </div>
+                </section>
+
                 {/* Final Step */}
                 <section className="bg-gray-900 rounded-[3rem] p-12 text-white text-center relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl"></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl"></div>
                     
-                    <h2 className="text-3xl md:text-5xl font-black mb-6 relative z-10">Ready to Track?</h2>
+                    <h2 className="text-3xl md:text-5xl font-black mb-6 relative z-10">Done Shopping?</h2>
                     <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto relative z-10">
-                        Once you have the Order ID, come back to DropBest and enter it in the "YES, TRACK IT!" prompt.
+                        Copy your Order ID and enter it in DropBest Tracker to claim your coins! 💎
                     </p>
                     <Link href="/" className="inline-flex items-center gap-2 bg-white text-gray-900 px-10 py-5 rounded-3xl font-black text-xl hover:scale-105 transition-all shadow-2xl">
-                        START SHOPPING <ChevronLeft className="rotate-180" />
+                        GO TO TRACKER <ChevronLeft className="rotate-180" />
                     </Link>
                 </section>
             </div>
-
-            <footer className="mt-24 text-center pb-12 border-t border-gray-100 pt-12">
-                <p className="text-gray-400 font-medium">DropBest Official Guide • Earn coins for being stylish.</p>
-            </footer>
         </div>
     );
 }
