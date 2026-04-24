@@ -7,18 +7,20 @@ import api from '../api/api';
 const violetPrimary = '#6b38d4';
 const background = '#f8f9fa';
 
-export default function AdminAddProductScreen({ navigation }: any) {
-    const [title, setTitle] = useState('');
-    const [keywords, setKeywords] = useState('');
-    const [price, setPrice] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
-    const [description, setDescription] = useState('');
+export default function AdminAddProductScreen({ navigation, route }: any) {
+    const editingProduct = route.params?.product;
+
+    const [title, setTitle] = useState(editingProduct?.title || '');
+    const [keywords, setKeywords] = useState(editingProduct?.search_keywords || '');
+    const [price, setPrice] = useState(editingProduct?.price?.toString() || '');
+    const [imageUrl, setImageUrl] = useState(editingProduct?.image_url || '');
+    const [description, setDescription] = useState(editingProduct?.description || '');
     const [loading, setLoading] = useState(false);
-    const [amazonLink, setAmazonLink] = useState('');
-    const [flipkartLink, setFlipkartLink] = useState('');
-    const [myntraLink, setMyntraLink] = useState('');
-    const [shopifyLink, setShopifyLink] = useState('');
-    const [category, setCategory] = useState(CATEGORIES[1].id); // Default to first actual category
+    const [amazonLink, setAmazonLink] = useState(editingProduct?.amazon_link || '');
+    const [flipkartLink, setFlipkartLink] = useState(editingProduct?.flipkart_link || '');
+    const [myntraLink, setMyntraLink] = useState(editingProduct?.myntra_link || '');
+    const [shopifyLink, setShopifyLink] = useState(editingProduct?.shopify_link || '');
+    const [category, setCategory] = useState(editingProduct?.category || CATEGORIES[1].id);
 
     const handleSave = async () => {
         if (!title || !price || !imageUrl || !description) {
@@ -33,7 +35,7 @@ export default function AdminAddProductScreen({ navigation }: any) {
 
         try {
             setLoading(true);
-            await api.post('/products', {
+            const productData = {
                 title,
                 description,
                 price: parseFloat(price),
@@ -44,9 +46,15 @@ export default function AdminAddProductScreen({ navigation }: any) {
                 shopify_link: shopifyLink,
                 category,
                 search_keywords: keywords
-            });
+            };
 
-            Alert.alert("Success", "Product added successfully!");
+            if (editingProduct) {
+                await api.put(`/products/${editingProduct.id}`, productData);
+                Alert.alert("Success", "Product updated successfully!");
+            } else {
+                await api.post('/products', productData);
+                Alert.alert("Success", "Product added successfully!");
+            }
             navigation.goBack();
         } catch (error) {
             console.error('Error saving product:', error);
@@ -65,7 +73,7 @@ export default function AdminAddProductScreen({ navigation }: any) {
                 <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                     <ArrowLeft size={24} color="#191c1d" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Add New Product</Text>
+                <Text style={styles.headerTitle}>{editingProduct ? 'Edit Product' : 'Add New Product'}</Text>
                 <View style={{ width: 40 }} />
             </View>
 

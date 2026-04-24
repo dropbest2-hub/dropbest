@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaView, TextInput, StatusBar, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { Menu, Search, Star, CreditCard, ChevronRight, Edit2, MessageSquare } from 'lucide-react-native';
+import SideMenuModal from '../components/SideMenuModal';
 import api from '../api/api';
 
 const violetPrimary = '#6b38d4';
@@ -14,6 +15,7 @@ export default function AdminMessagesScreen({ navigation }: any) {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
 
     const fetchMessages = useCallback(async () => {
         try {
@@ -54,7 +56,7 @@ export default function AdminMessagesScreen({ navigation }: any) {
     }, [messages, searchQuery, selectedFilter]);
 
     const handleMenuPress = () => {
-        Alert.alert("Menu", "Side menu will open here.");
+        setIsMenuVisible(true);
     };
 
     const handleViewThread = (ticket: string) => {
@@ -68,6 +70,12 @@ export default function AdminMessagesScreen({ navigation }: any) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+            
+            <SideMenuModal 
+                visible={isMenuVisible} 
+                onClose={() => setIsMenuVisible(false)} 
+                navigation={navigation} 
+            />
             
             {/* Header */}
             <View style={styles.header}>

@@ -60,12 +60,48 @@ export default function AdminProductsScreen({ navigation }: any) {
         navigation.navigate('AdminAddProductScreen');
     };
 
-    const handleEditProduct = (name: string) => {
-        Alert.alert("Edit Product", `Editing ${name}`);
+    const handleEditProduct = (product: any) => {
+        // Pass the existing product data to the add screen in "Edit" mode
+        navigation.navigate('AdminAddProductScreen', { product });
     };
 
-    const handleProductOptions = (name: string) => {
-        Alert.alert("Options", `More options for ${name} (e.g. Delete, Hide)`);
+    const handleDeleteProduct = (productId: string, title: string) => {
+        Alert.alert(
+            "Delete Product",
+            `Are you sure you want to delete "${title}"? This action cannot be undone.`,
+            [
+                { text: "Cancel", style: "cancel" },
+                { 
+                    text: "Delete", 
+                    style: "destructive", 
+                    onPress: async () => {
+                        try {
+                            setLoading(true);
+                            await api.delete(`/products/${productId}`);
+                            Alert.alert("Success", "Product deleted successfully.");
+                            fetchProducts();
+                        } catch (error) {
+                            console.error("Delete failed", error);
+                            Alert.alert("Error", "Failed to delete product.");
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    const handleProductOptions = (product: any) => {
+        Alert.alert(
+            "Product Options",
+            product.title,
+            [
+                { text: "Edit Details", onPress: () => handleEditProduct(product) },
+                { text: "Delete Product", style: "destructive", onPress: () => handleDeleteProduct(product.id, product.title) },
+                { text: "Cancel", style: "cancel" }
+            ]
+        );
     };
 
     return (
@@ -185,10 +221,10 @@ export default function AdminProductsScreen({ navigation }: any) {
                                     <View style={styles.productFooterRow}>
                                         <Text style={styles.productPrice}>₹{product.price}</Text>
                                         <View style={styles.actionButtons}>
-                                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleEditProduct(product.title)}>
+                                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleEditProduct(product)}>
                                                 <Edit2 size={20} color="#7b7486" />
                                             </TouchableOpacity>
-                                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleProductOptions(product.title)}>
+                                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleProductOptions(product)}>
                                                 <MoreVertical size={20} color="#7b7486" />
                                             </TouchableOpacity>
                                         </View>

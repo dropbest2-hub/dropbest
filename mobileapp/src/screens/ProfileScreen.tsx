@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, ActivityIndicator, RefreshControl, Alert } from 'react-native';
 import { COLORS, SPACING, SHADOWS } from '../constants/theme';
 import { useAuthStore } from '../store/authStore';
 import api from '../api/api';
@@ -102,18 +102,21 @@ export default function ProfileScreen({ navigation }: any) {
                         icon={Package} 
                         title="My Orders" 
                         subtitle="Track and manage your orders" 
+                        onPress={() => navigation.navigate('RewardsTab')}
                         color={COLORS.brand[500]}
                     />
                     <MenuItem 
                         icon={Heart} 
                         title="Watchlist" 
                         subtitle="Your favorite items" 
+                        onPress={() => Alert.alert('Coming Soon', 'Watchlist feature is under development.')}
                         color={COLORS.accent.pink}
                     />
                     <MenuItem 
                         icon={Smartphone} 
                         title="Device Settings" 
                         subtitle="Push notifications & more" 
+                        onPress={() => Alert.alert('Coming Soon', 'Device settings will be available in the next update.')}
                         color={COLORS.accent.orange}
                     />
                 </View>
@@ -134,11 +137,13 @@ export default function ProfileScreen({ navigation }: any) {
                     <MenuItem 
                         icon={Shield} 
                         title="Privacy Policy" 
+                        onPress={() => navigation.navigate('Policy')}
                         color={COLORS.gray[500]}
                     />
                     <MenuItem 
                         icon={Mail} 
                         title="Contact Support" 
+                        onPress={() => navigation.navigate('Contact')}
                         color={COLORS.gray[500]}
                     />
                 </View>

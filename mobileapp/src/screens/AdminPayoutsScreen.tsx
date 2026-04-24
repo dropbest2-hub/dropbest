@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, RefreshControl, Alert, Image, SafeAreaView, Platform, StatusBar, Clipboard } from 'react-native';
 
 import { Menu, Wallet, Copy, X, CheckCircle2 } from 'lucide-react-native';
+import SideMenuModal from '../components/SideMenuModal';
 import api from '../api/api';
 
 const violetPrimary = '#6b38d4';
@@ -11,6 +12,7 @@ export default function AdminPayoutsScreen({ navigation }: any) {
     const [payouts, setPayouts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [utrInputs, setUtrInputs] = useState<Record<string, string>>({});
 
     const fetchPayouts = async () => {
@@ -78,6 +80,10 @@ export default function AdminPayoutsScreen({ navigation }: any) {
         );
     };
 
+    const handleMenuPress = () => {
+        setIsMenuVisible(true);
+    };
+
     const copyToClipboard = (text: string) => {
         Clipboard.setString(text);
         // Alert.alert('Copied', 'UPI ID copied to clipboard');
@@ -95,10 +101,16 @@ export default function AdminPayoutsScreen({ navigation }: any) {
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
             
+            <SideMenuModal 
+                visible={isMenuVisible} 
+                onClose={() => setIsMenuVisible(false)} 
+                navigation={navigation} 
+            />
+            
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconButton} onPress={handleMenuPress}>
                         <Menu size={24} color={violetPrimary} />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Dropbest Admin</Text>
