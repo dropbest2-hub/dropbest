@@ -203,6 +203,20 @@ export const getAdminOrders = async (req: Request, res: Response) => {
     }
 };
 
+export const getAllUsers = async (req: Request, res: Response) => {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from('users')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        res.json(data || []);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 export const rejectOrder = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -263,8 +277,30 @@ export const approvePayout = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { utrNumber } = req.body;
-        const { error } = await supabaseAdmin.from('payout_requests').update({ status: 'PAID', utr_number: utrNumber, updated_at: new Date().toISOString() }).eq('id', id);
+
+        // Get payout details to notify user
+        const { data: payout } = await supabaseAdmin.from('payout_requests').select('*').eq('id', id).single();
+        if (!payout) {
+            res.status(404).json({ error: 'Payout not found' });
+            return;
+        }
+
+        const { error } = await supabaseAdmin.from('payout_requests').update({ 
+            status: 'PAID', 
+            utr_number: utrNumber, 
+            updated_at: new Date().toISOString() 
+        }).eq('id', id);
+
         if (error) throw error;
+
+        // Notify user
+        await supabaseAdmin.from('notifications').insert([{
+            user_id: payout.user_id,
+            type: 'PAYMENT',
+            message: `Success! Your payout request of ₹${payout.amount} has been processed and paid. UTR: ${utrNumber}`,
+            read: false
+        }]);
+
         res.json({ message: 'Payout approved successfully' });
     } catch (err: any) {
         res.status(500).json({ error: err.message });

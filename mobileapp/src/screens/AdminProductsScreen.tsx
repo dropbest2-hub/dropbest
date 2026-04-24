@@ -1,0 +1,495 @@
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaView, TextInput, StatusBar, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
+import { Menu, Plus, Search, TrendingUp, AlertCircle, MoreVertical, Edit2 } from 'lucide-react-native';
+import { CATEGORIES } from '../lib/categories';
+import SideMenuModal from '../components/SideMenuModal';
+import api from '../api/api';
+
+const violetPrimary = '#6b38d4';
+const background = '#f8f9fa';
+
+export default function AdminProductsScreen({ navigation }: any) {
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All Items');
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+    const fetchProducts = useCallback(async () => {
+        try {
+            const response = await api.get('/products');
+            setProducts(response.data || []);
+        } catch (error) {
+            console.error('Fetch products failed', error);
+            Alert.alert("Error", "Failed to fetch products from database.");
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchProducts();
+        });
+        return unsubscribe;
+    }, [navigation, fetchProducts]);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchProducts();
+    };
+
+    // Filter products based on search query and selected category
+    const filteredProducts = useMemo(() => {
+        return products.filter(product => {
+            const productTitle = product.title || '';
+            const matchesSearch = productTitle.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesCategory = selectedCategory === 'All Items' || product.category === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
+    }, [products, searchQuery, selectedCategory]);
+
+    const handleMenuPress = () => {
+        setIsMenuVisible(true);
+    };
+
+    const handleNewItem = () => {
+        navigation.navigate('AdminAddProductScreen');
+    };
+
+    const handleEditProduct = (name: string) => {
+        Alert.alert("Edit Product", `Editing ${name}`);
+    };
+
+    const handleProductOptions = (name: string) => {
+        Alert.alert("Options", `More options for ${name} (e.g. Delete, Hide)`);
+    };
+
+    return (
+        <SafeAreaView style={styles.safeArea}>
+            <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+            
+            <SideMenuModal 
+                visible={isMenuVisible} 
+                onClose={() => setIsMenuVisible(false)} 
+                navigation={navigation} 
+            />
+
+            {/* Header */}
+            <View style={styles.header}>
+                <View style={styles.headerLeft}>
+                    <TouchableOpacity style={styles.iconButton} onPress={handleMenuPress}>
+                        <Menu size={24} color={violetPrimary} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Dropbest Admin</Text>
+                </View>
+                <View style={styles.headerRight}>
+                    <View style={styles.avatarContainer}>
+                        <Image 
+                            source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150' }}
+                            style={styles.avatar}
+                        />
+                    </View>
+                </View>
+            </View>
+
+            <ScrollView 
+                style={styles.container} 
+                contentContainerStyle={styles.contentPadding}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[violetPrimary]} />}
+            >
+                
+                {/* Title and Search */}
+                <View style={styles.titleSection}>
+                    <View style={styles.titleRow}>
+                        <Text style={styles.pageTitle}>Products</Text>
+                        <TouchableOpacity style={styles.addButton} onPress={handleNewItem}>
+                            <Plus size={18} color="#ffffff" />
+                            <Text style={styles.addButtonText}>NEW ITEM</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.searchContainer}>
+                        <Search size={20} color="#7b7486" style={styles.searchIcon} />
+                        <TextInput 
+                            style={styles.searchInput}
+                            placeholder="Search inventory..."
+                            placeholderTextColor="#7b7486"
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                        />
+                    </View>
+                </View>
+
+                {/* Stats Grid */}
+                <View style={styles.statsGrid}>
+                    <View style={[styles.statCard, styles.shadow]}>
+                        <Text style={styles.statLabel}>ACTIVE INVENTORY</Text>
+                        <Text style={styles.statValue}>{products.length}</Text>
+                        <View style={styles.statTrendRow}>
+                            <TrendingUp size={12} color="#8a5100" />
+                            <Text style={styles.statTrendText}>+12%</Text>
+                        </View>
+                    </View>
+                    <View style={[styles.statCard, styles.shadow]}>
+                        <Text style={styles.statLabel}>PENDING ORDERS</Text>
+                        <Text style={[styles.statValue, { color: '#8a5100' }]}>42</Text>
+                        <View style={styles.statTrendRow}>
+                            <AlertCircle size={12} color="#ba1a1a" />
+                            <Text style={[styles.statTrendText, { color: '#ba1a1a' }]}>URGENT</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Category Chips */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer} contentContainerStyle={styles.chipsContent}>
+                    {CATEGORIES.map(category => (
+                        <TouchableOpacity 
+                            key={category.id}
+                            style={[styles.chip, selectedCategory === category.name && styles.chipActive]}
+                            onPress={() => setSelectedCategory(category.name)}
+                        >
+                            <Text style={[styles.chipText, selectedCategory === category.name && styles.chipTextActive]}>
+                                {category.name}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+
+                {/* Product List */}
+                <View style={styles.productList}>
+                    {loading ? (
+                        <ActivityIndicator size="large" color={violetPrimary} style={{ marginTop: 40 }} />
+                    ) : filteredProducts.length === 0 ? (
+                        <Text style={styles.emptyText}>No products found.</Text>
+                    ) : (
+                        filteredProducts.map(product => (
+                            <TouchableOpacity key={product.id} style={[styles.productItem, styles.shadow]}>
+                                <View style={styles.productImageContainer}>
+                                    <Image 
+                                        source={{ uri: product.image_url || 'https://via.placeholder.com/150' }}
+                                        style={styles.productImage}
+                                    />
+                                </View>
+                                <View style={styles.productInfo}>
+                                    <View style={styles.productHeaderRow}>
+                                        <Text style={styles.productName} numberOfLines={1}>{product.title}</Text>
+                                        <View style={[styles.statusBadge, { backgroundColor: '#dcfce7' }]}>
+                                            <Text style={[styles.statusText, { color: '#15803d' }]}>Active</Text>
+                                        </View>
+                                    </View>
+                                    <Text style={styles.productCategory}>Category: {product.category}</Text>
+                                    <View style={styles.productFooterRow}>
+                                        <Text style={styles.productPrice}>₹{product.price}</Text>
+                                        <View style={styles.actionButtons}>
+                                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleEditProduct(product.title)}>
+                                                <Edit2 size={20} color="#7b7486" />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleProductOptions(product.title)}>
+                                                <MoreVertical size={20} color="#7b7486" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        ))
+                    )}
+                </View>
+
+                <View style={{ height: 100 }} />
+            </ScrollView>
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        height: 60,
+        backgroundColor: '#ffffff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+        zIndex: 10,
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 16,
+    },
+    iconButton: {
+        padding: 4,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: violetPrimary,
+        letterSpacing: -0.5,
+    },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatarContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        overflow: 'hidden',
+        backgroundColor: '#e2e8f0',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+    },
+    avatar: {
+        width: '100%',
+        height: '100%',
+    },
+    container: {
+        flex: 1,
+        backgroundColor: background,
+    },
+    contentPadding: {
+        padding: 20,
+    },
+    titleSection: {
+        marginBottom: 32,
+    },
+    titleRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    pageTitle: {
+        fontSize: 24,
+        fontWeight: '700',
+        color: '#191c1d',
+        letterSpacing: -0.5,
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: violetPrimary,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 12,
+        gap: 8,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#111827',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
+    },
+    addButtonText: {
+        color: '#ffffff',
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
+    searchContainer: {
+        position: 'relative',
+        width: '100%',
+    },
+    searchIcon: {
+        position: 'absolute',
+        left: 16,
+        top: '50%',
+        marginTop: -10,
+        zIndex: 2,
+    },
+    searchInput: {
+        backgroundColor: '#ffffff',
+        height: 48,
+        borderRadius: 24,
+        paddingLeft: 48,
+        paddingRight: 16,
+        fontSize: 14,
+        color: '#191c1d',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#111827',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
+    },
+    statsGrid: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 32,
+    },
+    statCard: {
+        flex: 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: 16,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+    },
+    statLabel: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: '#7b7486',
+        letterSpacing: 0.5,
+        marginBottom: 4,
+    },
+    statValue: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: violetPrimary,
+        marginBottom: 4,
+    },
+    statTrendRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    statTrendText: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: '#8a5100',
+    },
+    chipsContainer: {
+        marginHorizontal: -20,
+        marginBottom: 20,
+    },
+    chipsContent: {
+        paddingHorizontal: 20,
+        gap: 8,
+    },
+    chip: {
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: '#ffffff',
+        borderWidth: 1,
+        borderColor: '#cbc3d7',
+    },
+    chipActive: {
+        backgroundColor: violetPrimary,
+        borderColor: violetPrimary,
+    },
+    chipText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#494454',
+    },
+    chipTextActive: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#ffffff',
+    },
+    productList: {
+        gap: 16,
+    },
+    productItem: {
+        flexDirection: 'row',
+        backgroundColor: '#ffffff',
+        padding: 12,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        alignItems: 'center',
+        gap: 16,
+    },
+    productImageContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
+        backgroundColor: '#edeeef',
+        overflow: 'hidden',
+    },
+    productImage: {
+        width: '100%',
+        height: '100%',
+    },
+    grayscale: {
+        tintColor: 'gray',
+        opacity: 0.8,
+    },
+    productInfo: {
+        flex: 1,
+    },
+    productHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 4,
+    },
+    productName: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#191c1d',
+        flex: 1,
+        marginRight: 8,
+    },
+    statusBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 4,
+    },
+    statusText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    productCategory: {
+        fontSize: 12,
+        color: '#7b7486',
+        marginBottom: 8,
+    },
+    productFooterRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    productPrice: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: violetPrimary,
+    },
+    actionButtons: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    actionBtn: {
+        padding: 6,
+    },
+    emptyText: {
+        textAlign: 'center',
+        color: '#7b7486',
+        marginTop: 20,
+    },
+    shadow: {
+        ...Platform.select({
+            ios: {
+                shadowColor: '#111827',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
+    }
+});

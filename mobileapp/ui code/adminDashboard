@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#f8f9fa",
+                    "tertiary": "#555c6e",
+                    "primary-fixed-dim": "#d0bcff",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#cbc3d7",
+                    "on-tertiary-container": "#fefcff",
+                    "surface-dim": "#d9dadb",
+                    "secondary": "#8a5100",
+                    "on-tertiary-fixed": "#141b2b",
+                    "primary-fixed": "#e9ddff",
+                    "on-secondary-container": "#643900",
+                    "surface": "#f8f9fa",
+                    "on-background": "#191c1d",
+                    "tertiary-fixed": "#dce2f7",
+                    "outline": "#7b7486",
+                    "inverse-surface": "#2e3132",
+                    "tertiary-container": "#6e7487",
+                    "secondary-fixed-dim": "#ffb86f",
+                    "error": "#ba1a1a",
+                    "primary": "#6b38d4",
+                    "surface-tint": "#6d3bd7",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#191c1d",
+                    "on-tertiary-fixed-variant": "#404758",
+                    "secondary-fixed": "#ffdcbd",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-primary": "#d0bcff",
+                    "surface-container-low": "#f3f4f5",
+                    "on-surface-variant": "#494454",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#693c00",
+                    "surface-variant": "#e1e3e4",
+                    "surface-container-highest": "#e1e3e4",
+                    "surface-container-high": "#e7e8e9",
+                    "primary-container": "#8455ef",
+                    "on-primary-fixed-variant": "#5516be",
+                    "secondary-container": "#fe9800"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "2rem",
+                    "gutter-grid": "0.75rem",
+                    "stack-sm": "0.25rem",
+                    "stack-md": "0.5rem",
+                    "stack-lg": "1rem",
+                    "margin-main": "1.25rem"
+            },
+            "fontFamily": {
+                    "label-bold": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "label-bold": ["12px", {"lineHeight": "14px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar from JSON -->
+<header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 shadow-sm fixed top-0 z-50 flex items-center justify-between px-5 h-16 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-violet-600 dark:text-violet-400 active:scale-95 transition-all duration-200 cursor-pointer" data-icon="menu">menu</span>
+<h1 class="text-lg font-black tracking-tighter text-violet-600 dark:text-violet-400">Dropbest Admin</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-100 bg-slate-200">
+<img alt="Admin Profile" class="h-full w-full object-cover" data-alt="Close-up portrait of a professional man in a minimalist office setting with soft studio lighting and a clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaTpLfFEIG_f8B3vX7tV3arcC3g9DfCUu8E_QfkQvLc1poC0lQpcWcpGm8vj5OXpkiCBIsCUh1vX72228jK_WijQD65XKMy7EzP5FWy7O8lQMZzo9IseAcKdlqmJ_2E3hF96l1NQHZqQCAr0elNctELiCmOhzvN-K8MRFEC6Xx-CgGUSvD7B5q7cuTiiLfKDLUn-MV4RkR1njYVrSKM-GK_F6t1KF5mkQUBA-D5F5Y20P__V3hX2faHaCtayKxdAgL7cY4gNiz7Hw"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas Content -->
+<main class="flex-grow pt-24 pb-32 px-margin-main">
+<!-- Welcome Hero Section -->
+<section class="mb-section-gap">
+<div class="flex items-center gap-2 mb-stack-sm">
+<span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full font-label-caps text-label-caps uppercase tracking-widest">System Admin</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-background">Welcome back, DROPBEST!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-sm">Manage your platform confirmations and activities.</p>
+</section>
+<!-- Bento Grid for Quick Stats -->
+<div class="grid grid-cols-2 gap-gutter-grid mb-section-gap">
+<div class="col-span-1 p-stack-lg bg-white rounded-xl shadow-[0_8px_16px_rgba(17,24,39,0.08)] border border-slate-100 flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-violet-600" data-icon="pending_actions">pending_actions</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">TOTAL PENDING</p>
+<p class="font-headline-md text-headline-md text-primary">0</p>
+</div>
+</div>
+<div class="col-span-1 p-stack-lg bg-white rounded-xl shadow-[0_8px_16px_rgba(17,24,39,0.08)] border border-slate-100 flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle">check_circle</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">COMPLETED</p>
+<p class="font-headline-md text-headline-md text-on-background">1,248</p>
+</div>
+</div>
+</div>
+<!-- Confirmations Section (Primary Goal) -->
+<section>
+<div class="flex items-center justify-between mb-stack-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">40-Day Purchase Confirmations</h3>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="filter_list">filter_list</span>
+</div>
+<!-- Empty State Card -->
+<div class="bg-white rounded-xl border border-slate-100 shadow-[0_8px_16px_rgba(17,24,39,0.08)] p-10 flex flex-col items-center text-center">
+<div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-stack-lg">
+<span class="material-symbols-outlined text-4xl text-slate-300" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-stack-sm">No pending orders to confirm</h4>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[200px]">Everything is up to date. New purchase confirmations will appear here.</p>
+<button class="mt-section-gap bg-primary text-white px-6 py-3 rounded-full font-body-lg text-body-lg w-full active:scale-[0.98] transition-all">
+                    Check Logs
+                </button>
+</div>
+</section>
+<!-- Decorative Activity Card -->
+<section class="mt-section-gap">
+<div class="relative rounded-2xl overflow-hidden h-40 flex items-end p-stack-lg shadow-xl">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent z-10"></div>
+<div class="absolute inset-0">
+<img alt="Analytics background" class="h-full w-full object-cover" data-alt="Abstract visualization of growth data and financial charts with glowing violet lines on a dark sophisticated background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_lATcTMITSfnafaDV_Nb8k9wbdFyGSgmrh5QhWfELRzIn56_nCUvfd9H3QDERZuaq46gpPkSA6RLWu6-RZV7xs2xhMoPXh0qCP1AsnlDTgvW6Wi-aalqJb5u9K2ORCD-wY4lnHQjb60qZH0j7vbiClfTzuseqzPkQ37PuHJQFVX5EIPXM5woUO7FwvONpiMgzPugpcBrg30on2X2vuWmAKxqpBqoKDtcBWyL6lBbIa5-cNGnnkNp-Hnru6Q998jnMsk2HOoBEyiY"/>
+</div>
+<div class="relative z-20">
+<p class="font-label-caps text-label-caps text-primary-fixed uppercase mb-stack-sm">Weekly Report</p>
+<h4 class="font-headline-md text-headline-md text-white">System is healthy</h4>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar from JSON -->
+<!-- Active state logic: "Confirmations" maps to "Confirm" label -->
+<nav class="bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] fixed bottom-0 w-full z-50 rounded-t-2xl flex justify-around items-center h-20 px-2 pb-safe">
+<!-- Tab: Confirm (Active) -->
+<a class="flex flex-col items-center justify-center text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-violet-900/20 rounded-xl px-3 py-1 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined mb-0.5" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-caps text-[10px] font-bold uppercase tracking-widest">Confirm</span>
+</a>
+<!-- Tab: Products -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined mb-0.5" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-[10px] font-bold uppercase tracking-widest">Products</span>
+</a>
+<!-- Tab: Users -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined mb-0.5" data-icon="group">group</span>
+<span class="font-label-caps text-[10px] font-bold uppercase tracking-widest">Users</span>
+</a>
+<!-- Tab: Messages -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined mb-0.5" data-icon="chat">chat</span>
+<span class="font-label-caps text-[10px] font-bold uppercase tracking-widest">Messages</span>
+</a>
+<!-- Tab: Payouts -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined mb-0.5" data-icon="payments">payments</span>
+<span class="font-label-caps text-[10px] font-bold uppercase tracking-widest">Payouts</span>
+</a>
+</nav>
+</body></html>

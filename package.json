@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "dropbest-mobile": "file:mobileapp"
+  }
+}

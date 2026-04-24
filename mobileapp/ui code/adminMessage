@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#f8f9fa",
+                    "tertiary": "#555c6e",
+                    "primary-fixed-dim": "#d0bcff",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#cbc3d7",
+                    "on-tertiary-container": "#fefcff",
+                    "surface-dim": "#d9dadb",
+                    "secondary": "#8a5100",
+                    "on-tertiary-fixed": "#141b2b",
+                    "primary-fixed": "#e9ddff",
+                    "on-secondary-container": "#643900",
+                    "surface": "#f8f9fa",
+                    "on-primary-fixed": "#23005c",
+                    "tertiary-fixed-dim": "#c0c6db",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#fffbff",
+                    "surface-container": "#edeeef",
+                    "on-secondary-fixed": "#2c1600",
+                    "on-background": "#191c1d",
+                    "tertiary-fixed": "#dce2f7",
+                    "outline": "#7b7486",
+                    "inverse-surface": "#2e3132",
+                    "tertiary-container": "#6e7487",
+                    "secondary-fixed-dim": "#ffb86f",
+                    "error": "#ba1a1a",
+                    "primary": "#6b38d4",
+                    "surface-tint": "#6d3bd7",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#191c1d",
+                    "on-tertiary-fixed-variant": "#404758",
+                    "secondary-fixed": "#ffdcbd",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-primary": "#d0bcff",
+                    "surface-container-low": "#f3f4f5",
+                    "on-surface-variant": "#494454",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#693c00",
+                    "surface-variant": "#e1e3e4",
+                    "surface-container-highest": "#e1e3e4",
+                    "surface-container-high": "#e7e8e9",
+                    "primary-container": "#8455ef",
+                    "on-primary-fixed-variant": "#5516be",
+                    "secondary-container": "#fe9800"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "2rem",
+                    "gutter-grid": "0.75rem",
+                    "stack-sm": "0.25rem",
+                    "stack-md": "0.5rem",
+                    "stack-lg": "1rem",
+                    "margin-main": "1.25rem"
+            },
+            "fontFamily": {
+                    "label-bold": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "label-bold": ["12px", {"lineHeight": "14px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen text-on-surface font-body-md">
+<!-- TopAppBar -->
+<header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm border-b border-slate-100 dark:border-slate-800 docked full-width top-0 z-50 flex items-center justify-between px-5 h-16 w-full sticky">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-violet-600 dark:text-violet-400" data-icon="menu">menu</span>
+<h1 class="text-lg font-black tracking-tighter text-violet-600 dark:text-violet-400 font-sans">Dropbest Admin</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined text-slate-500" data-icon="search">search</span>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="professional portrait of a manager in a clean modern office setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFGOt0tEC1M0y4ykeX09yL8rcRqBq6jxalOyXpSzFcJ2oYHYP8von9Dipp99dNT2JTYLmaSVYgYNDZIbU53FfiuIGw6RjVSfg47wGlYJ1ktG3Gs7gY86LHg_ehdKXtFYrrU8i1avdxbgFa5MQdetFM5oqDsgLYuVo3tzpC2B_Z6TOlnU8LA4KOGD2ebBY9ju4WB8NlV-dCGI2M1cfpBzFnoBxcmXPt3oUIt44NjAkCM6CJvE_tNur5STSWNqKRmcfxRQ2BfSt1lBw"/>
+</div>
+</div>
+</header>
+<main class="pb-24 px-margin-main pt-6 max-w-2xl mx-auto">
+<!-- Hero Search Section -->
+<div class="mb-section-gap">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Support Messages</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-stack-lg">Manage user inquiries regarding rewards and marketplace issues.</p>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-white border border-outline-variant rounded-full font-body-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Search by user or subject..." type="text"/>
+</div>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 mb-section-gap overflow-x-auto pb-2 no-scrollbar">
+<button class="bg-primary text-white px-4 py-1.5 rounded-full font-label-bold text-label-bold whitespace-nowrap">All Messages</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-1.5 rounded-full font-label-bold text-label-bold whitespace-nowrap">Pending</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-1.5 rounded-full font-label-bold text-label-bold whitespace-nowrap">Rewards Only</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-1.5 rounded-full font-label-bold text-label-bold whitespace-nowrap">Refunds</button>
+</div>
+<!-- Messages List -->
+<div class="space-y-4">
+<!-- Message Card 1 (Active/Highlighted from UI) -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-outline-variant hover:shadow-md transition-shadow duration-200">
+<div class="flex justify-between items-start mb-stack-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">Alex Rivera</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ticket #RE-2049</p>
+</div>
+</div>
+<div class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Replied</div>
+</div>
+<div class="mb-stack-lg">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="stars">stars</span>
+<h3 class="font-label-bold text-label-bold text-secondary uppercase">Subject: rewards</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface line-clamp-2">"Hi, I completed the weekly challenge but my 500 bonus points haven't appeared in my wallet yet. Can you check?"</p>
+</div>
+<div class="flex justify-between items-center pt-stack-lg border-t border-slate-50">
+<span class="font-label-caps text-label-caps text-on-surface-variant">2 HOURS AGO</span>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:underline">
+                        View Thread
+                        <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Message Card 2 -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-outline-variant opacity-90">
+<div class="flex justify-between items-start mb-stack-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">Sarah Jenkins</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ticket #RE-2051</p>
+</div>
+</div>
+<div class="bg-violet-100 text-violet-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">New</div>
+</div>
+<div class="mb-stack-lg">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="stars">stars</span>
+<h3 class="font-label-bold text-label-bold text-secondary uppercase">Subject: rewards</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface line-clamp-2">"Where can I find the list of items I can redeem with my current balance? The shop page is blank."</p>
+</div>
+<div class="flex justify-between items-center pt-stack-lg border-t border-slate-50">
+<span class="font-label-caps text-label-caps text-on-surface-variant">5 HOURS AGO</span>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1">
+                        View Thread
+                        <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Message Card 3 -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-outline-variant">
+<div class="flex justify-between items-start mb-stack-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white">
+<img alt="User Profile" class="w-full h-full object-cover rounded-full" data-alt="close-up portrait of a young man with a friendly expression in a brightly lit modern environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY4LuRUPTZmipgud2uL0KW_i0FQshoO5a7M58ns71o9HilAnWQMPf6Z-bzldhmJDzfvAjHlSEyi4PTtmryTNgD4MC_O7gN1LwJqi02hJgNI0aDsSYC12M-V6b1yxroonVsA_CyIlg-bh0kcSTA-7c4legJomou1M2j4btdzyA0mmIKiuM5BlsPG9tMeftlQgVbhL6AKfwMICkjDi18wy2yzKfntDXeUsx_YKVhqGivqSSmlITLhxYEi7P2m6fJQ66O2do0J1PV9-8"/>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">Mark Thompson</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ticket #PA-3122</p>
+</div>
+</div>
+<div class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Replied</div>
+</div>
+<div class="mb-stack-lg">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-on-tertiary-container text-lg" data-icon="payments">payments</span>
+<h3 class="font-label-bold text-label-bold text-on-tertiary-container uppercase">Subject: payouts</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface line-clamp-2">"My payout for last month's referrals is still marked as processing. Does it take more than 3 days?"</p>
+</div>
+<div class="flex justify-between items-center pt-stack-lg border-t border-slate-50">
+<span class="font-label-caps text-label-caps text-on-surface-variant">YESTERDAY</span>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1">
+                        View Thread
+                        <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for New Message (Contextual for Messages screen) -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all z-40">
+<span class="material-symbols-outlined text-3xl" data-icon="edit">edit</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-2xl bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] flex justify-around items-center h-20 px-2 pb-safe">
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:translate-y-0.5 transition-transform hover:text-violet-500">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Confirm</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:translate-y-0.5 transition-transform hover:text-violet-500">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Products</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:translate-y-0.5 transition-transform hover:text-violet-500">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Users</span>
+</div>
+<div class="flex flex-col items-center justify-center text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-violet-900/20 rounded-xl px-3 py-1 active:translate-y-0.5 transition-transform">
+<span class="material-symbols-outlined" data-icon="chat" data-weight="fill">chat</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Messages</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:translate-y-0.5 transition-transform hover:text-violet-500">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Payouts</span>
+</div>
+</nav>
+</body></html>

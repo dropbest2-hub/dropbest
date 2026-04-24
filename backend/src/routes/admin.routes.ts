@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
-import { confirmOrder, rejectOrder, getPayouts, approvePayout, rejectPayout, getAdminOrders } from '../controllers/admin.controller';
+import { confirmOrder, rejectOrder, getPayouts, approvePayout, rejectPayout, getAdminOrders, getAllUsers } from '../controllers/admin.controller';
 
 const router = Router();
+
+// Users management
+router.get('/users', requireAdmin, getAllUsers);
 
 // Order confirmations (requires admin)
 router.get('/orders', requireAdmin, getAdminOrders);

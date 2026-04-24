@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#f8f9fa",
+                        "tertiary": "#555c6e",
+                        "primary-fixed-dim": "#d0bcff",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#cbc3d7",
+                        "on-tertiary-container": "#fefcff",
+                        "surface-dim": "#d9dadb",
+                        "secondary": "#8a5100",
+                        "on-tertiary-fixed": "#141b2b",
+                        "primary-fixed": "#e9ddff",
+                        "on-secondary-container": "#643900",
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed": "#23005c",
+                        "tertiary-fixed-dim": "#c0c6db",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#fffbff",
+                        "surface-container": "#edeeef",
+                        "on-secondary-fixed": "#2c1600",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed": "#dce2f7",
+                        "outline": "#7b7486",
+                        "inverse-surface": "#2e3132",
+                        "tertiary-container": "#6e7487",
+                        "secondary-fixed-dim": "#ffb86f",
+                        "error": "#ba1a1a",
+                        "primary": "#6b38d4",
+                        "surface-tint": "#6d3bd7",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-tertiary-fixed-variant": "#404758",
+                        "secondary-fixed": "#ffdcbd",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-primary": "#d0bcff",
+                        "surface-container-low": "#f3f4f5",
+                        "on-surface-variant": "#494454",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#693c00",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-high": "#e7e8e9",
+                        "primary-container": "#8455ef",
+                        "on-primary-fixed-variant": "#5516be",
+                        "secondary-container": "#fe9800"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "2rem",
+                        "gutter-grid": "0.75rem",
+                        "stack-sm": "0.25rem",
+                        "stack-md": "0.5rem",
+                        "stack-lg": "1rem",
+                        "margin-main": "1.25rem"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["12px", {"lineHeight": "14px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- Top AppBar -->
+<header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 shadow-sm fixed top-0 z-50 flex items-center justify-between px-5 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-violet-600">menu</span>
+<h1 class="text-lg font-black tracking-tighter text-violet-600 dark:text-violet-400">Dropbest Admin</h1>
+</div>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-primary">
+<img alt="Admin Profile" class="h-full w-full object-cover" data-alt="Professional headshot of a smiling male administrative manager with short dark hair and clean-shaven face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3gsQk2JRxT34jEVV54E1rtYNrbOQKeDui-gnLYseaCgacFs7frdc2kFixZthTiabvVEkfW3EVp7vJzcASFEkwWtmQgl3-3bxJ8ghJ-jn3PjWypJvXNdfUMeDdOduLerzWNmAbCJeMA3QbIKS6QtTk1d4bJ9nRGXiSd_AxH8A3IvqmEjy9cIiq5eFSm_qoX0TnWDb4dYPOpFtN58uLiuFB0oMN6ZExrybRJOmYJB3Al6Ctq6LzIDbjwwRk1PDmn1O5i_0RJSLmbqI"/>
+</div>
+</header>
+<main class="pt-20 px-margin-main">
+<!-- Welcome Section -->
+<section class="mt-4 mb-section-gap">
+<h2 class="font-headline-md text-headline-md text-on-background">Welcome back</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your registered users and system health.</p>
+</section>
+<!-- Search and Filter -->
+<div class="mb-gutter-grid flex gap-stack-md">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full bg-white border border-outline-variant rounded-full py-2.5 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="Search users..." type="text"/>
+</div>
+<button class="bg-white border border-outline-variant rounded-xl p-2.5 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<!-- Registered Users Header -->
+<div class="flex items-center justify-between mb-stack-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Registered Users</h3>
+<span class="font-label-caps text-label-caps bg-secondary-container/20 text-on-secondary-fixed-variant px-2 py-1 rounded-full">Active Now</span>
+</div>
+<!-- Users List -->
+<div class="space-y-stack-lg">
+<!-- User Card 1 -->
+<div class="bg-white rounded-xl p-4 shadow-[0_8px_16px_rgba(17,24,39,0.08)] border border-surface-container flex flex-col gap-stack-md">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="h-12 w-12 rounded-lg overflow-hidden bg-slate-100">
+<img alt="Sarah Miller" class="h-full w-full object-cover" data-alt="Close up portrait of a professional woman with a warm expression, natural lighting, high resolution office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd1muvyxAPB2ZYbaVUr5gRZAl_ff1H17fls9DAvb2SL_7pys8O8hFchqpDFg3R3M2E5uAw-hCVRq2KWg48mgXXVtng5FgJKriQVs81uhwZ-0ZpH1mmkAzdDcnGZyRPCCUPlOQdyFO5ETOF3-lOs1moUH3Ji1yYtWR-cPbS-G3ivKP6L_kUknxwEn9nz-1hjoFWMy3e7vb4RiRKTbOESVy1xXKacP15RM-kyTA4FGyIPXsinslb9tfucBBfA0gz_FQBADi_gI-6-Gs"/>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">Sarah Miller</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">sarah.m@dropbest.com</p>
+</div>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 bg-primary-container text-white rounded-sm">ADMIN</span>
+</div>
+<div class="grid grid-cols-2 gap-stack-md pt-stack-md border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">workspace_premium</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Level</span>
+<span class="font-label-bold text-label-bold text-secondary">Bronze</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Coins</span>
+<span class="font-label-bold text-label-bold text-on-surface">1,240</span>
+</div>
+</div>
+</div>
+</div>
+<!-- User Card 2 -->
+<div class="bg-white rounded-xl p-4 shadow-[0_8px_16px_rgba(17,24,39,0.08)] border border-surface-container flex flex-col gap-stack-md">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="h-12 w-12 rounded-lg overflow-hidden bg-slate-100">
+<img alt="James Wilson" class="h-full w-full object-cover" data-alt="Portrait of a young man with glasses smiling, studio lighting with a neutral gray background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoN1-yFqhbrxTRoryv6_yeXd9q3Do9CYciuS3aWxaSucHwBTybbvKhV5Pshzkb-n3WTRy44AMTpVD7EMaGTzpseIODtJg7eMjpQxq4hLJF-Z-2TFoc2dJz_NT0UhRuHBRYpgt7-zQDeZ07tKYPVW9Op0hjvBCFE5fXh_h1Ury8b1cP-artkAwVH6OCx2po6NLB6ZW0V3mhymZIZRJVmGVnEo5zZZ532ulzkcmZJjJCU0jNi5pZtg78ZdN6w1YRE2Txf541T07ghPc"/>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">James Wilson</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">j.wilson@gmail.com</p>
+</div>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 bg-surface-container-highest text-on-surface-variant rounded-sm">USER</span>
+</div>
+<div class="grid grid-cols-2 gap-stack-md pt-stack-md border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">workspace_premium</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Level</span>
+<span class="font-label-bold text-label-bold text-secondary">Bronze</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Coins</span>
+<span class="font-label-bold text-label-bold text-on-surface">450</span>
+</div>
+</div>
+</div>
+</div>
+<!-- User Card 3 -->
+<div class="bg-white rounded-xl p-4 shadow-[0_8px_16px_rgba(17,24,39,0.08)] border border-surface-container flex flex-col gap-stack-md opacity-90">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="h-12 w-12 rounded-lg overflow-hidden bg-slate-100">
+<img alt="Elena Rodriguez" class="h-full w-full object-cover" data-alt="Professional woman of color in business attire, modern office interior with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzUdgUROASsBZayRerzE4vs1r5YHfZrDjfrpZHsQAG6VI6-RqTq0JD1NcqrkNsgokYDywqYpemJfWRoI4PgS_9mROOWv64zbXAVqCr2CfvbLzQN2Lqqfzq5gle_Td3EHhAcYXtyeLNsLxbdbxKOgPRThTTrQrUbm7VrLs4pibvGAbB0eFG_Ll0E1MHslMYNdD9IajQRQJjLIs2kTrR_5omb3dyycLfnKcPnBITzy81yDdf2YlDtDPGnB55_IcOVo_-fwTZcyy5aZs"/>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">Elena Rodriguez</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">elena.rod@outlook.com</p>
+</div>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 bg-surface-container-highest text-on-surface-variant rounded-sm">USER</span>
+</div>
+<div class="grid grid-cols-2 gap-stack-md pt-stack-md border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">workspace_premium</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Level</span>
+<span class="font-label-bold text-label-bold text-secondary">Bronze</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Coins</span>
+<span class="font-label-bold text-label-bold text-on-surface">890</span>
+</div>
+</div>
+</div>
+</div>
+<!-- User Card 4 -->
+<div class="bg-white rounded-xl p-4 shadow-[0_8px_16px_rgba(17,24,39,0.08)] border border-surface-container flex flex-col gap-stack-md">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="h-12 w-12 rounded-lg overflow-hidden bg-slate-100">
+<img alt="Marcus Chen" class="h-full w-full object-cover" data-alt="Cheerful man with beard looking at camera, sunset lighting in a city background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQK1A2NoORJp21L8XMlxK1ErMxo9nuG_SFg0_LArwAr5U6K8ZZ57eCRoWKChoXK1I0cd9ixMtDJoLBn4ZHZQwXVNH3QcXP9T4NfigNrafEUBOfsuQGWQ0e51oI2o72fSqdA1PcAvdL0Em8v6CR_oRZa1LUBAA0oFrUtr9pTxbGl3SKT6T_IJED2_Hu1_1Tk8OhNxJkdX_X2gpMtZgJCajKmWLXS2P48CN-LTBNLp35u5JkjVlvgo8dak4JKHC_Va2sBQAKELY_lSQ"/>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface">Marcus Chen</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">m.chen@dropbest.com</p>
+</div>
+</div>
+<span class="font-label-caps text-label-caps px-2 py-0.5 bg-primary-container text-white rounded-sm">ADMIN</span>
+</div>
+<div class="grid grid-cols-2 gap-stack-md pt-stack-md border-t border-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">workspace_premium</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Level</span>
+<span class="font-label-bold text-label-bold text-secondary">Bronze</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[8px] text-outline uppercase tracking-wider">Coins</span>
+<span class="font-label-bold text-label-bold text-on-surface">3,120</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-2xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] flex justify-around items-center h-20 px-2 pb-safe">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Confirm</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Products</span>
+</a>
+<a class="flex flex-col items-center justify-center text-violet-600 dark:text-violet-400 bg-violet-50/50 dark:bg-violet-900/20 rounded-xl px-3 py-1 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Users</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-violet-500 active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-widest mt-1">Payouts</span>
+</a>
+</nav>
+</body></html>
