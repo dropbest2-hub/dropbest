@@ -102,7 +102,7 @@ export default function ProfileScreen({ navigation }: any) {
                         icon={Package} 
                         title="My Orders" 
                         subtitle="Track and manage your orders" 
-                        onPress={() => navigation.navigate('RewardsTab')}
+                        onPress={() => navigation.navigate('Main', { screen: 'RewardsTab' })}
                         color={COLORS.brand[500]}
                     />
                     <MenuItem 

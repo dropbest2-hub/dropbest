@@ -20,7 +20,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
     const [flipkartLink, setFlipkartLink] = useState(editingProduct?.flipkart_link || '');
     const [myntraLink, setMyntraLink] = useState(editingProduct?.myntra_link || '');
     const [shopifyLink, setShopifyLink] = useState(editingProduct?.shopify_link || '');
-    const [category, setCategory] = useState(editingProduct?.category || CATEGORIES[1].id);
+    const [category, setCategory] = useState(editingProduct?.category || (CATEGORIES[1] ? CATEGORIES[1].id : ''));
 
     const handleSave = async () => {
         if (!title || !price || !imageUrl || !description) {
@@ -58,7 +58,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
             navigation.goBack();
         } catch (error) {
             console.error('Error saving product:', error);
-            Alert.alert("Error", "Failed to add product to database.");
+            Alert.alert("Error", "Failed to save product to database.");
         } finally {
             setLoading(false);
         }

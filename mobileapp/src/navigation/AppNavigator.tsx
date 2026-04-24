@@ -156,6 +156,7 @@ export default function AppNavigator() {
                     <Stack.Group>
                         <Stack.Screen name="AdminMain" component={AdminTabNavigator} />
                         <Stack.Screen name="AdminAddProductScreen" component={AdminAddProductScreen} />
+                        <Stack.Screen name="Main" component={UserTabNavigator} />
                         <Stack.Screen name="ProfileTab" component={ProfileScreen} />
                         <Stack.Screen name="Contact" component={ContactScreen} />
                         <Stack.Screen name="Policy" component={PolicyScreen} />

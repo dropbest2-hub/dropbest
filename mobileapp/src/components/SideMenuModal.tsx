@@ -22,13 +22,16 @@ export default function SideMenuModal({ visible, onClose, navigation }: SideMenu
 
     const handleNavigate = (route: string) => {
         onClose();
-        // Since Admin screens are in a separate stack, navigating to user screens might require navigating to 'Main' stack first, or we can just mock it for now
-        // For now, let's just show an alert or attempt navigation
         if (route) {
             try {
-                navigation.navigate(route);
+                // If it's a user screen, we might need to navigate to 'Main' first
+                if (['HomeTab', 'RewardsTab', 'ProfileTab'].includes(route)) {
+                    navigation.navigate('Main', { screen: route });
+                } else {
+                    navigation.navigate(route);
+                }
             } catch(e) {
-                console.log("Navigation to user route from admin failed", e);
+                console.log("Navigation to route failed", e);
             }
         }
     };
