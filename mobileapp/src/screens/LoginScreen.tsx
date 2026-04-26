@@ -1,47 +1,62 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ActivityIndicator, StatusBar, Platform, Image } from 'react-native';
 import { COLORS, SHADOWS } from '../constants/theme';
 import { useAuthStore } from '../store/authStore';
 
 export default function LoginScreen() {
-    const login = useAuthStore(state => state.login);
-
-    const handleAdminLogin = async () => {
-        const mockAdminUser = {
-            id: 'admin-123',
-            email: 'admin@dropbest.com',
-            name: 'Admin User',
-            avatar_url: null,
-            role: 'ADMIN',
-            badge_count: 0,
-            coin_count: 0,
-            wallet_balance: 0,
-            user_level: 'ADMIN'
-        };
-        await login('mock-admin-token', mockAdminUser);
-    };
+    const signInWithGoogle = useAuthStore(state => state.signInWithGoogle);
+    const loading = useAuthStore(state => state.loading);
 
     return (
         <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="light-content" />
+            
+            {/* Decorative Background Blobs */}
+            <View style={styles.blob1} />
+            <View style={styles.blob2} />
+            <View style={styles.blob3} />
+
             <View style={styles.content}>
                 <View style={styles.header}>
                     <View style={styles.logoContainer}>
-                        <Text style={styles.logo}>D</Text>
+                        <Image 
+                            source={require('../../assets/dropbest_icon.png')} 
+                            style={styles.logoImage}
+                            resizeMode="contain"
+                        />
                     </View>
                     <Text style={styles.title}>DropBest!</Text>
-                    <Text style={styles.subtitle}>Admin Portal</Text>
+                    <Text style={styles.subtitle}>Curated Picks. Smart Rewards.</Text>
                 </View>
 
-                <View style={styles.loginCard}>
-                    <Text style={styles.loginTitle}>Development Mode</Text>
-                    <Text style={styles.loginDesc}>Google Auth has been removed for now so we can focus entirely on building the new Admin UI.</Text>
+                <View style={styles.bottomSection}>
+                    <View style={styles.loginCard}>
+                        <Text style={styles.loginTitle}>Welcome Back</Text>
+                        <Text style={styles.loginDesc}>
+                            Sign in to continue to DropBest and start earning rewards on every purchase.
+                        </Text>
 
-                    <TouchableOpacity 
-                        onPress={handleAdminLogin}
-                        style={styles.googleButton}
-                    >
-                        <Text style={styles.googleText}>Enter Admin Dashboard</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity 
+                            onPress={signInWithGoogle}
+                            style={[styles.googleButton, loading && styles.googleButtonDisabled]}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color={COLORS.white} />
+                            ) : (
+                                <View style={styles.googleContent}>
+                                    <View style={styles.googleIconPlaceholder}>
+                                        <Text style={styles.googleG}>G</Text>
+                                    </View>
+                                    <Text style={styles.googleText}>Continue with Google</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+
+                        <Text style={styles.terms}>
+                            By continuing, you agree to our Terms and Privacy Policy.
+                        </Text>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
@@ -53,75 +68,134 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.brand[600],
     },
+    blob1: {
+        position: 'absolute',
+        top: -100,
+        right: -100,
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    blob2: {
+        position: 'absolute',
+        top: '40%',
+        left: -80,
+        width: 200,
+        height: 200,
+        borderRadius: 100,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+    },
+    blob3: {
+        position: 'absolute',
+        bottom: 250,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+    },
     content: {
         flex: 1,
         justifyContent: 'space-between',
-        paddingVertical: 50,
     },
     header: {
         alignItems: 'center',
-        marginTop: 40,
+        marginTop: 80,
     },
     logoContainer: {
-        width: 80,
-        height: 80,
+        width: 100,
+        height: 100,
         backgroundColor: COLORS.white,
-        borderRadius: 25,
+        borderRadius: 30,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
+        marginBottom: 24,
         ...SHADOWS.lg,
+        transform: [{ rotate: '-10deg' }],
     },
-    logo: {
-        fontSize: 40,
-        fontWeight: '900',
-        color: COLORS.brand[600],
+    logoImage: {
+        width: 70,
+        height: 70,
     },
     title: {
-        fontSize: 36,
+        fontSize: 40,
         fontWeight: '900',
         color: COLORS.white,
-        letterSpacing: -1,
+        letterSpacing: -1.5,
     },
     subtitle: {
         fontSize: 16,
-        color: 'rgba(255, 255, 255, 0.8)',
+        color: 'rgba(255, 255, 255, 0.7)',
         fontWeight: '600',
-        marginTop: 5,
+        marginTop: 8,
+        letterSpacing: 0.5,
+    },
+    bottomSection: {
+        paddingHorizontal: 20,
+        paddingBottom: Platform.OS === 'ios' ? 20 : 40,
     },
     loginCard: {
         backgroundColor: COLORS.white,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
-        padding: 40,
-        paddingBottom: 60,
+        borderRadius: 40,
+        padding: 32,
         ...SHADOWS.lg,
     },
     loginTitle: {
         fontSize: 28,
         fontWeight: '900',
         color: COLORS.gray[900],
-        marginBottom: 10,
+        marginBottom: 8,
+        letterSpacing: -0.5,
     },
     loginDesc: {
-        fontSize: 16,
+        fontSize: 15,
         color: COLORS.gray[500],
         fontWeight: '500',
-        lineHeight: 24,
-        marginBottom: 35,
+        lineHeight: 22,
+        marginBottom: 32,
     },
     googleButton: {
         backgroundColor: COLORS.brand[600],
         height: 65,
-        borderRadius: 20,
+        borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
-        ...SHADOWS.sm,
+        marginBottom: 20,
+        ...SHADOWS.md,
+    },
+    googleButtonDisabled: {
+        opacity: 0.7,
+    },
+    googleContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    googleIconPlaceholder: {
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        backgroundColor: COLORS.white,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    googleG: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: COLORS.brand[600],
     },
     googleText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: '900',
         color: COLORS.white,
+    },
+    terms: {
+        fontSize: 12,
+        color: COLORS.gray[400],
+        textAlign: 'center',
+        lineHeight: 18,
+        paddingHorizontal: 20,
     }
 });
 

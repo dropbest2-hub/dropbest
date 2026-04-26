@@ -3,9 +3,12 @@ import { supabase, supabaseAdmin } from '../config/supabase';
 
 // Helper to determine coins based on value
 const calculateCoins = (value: number): number => {
-    if (value >= 2000) return 35;
-    if (value >= 300) return 30;
-    return 0; 
+    if (value >= 5000) return 100;
+    if (value >= 2000) return 50;
+    if (value >= 1000) return 30;
+    if (value >= 500) return 20;
+    if (value >= 100) return 10;
+    return 5; // Minimum 5 coins for any purchase
 };
 
 // Admin route to confirm an order after 40 days
@@ -45,34 +48,41 @@ export const confirmOrder = async (req: Request, res: Response) => {
             .update({
                 purchase_value: purchaseValue,
                 status: 'CONFIRMED',
-                confirmed_badges: earnedCoins, // Keeping column name same for DB compatibility
                 confirmation_sent_at: new Date().toISOString()
             })
             .eq('id', id);
 
-        if (updateError) throw updateError;
+        if (updateError) {
+            console.error("Order Update Failed:", updateError);
+            throw new Error(`Failed to update order status: ${updateError.message}`);
+        }
 
         // 4. Update the user's total coins
-        const { data: user, error: userError } = await supabase
+        const { data: user, error: userError } = await supabaseAdmin
             .from('users')
             .select('coin_count')
             .eq('id', order.user_id)
             .single();
-
+ 
         if (!userError && user) {
             const newCoinCount = (user.coin_count || 0) + earnedCoins;
             let newLevel = 'BRONZE';
             if (newCoinCount >= 700) newLevel = 'PLATINUM';
             else if (newCoinCount >= 300) newLevel = 'GOLD';
             else if (newCoinCount >= 100) newLevel = 'SILVER';
-
-            await supabase
+ 
+            const { error: userUpdateError } = await supabaseAdmin
                 .from('users')
                 .update({
                     coin_count: newCoinCount,
+                    badge_count: newCoinCount, // Keep in sync
                     user_level: newLevel
                 })
                 .eq('id', order.user_id);
+                
+            if (userUpdateError) {
+                console.error("User Coins Update Failed:", userUpdateError);
+            }
         }
 
         // 5. Check for existing reviews to verify and award badge
@@ -86,7 +96,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
         let reviewBonus = 0;
         if (reviews && reviews.length > 0) {
             reviewBonus = 1;
-            await supabase
+            await supabaseAdmin
                 .from('reviews')
                 .update({ is_verified: true, badge_awarded: true }) // keep schema compatibility
                 .eq('user_id', order.user_id)
@@ -94,7 +104,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
             
             // Increment coin for review
             const { data: currentUser } = await supabaseAdmin.from('users').select('coin_count').eq('id', order.user_id).single();
-            await supabaseAdmin.from('users').update({ coin_count: (currentUser?.coin_count || 0) + 1 }).eq('id', order.user_id);
+            await supabaseAdmin.from('users').update({ coin_count: (currentUser?.coin_count || 0) + 1, badge_count: (currentUser?.coin_count || 0) + 1 }).eq('id', order.user_id);
         }
 
         const totalEarned = earnedCoins + reviewBonus;
@@ -111,7 +121,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
 
         // 7. GENERATE SCRATCH CARD FOR THE BUYER
         const randomCoins = Math.floor(Math.random() * (20 - 5 + 1)) + 5; // 5 to 20 coins
-        await supabase
+        await supabaseAdmin
             .from('scratch_cards')
             .insert([{ 
                 user_id: order.user_id, 
@@ -135,7 +145,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
                 .eq('user_id', order.user_id)
                 .eq('status', 'CONFIRMED');
 
-            if (!countError && count === 3) {
+            if (!countError && count === 1) {
                 // Award 25 coins to the referrer
                 const referrerId = referredUser.referred_by_id;
                 
@@ -156,6 +166,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
                         .from('users')
                         .update({
                             coin_count: newRefCoinCount,
+                            badge_count: newRefCoinCount,
                             user_level: newRefLevel
                         })
                         .eq('id', referrerId);
@@ -170,7 +181,7 @@ export const confirmOrder = async (req: Request, res: Response) => {
                     await supabaseAdmin.from('notifications').insert([{
                         user_id: referrerId,
                         type: 'REWARD',
-                        message: `Referral Bonus! Your friend completed 3 purchases. You've been awarded 25 coins!`,
+                        message: `Referral Bonus! Your friend completed 1 purchase. You've been awarded 25 coins!`,
                         read: false
                     }]);
                 }
@@ -207,7 +218,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const { data, error } = await supabaseAdmin
             .from('users')
-            .select('*')
+            .select('*, referred_by:referred_by_id ( name )')
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -262,7 +273,7 @@ export const rejectOrder = async (req: Request, res: Response) => {
 // Payouts Administration
 export const getPayouts = async (req: Request, res: Response) => {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
             .from('payout_requests')
             .select('*, users ( email, name )')
             .order('created_at', { ascending: false });
@@ -278,30 +289,48 @@ export const approvePayout = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { utrNumber } = req.body;
 
-        // Get payout details to notify user
-        const { data: payout } = await supabaseAdmin.from('payout_requests').select('*').eq('id', id).single();
-        if (!payout) {
+        // 2. Get payout details AND user details to notify correctly
+        const { data: payout, error: payoutErr } = await supabaseAdmin
+            .from('payout_requests')
+            .select('*, users ( email, name )')
+            .eq('id', id)
+            .single();
+
+        if (payoutErr || !payout) {
             res.status(404).json({ error: 'Payout not found' });
             return;
         }
 
-        const { error } = await supabaseAdmin.from('payout_requests').update({ 
+        // 3. Mark payout as paid in database
+        const { error: updateError } = await supabaseAdmin.from('payout_requests').update({ 
             status: 'PAID', 
             utr_number: utrNumber, 
             updated_at: new Date().toISOString() 
         }).eq('id', id);
 
-        if (error) throw error;
+        if (updateError) throw updateError;
 
-        // Notify user
+        const confirmationMsg = "Money received and please check ur account balance. any queries contact us.";
+
+        // 4. INSERT INTO CONTACT MESSAGES (for the user's message page)
+        await supabaseAdmin.from('contact_messages').insert([{
+            email: payout.users?.email,
+            name: payout.users?.name || 'User',
+            subject: 'Payout Confirmation',
+            message: `Request for withdrawal of ₹${payout.amount}`,
+            status: 'Replied',
+            admin_reply: confirmationMsg
+        }]);
+
+        // 5. Notify user via Notifications
         await supabaseAdmin.from('notifications').insert([{
             user_id: payout.user_id,
             type: 'PAYMENT',
-            message: `Success! Your payout request of ₹${payout.amount} has been processed and paid. UTR: ${utrNumber}`,
+            message: `Payout of ₹${payout.amount} Paid! ${confirmationMsg}`,
             read: false
         }]);
 
-        res.json({ message: 'Payout approved successfully' });
+        res.json({ message: 'Payout approved and user notified!' });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

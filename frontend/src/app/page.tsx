@@ -216,6 +216,61 @@ export default function Home() {
                     </div>
                 </motion.div>
             </section>
+            
+            {/* App Download Banner */}
+            <motion.section 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-gray-100 shadow-xl overflow-hidden relative"
+            >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                    <div className="text-left max-w-xl">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-50 rounded-full text-brand-600 text-xs font-black uppercase tracking-widest mb-6">
+                            <Smartphone size={14} /> Mobile App Now Available
+                        </div>
+                        <h2 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">
+                            Shop on the go with <span className="text-brand-600">DropBest App!</span>
+                        </h2>
+                        <p className="text-gray-500 font-medium text-lg leading-relaxed mb-8">
+                            Get exclusive mobile-only rewards, faster tracking, and instant notifications. Download the APK directly and start earning today.
+                        </p>
+                        <motion.a 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            href="/dropbest.apk" 
+                            download="dropbest.apk"
+                            className="inline-flex items-center gap-3 bg-gray-900 text-white font-black px-10 py-5 rounded-2xl shadow-xl hover:bg-black transition-all group"
+                        >
+                            <Smartphone size={24} />
+                            <div className="flex flex-col items-start">
+                                <span className="text-[10px] opacity-60 font-bold uppercase tracking-widest leading-none mb-1">Download for</span>
+                                <span className="text-lg leading-none">Android APK</span>
+                            </div>
+                        </motion.a>
+                    </div>
+                    
+                    <div className="relative w-full max-w-[300px] aspect-[9/16] bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden group">
+                        {/* Mock App Screen */}
+                        <div className="absolute inset-0 bg-brand-600 flex flex-col items-center justify-center p-6 text-center">
+                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-xl rotate-12">
+                                <span className="text-4xl font-black text-brand-600">D</span>
+                            </div>
+                            <h3 className="text-white text-2xl font-black mb-2">DropBest!</h3>
+                            <p className="text-brand-100 text-sm font-medium">Curated Picks. Smart Rewards.</p>
+                            
+                            <div className="mt-12 w-full space-y-3">
+                                <div className="h-12 bg-white/10 rounded-xl w-full"></div>
+                                <div className="h-12 bg-white/10 rounded-xl w-full"></div>
+                                <div className="h-12 bg-brand-400 rounded-xl w-full flex items-center justify-center font-bold text-white text-xs">
+                                    CONTINUE WITH GOOGLE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </motion.section>
 
             {/* Product Grid */}
             <section id="trending" className="scroll-mt-24 pt-10">

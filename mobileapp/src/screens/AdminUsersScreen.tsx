@@ -1,13 +1,39 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaView, TextInput, StatusBar, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
-import { Menu, Search, Filter, Coins, Medal } from 'lucide-react-native';
+import { Menu, Search, Filter, Coins, Medal, User } from 'lucide-react-native';
 import SideMenuModal from '../components/SideMenuModal';
+import { useTheme } from '../context/ThemeContext';
 import api from '../api/api';
 
 const violetPrimary = '#6b38d4';
 const background = '#f8f9fa';
 
+// Stable Search Row to prevent keyboard dismissal
+const AdminUsersSearchRow = ({ 
+    isDark, 
+    searchQuery, 
+    setSearchQuery, 
+    handleFilterPress 
+}: any) => (
+    <View style={styles.searchFilterRow}>
+        <View style={styles.searchContainer}>
+            <Search size={20} color={isDark ? "#666" : "#7b7486"} style={styles.searchIcon} />
+            <TextInput 
+                style={[styles.searchInput, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333', color: '#ffffff' }]}
+                placeholder="Search users..."
+                placeholderTextColor={isDark ? "#444" : "#7b7486"}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+        </View>
+        <TouchableOpacity style={[styles.filterButton, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }]} onPress={handleFilterPress}>
+            <Filter size={20} color={isDark ? "#888" : "#494454"} />
+        </TouchableOpacity>
+    </View>
+);
+
 export default function AdminUsersScreen({ navigation }: any) {
+    const { isDark } = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -46,17 +72,18 @@ export default function AdminUsersScreen({ navigation }: any) {
         });
     }, [users, searchQuery]);
 
-    const handleMenuPress = () => {
-        setIsMenuVisible(true);
-    };
-
-    const handleFilterPress = () => {
-        Alert.alert("Filters", "Filter users by Role, Level, etc.");
-    };
+    const memoizedSearchRow = useMemo(() => (
+        <AdminUsersSearchRow 
+            isDark={isDark}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            handleFilterPress={() => Alert.alert("Filters", "Filter users by Role, Level, etc.")}
+        />
+    ), [isDark, searchQuery]);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+        <SafeAreaView style={[styles.safeArea, isDark && { backgroundColor: '#121212' }]}>
+            <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#121212" : "#ffffff"} />
             
             <SideMenuModal 
                 visible={isMenuVisible} 
@@ -64,58 +91,34 @@ export default function AdminUsersScreen({ navigation }: any) {
                 navigation={navigation} 
             />
             
-            {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, isDark && { backgroundColor: '#121212', borderBottomColor: '#333' }]}>
                 <View style={styles.headerLeft}>
-                    <TouchableOpacity style={styles.iconButton} onPress={handleMenuPress}>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => setIsMenuVisible(true)}>
                         <Menu size={24} color={violetPrimary} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Dropbest Admin</Text>
-                </View>
-                <View style={styles.headerRight}>
-                    <View style={styles.avatarContainer}>
-                        <Image 
-                            source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150' }}
-                            style={styles.avatar}
-                        />
-                    </View>
+                    <Text style={[styles.headerTitle, isDark && { color: '#ffffff' }]}>Dropbest Admin</Text>
                 </View>
             </View>
 
             <ScrollView 
-                style={styles.container} 
+                style={[styles.container, isDark && { backgroundColor: '#121212' }]} 
                 contentContainerStyle={styles.contentPadding}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[violetPrimary]} />}
             >
                 
                 {/* Welcome Section */}
                 <View style={styles.welcomeSection}>
-                    <Text style={styles.pageTitle}>Welcome back</Text>
-                    <Text style={styles.pageSubtitle}>Manage your registered users and system health.</Text>
+                    <Text style={[styles.pageTitle, isDark && { color: '#ffffff' }]}>Welcome back</Text>
+                    <Text style={[styles.pageSubtitle, isDark && { color: '#888' }]}>Manage your registered users and system health.</Text>
                 </View>
 
-                {/* Search and Filter */}
-                <View style={styles.searchFilterRow}>
-                    <View style={styles.searchContainer}>
-                        <Search size={20} color="#7b7486" style={styles.searchIcon} />
-                        <TextInput 
-                            style={styles.searchInput}
-                            placeholder="Search users..."
-                            placeholderTextColor="#7b7486"
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                        />
-                    </View>
-                    <TouchableOpacity style={styles.filterButton} onPress={handleFilterPress}>
-                        <Filter size={20} color="#494454" />
-                    </TouchableOpacity>
-                </View>
+                {memoizedSearchRow}
 
                 {/* Registered Users Header */}
                 <View style={styles.listHeader}>
-                    <Text style={styles.listTitle}>Registered Users</Text>
-                    <View style={styles.activeBadge}>
-                        <Text style={styles.activeBadgeText}>Active Now</Text>
+                    <Text style={[styles.listTitle, isDark && { color: '#ffffff' }]}>Registered Users</Text>
+                    <View style={[styles.activeBadge, isDark && { backgroundColor: '#422006' }]}>
+                        <Text style={[styles.activeBadgeText, isDark && { color: '#fb923c' }]}>Active Now</Text>
                     </View>
                 </View>
 
@@ -127,7 +130,7 @@ export default function AdminUsersScreen({ navigation }: any) {
                         <Text style={styles.emptyText}>No users found.</Text>
                     ) : (
                         filteredUsers.map(user => (
-                            <TouchableOpacity key={user.id} style={[styles.userCard, styles.shadow]}>
+                            <TouchableOpacity key={user.id} style={[styles.userCard, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }, styles.shadow]}>
                                 <View style={styles.cardTop}>
                                     <View style={styles.userInfo}>
                                         <Image 
@@ -135,30 +138,39 @@ export default function AdminUsersScreen({ navigation }: any) {
                                             style={styles.userAvatar} 
                                         />
                                         <View>
-                                            <Text style={styles.userName}>{user.name || user.email.split('@')[0]}</Text>
-                                            <Text style={styles.userEmail}>{user.email}</Text>
+                                            <Text style={[styles.userName, isDark && { color: '#ffffff' }]}>{user.name || user.email.split('@')[0]}</Text>
+                                            <Text style={[styles.userEmail, isDark && { color: '#888' }]}>{user.email}</Text>
                                         </View>
                                     </View>
-                                    <View style={[styles.roleBadge, { backgroundColor: user.role === 'ADMIN' ? '#e9ddff' : '#f1f5f9' }]}>
-                                        <Text style={[styles.roleText, { color: user.role === 'ADMIN' ? '#6b38d4' : '#494454' }]}>{user.role || 'USER'}</Text>
+                                    <View style={[styles.roleBadge, { backgroundColor: user.role === 'ADMIN' ? (isDark ? '#2e1065' : '#e9ddff') : (isDark ? '#262626' : '#f1f5f9') }]}>
+                                        <Text style={[styles.roleText, { color: user.role === 'ADMIN' ? (isDark ? '#a78bfa' : '#6b38d4') : (isDark ? '#a3a3a3' : '#494454') }]}>{user.role || 'USER'}</Text>
                                     </View>
                                 </View>
-
-                                <View style={styles.cardBottom}>
+ 
+                                <View style={[styles.cardBottom, isDark && { borderTopColor: '#333' }]}>
                                     <View style={styles.statsItem}>
                                         <Medal size={18} color="#8a5100" />
                                         <View>
-                                            <Text style={styles.statsLabel}>LEVEL</Text>
+                                            <Text style={[styles.statsLabel, isDark && { color: '#666' }]}>LEVEL</Text>
                                             <Text style={styles.statsValueBronze}>{user.user_level || 'Bronze'}</Text>
                                         </View>
                                     </View>
                                     <View style={styles.statsItem}>
                                         <Coins size={18} color={violetPrimary} />
                                         <View>
-                                            <Text style={styles.statsLabel}>COINS</Text>
-                                            <Text style={styles.statsValueDark}>{user.coin_count || 0}</Text>
+                                            <Text style={[styles.statsLabel, isDark && { color: '#666' }]}>COINS</Text>
+                                            <Text style={[styles.statsValueDark, isDark && { color: '#ffffff' }]}>{user.coin_count || 0}</Text>
                                         </View>
                                     </View>
+                                    {user.referred_by?.name && (
+                                        <View style={styles.statsItem}>
+                                            <User size={18} color="#10b981" />
+                                            <View>
+                                                <Text style={[styles.statsLabel, isDark && { color: '#666' }]}>REFERRED BY</Text>
+                                                <Text style={[styles.statsValueDark, { color: '#059669' }, isDark && { color: '#10b981' }]}>{user.referred_by.name}</Text>
+                                            </View>
+                                        </View>
+                                    )}
                                 </View>
                             </TouchableOpacity>
                         ))

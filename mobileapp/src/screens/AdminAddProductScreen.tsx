@@ -35,15 +35,23 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
 
         try {
             setLoading(true);
+            const ensureProtocol = (url: string) => {
+                if (!url) return '';
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    return `https://${url}`;
+                }
+                return url;
+            };
+
             const productData = {
                 title,
                 description,
                 price: parseFloat(price),
-                image_url: imageUrl,
-                amazon_link: amazonLink,
-                flipkart_link: flipkartLink,
-                myntra_link: myntraLink,
-                shopify_link: shopifyLink,
+                image_url: ensureProtocol(imageUrl),
+                amazon_link: ensureProtocol(amazonLink),
+                flipkart_link: ensureProtocol(flipkartLink),
+                myntra_link: ensureProtocol(myntraLink),
+                shopify_link: ensureProtocol(shopifyLink),
                 category,
                 search_keywords: keywords
             };

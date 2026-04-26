@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Share } from 'react-native';
 import { COLORS, SPACING, SHADOWS } from '../constants/theme';
 import api from '../api/api';
-import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck } from 'lucide-react-native';
+import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck, Package, CheckCircle2 } from 'lucide-react-native';
+import { Linking, Modal } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -11,6 +12,8 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [showRedirectModal, setShowRedirectModal] = useState(false);
+    const [lastOrderId, setLastOrderId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -53,6 +56,24 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
             });
         } catch (error) {
             console.error('Error sharing:', error);
+        }
+    };
+
+    const handleRedirect = async (link: string) => {
+        try {
+            // Track the redirect on backend
+            const response = await api.post('/orders/redirect', { productId: product.id });
+            setLastOrderId(response.data.id);
+            
+            // Open the external link
+            await Linking.openURL(link);
+            
+            // Show the modal to encourage tracking
+            setShowRedirectModal(true);
+        } catch (error) {
+            console.error('Error tracking redirect:', error);
+            // Still try to open the link even if tracking fails
+            Linking.openURL(link).catch(e => console.error('Failed to open URL', e));
         }
     };
 
@@ -128,23 +149,77 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
                     {product.amazon_link && (
                         <TouchableOpacity 
                             style={[styles.buyBtn, { backgroundColor: '#FF9900' }]}
-                            onPress={() => {}} // Handle redirect
+                            onPress={() => handleRedirect(product.amazon_link)}
                         >
-                            <Text style={styles.buyBtnText}>Amazon</Text>
+                            <Text style={styles.buyBtnText}>BUY ON AMAZON</Text>
                             <ExternalLink size={16} color={COLORS.white} />
                         </TouchableOpacity>
                     )}
                     {product.flipkart_link && (
                         <TouchableOpacity 
                             style={[styles.buyBtn, { backgroundColor: '#2874F0' }]}
-                            onPress={() => {}} // Handle redirect
+                            onPress={() => handleRedirect(product.flipkart_link)}
                         >
-                            <Text style={styles.buyBtnText}>Flipkart</Text>
+                            <Text style={styles.buyBtnText}>BUY ON FLIPKART</Text>
+                            <ExternalLink size={16} color={COLORS.white} />
+                        </TouchableOpacity>
+                    )}
+                    {product.myntra_link && (
+                        <TouchableOpacity 
+                            style={[styles.buyBtn, { backgroundColor: '#ff3f6c' }]}
+                            onPress={() => handleRedirect(product.myntra_link)}
+                        >
+                            <Text style={styles.buyBtnText}>BUY ON MYNTRA</Text>
+                            <ExternalLink size={16} color={COLORS.white} />
+                        </TouchableOpacity>
+                    )}
+                    {product.shopify_link && (
+                        <TouchableOpacity 
+                            style={[styles.buyBtn, { backgroundColor: '#95bf47' }]}
+                            onPress={() => handleRedirect(product.shopify_link)}
+                        >
+                            <Text style={styles.buyBtnText}>BUY ON SHOPIFY</Text>
                             <ExternalLink size={16} color={COLORS.white} />
                         </TouchableOpacity>
                     )}
                 </View>
             </View>
+
+            {/* Redirect Tracking Modal */}
+            <Modal
+                visible={showRedirectModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowRedirectModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalIcon}>
+                            <Package size={40} color={COLORS.brand[600]} />
+                        </View>
+                        <Text style={styles.modalTitle}>Did you just order this?</Text>
+                        <Text style={styles.modalSubtitle}>Great! Mark it as ordered now to start tracking your rewards immediately.</Text>
+                        
+                        <TouchableOpacity 
+                            style={styles.modalConfirmBtn}
+                            onPress={() => {
+                                setShowRedirectModal(false);
+                                navigation.navigate('MyOrders');
+                            }}
+                        >
+                            <Text style={styles.modalConfirmText}>YES, I ORDERED!</Text>
+                            <CheckCircle2 size={18} color={COLORS.white} />
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                            style={styles.modalCancelBtn}
+                            onPress={() => setShowRedirectModal(false)}
+                        >
+                            <Text style={styles.modalCancelText}>Maybe later</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -298,4 +373,67 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: SPACING.xl,
+    },
+    modalContent: {
+        backgroundColor: COLORS.white,
+        borderRadius: 32,
+        padding: 30,
+        alignItems: 'center',
+        width: '100%',
+        ...SHADOWS.lg,
+    },
+    modalIcon: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: COLORS.brand[50],
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: '900',
+        color: COLORS.gray[900],
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    modalSubtitle: {
+        fontSize: 14,
+        color: COLORS.gray[500],
+        textAlign: 'center',
+        lineHeight: 20,
+        marginBottom: 30,
+    },
+    modalConfirmBtn: {
+        backgroundColor: COLORS.brand[600],
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        width: '100%',
+        height: 56,
+        borderRadius: 18,
+        marginBottom: 15,
+        ...SHADOWS.md,
+    },
+    modalConfirmText: {
+        color: COLORS.white,
+        fontSize: 16,
+        fontWeight: '900',
+    },
+    modalCancelBtn: {
+        padding: 10,
+    },
+    modalCancelText: {
+        color: COLORS.gray[400],
+        fontSize: 14,
+        fontWeight: 'bold',
+    }
 });

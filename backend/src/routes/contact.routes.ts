@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import nodemailer from 'nodemailer';
 import { supabaseAdmin } from '../config/supabase';
-import { requireAdmin } from '../middlewares/auth.middleware';
+import { requireAdmin, requireAuth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -37,28 +37,56 @@ router.post('/', async (req, res, next) => {
             // We continue anyway so the email might still send
         }
 
-        // SEND EMAIL NOTIFICATION TO ADMIN
-        const mailOptions = {
-            from: process.env.ADMIN_EMAIL,
-            to: process.env.ADMIN_EMAIL,
-            replyTo: email,
-            subject: `[New Inquiry] ${subject}`,
-            html: `
-                <h3>New message from ${name}</h3>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Message:</strong></p>
-                <p>${message.replace(/\n/g, '<br>')}</p>
-                <hr>
-                <p>Check your Admin Dashboard to reply.</p>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
+        // SEND EMAIL NOTIFICATION TO ADMIN (Optional, don't crash if it fails)
+        try {
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: process.env.ADMIN_EMAIL,
+                replyTo: email,
+                subject: `[New Inquiry] ${subject}`,
+                html: `
+                    <h3>New message from ${name}</h3>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Message:</strong></p>
+                    <p>${message.replace(/\n/g, '<br>')}</p>
+                    <hr>
+                    <p>Check your Admin Dashboard to reply.</p>
+                `
+            };
+            await transporter.sendMail(mailOptions);
+            console.log('Admin notification email sent.');
+        } catch (emailErr) {
+            console.error('Email Notification Failed:', emailErr);
+            // We don't return error here because the message is already in the DB
+        }
 
         return res.status(201).json({ message: 'Message sent successfully.' });
     } catch (err) {
-        console.error('Error:', err);
+        console.error('General Error in Contact Route:', err);
         return res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// 1.5 User fetches their own messages
+router.get('/my', requireAuth, async (req: any, res) => {
+    try {
+        const userEmail = req.user?.email; // Set by requireAuth middleware
+        
+        if (!userEmail) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+
+        const { data, error } = await supabaseAdmin
+            .from('contact_messages')
+            .select('*')
+            .eq('email', userEmail)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return res.json(data);
+    } catch (err) {
+        console.error('Error fetching my messages:', err);
+        return res.status(500).json({ message: 'Error fetching messages.' });
     }
 });
 

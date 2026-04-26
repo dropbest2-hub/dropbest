@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView, Dimensions, TouchableWithoutFeedback, Image } from 'react-native';
-import { User, MessageSquare, Shield, AlertCircle, X, ChevronRight, LogOut } from 'lucide-react-native';
+import { User, MessageSquare, Shield, AlertCircle, X, ChevronRight, LogOut, Settings } from 'lucide-react-native';
+import { useAuthStore } from '../store/authStore';
+import { useTheme } from '../context/ThemeContext';
+import { COLORS } from '../constants/theme';
 
 const { width, height } = Dimensions.get('window');
 const violetPrimary = '#6b38d4';
@@ -12,9 +15,17 @@ interface SideMenuModalProps {
 }
 
 export default function SideMenuModal({ visible, onClose, navigation }: SideMenuModalProps) {
+    const { user, logout } = useAuthStore();
+    const { isDark } = useTheme();
     
+    const handleLogout = async () => {
+        onClose();
+        await logout();
+    };
+
     const menuItems = [
         { icon: User, label: 'Profile', route: 'ProfileTab' },
+        { icon: Settings, label: 'Settings', route: 'Settings' },
         { icon: MessageSquare, label: 'Contact Us', route: 'Contact' },
         { icon: Shield, label: 'Privacy Policy', route: 'Policy' },
         { icon: AlertCircle, label: 'Affiliate Disclaimer', route: 'Disclaimer' },
@@ -24,7 +35,6 @@ export default function SideMenuModal({ visible, onClose, navigation }: SideMenu
         onClose();
         if (route) {
             try {
-                // If it's a user screen, we might need to navigate to 'Main' first
                 if (['HomeTab', 'RewardsTab', 'ProfileTab'].includes(route)) {
                     navigation.navigate('Main', { screen: route });
                 } else {
@@ -34,6 +44,15 @@ export default function SideMenuModal({ visible, onClose, navigation }: SideMenu
                 console.log("Navigation to route failed", e);
             }
         }
+    };
+
+    const themeStyles = {
+        container: { backgroundColor: isDark ? '#121212' : '#ffffff' },
+        header: { borderBottomColor: isDark ? '#333' : '#f1f5f9' },
+        text: { color: isDark ? '#ffffff' : '#191c1d' },
+        subText: { color: isDark ? '#888' : '#7b7486' },
+        divider: { borderTopColor: isDark ? '#333' : '#f1f5f9' },
+        icon: isDark ? '#888' : '#494454',
     };
 
     return (
@@ -48,22 +67,30 @@ export default function SideMenuModal({ visible, onClose, navigation }: SideMenu
                     <View style={styles.backdrop} />
                 </TouchableWithoutFeedback>
                 
-                <View style={styles.menuContainer}>
+                <View style={[styles.menuContainer, themeStyles.container]}>
                     <SafeAreaView style={styles.safeArea}>
                         {/* Header */}
-                        <View style={styles.header}>
+                        <View style={[styles.header, themeStyles.header]}>
                             <View style={styles.userInfo}>
-                                <Image 
-                                    source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150' }}
-                                    style={styles.avatar}
-                                />
+                                {user?.avatar_url ? (
+                                    <Image 
+                                        source={{ uri: user.avatar_url }}
+                                        style={styles.avatar}
+                                    />
+                                ) : (
+                                    <View style={[styles.avatar, { backgroundColor: isDark ? '#2d2d2d' : '#e9ddff', justifyContent: 'center', alignItems: 'center' }]}>
+                                        <Text style={{ color: isDark ? COLORS.brand[400] : '#6b38d4', fontWeight: 'bold', fontSize: 18 }}>
+                                            {user?.name?.[0] || user?.email?.[0]?.toUpperCase()}
+                                        </Text>
+                                    </View>
+                                )}
                                 <View>
-                                    <Text style={styles.userName}>Dropbest Admin</Text>
-                                    <Text style={styles.userEmail}>admin@dropbest.com</Text>
+                                    <Text style={[styles.userName, themeStyles.text]}>{user?.name || 'User'}</Text>
+                                    <Text style={[styles.userEmail, themeStyles.subText]} numberOfLines={1}>{user?.email}</Text>
                                 </View>
                             </View>
                             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                                <X size={24} color="#191c1d" />
+                                <X size={24} color={isDark ? '#fff' : "#191c1d"} />
                             </TouchableOpacity>
                         </View>
 
@@ -78,17 +105,17 @@ export default function SideMenuModal({ visible, onClose, navigation }: SideMenu
                                         onPress={() => handleNavigate(item.route)}
                                     >
                                         <View style={styles.menuItemLeft}>
-                                            <Icon size={22} color="#494454" />
-                                            <Text style={styles.menuItemText}>{item.label}</Text>
+                                            <Icon size={22} color={themeStyles.icon} />
+                                            <Text style={[styles.menuItemText, themeStyles.text]}>{item.label}</Text>
                                         </View>
-                                        <ChevronRight size={20} color="#cbc3d7" />
+                                        <ChevronRight size={20} color={isDark ? "#444" : "#cbc3d7"} />
                                     </TouchableOpacity>
                                 );
                             })}
                         </View>
 
                         {/* Logout */}
-                        <TouchableOpacity style={styles.logoutBtn} onPress={onClose}>
+                        <TouchableOpacity style={[styles.logoutBtn, themeStyles.divider]} onPress={handleLogout}>
                             <LogOut size={22} color="#ba1a1a" />
                             <Text style={styles.logoutText}>Log Out</Text>
                         </TouchableOpacity>

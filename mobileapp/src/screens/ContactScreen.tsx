@@ -1,9 +1,42 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Linking, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { COLORS, SPACING, SHADOWS } from '../constants/theme';
-import { Mail, Phone, MessageSquare, Globe, ChevronLeft, MapPin } from 'lucide-react-native';
+import { Mail, Phone, MessageSquare, Globe, ChevronLeft, MapPin, Send } from 'lucide-react-native';
+import { useAuthStore } from '../store/authStore';
+import api from '../api/api';
 
-export default function ContactScreen({ navigation }: any) {
+export default function ContactScreen({ navigation, route }: any) {
+    const { initialSubject } = route.params || {};
+    const { user } = useAuthStore();
+    const [subject, setSubject] = useState(initialSubject || '');
+    const [message, setMessage] = useState('');
+    const [sending, setSending] = useState(false);
+
+    const handleSendMessage = async () => {
+        if (!subject.trim() || !message.trim()) {
+            Alert.alert('Error', 'Please fill in both subject and message.');
+            return;
+        }
+
+        setSending(true);
+        try {
+            await api.post('/contacts', {
+                name: user?.name || 'App User',
+                email: user?.email,
+                subject: subject,
+                message: message
+            });
+            Alert.alert('Success', 'Your message has been sent to the admin. We will get back to you soon.');
+            setSubject('');
+            setMessage('');
+        } catch (error: any) {
+            console.error('Failed to send message:', error);
+            Alert.alert('Error', error.response?.data?.message || 'Failed to send message. Please try again.');
+        } finally {
+            setSending(false);
+        }
+    };
+
     const ContactItem = ({ icon: Icon, title, value, onPress, color = COLORS.brand[500] }: any) => (
         <TouchableOpacity style={styles.card} onPress={onPress}>
             <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>
@@ -34,43 +67,73 @@ export default function ContactScreen({ navigation }: any) {
                     <Text style={styles.heroSubtitle}>We're here to assist you with any questions or concerns.</Text>
                 </View>
 
+                {/* Direct Message Form */}
+                <View style={styles.formContainer}>
+                    <Text style={styles.formTitle}>Send a Direct Message</Text>
+                    
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Subject</Text>
+                        <TextInput 
+                            style={styles.input}
+                            placeholder="What is this about?"
+                            value={subject}
+                            onChangeText={setSubject}
+                            placeholderTextColor={COLORS.gray[300]}
+                        />
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Message</Text>
+                        <TextInput 
+                            style={[styles.input, styles.textArea]}
+                            placeholder="Type your message here..."
+                            value={message}
+                            onChangeText={setMessage}
+                            multiline
+                            numberOfLines={4}
+                            textAlignVertical="top"
+                            placeholderTextColor={COLORS.gray[300]}
+                        />
+                    </View>
+
+                    <TouchableOpacity 
+                        style={[styles.sendBtn, sending && { opacity: 0.7 }]}
+                        onPress={handleSendMessage}
+                        disabled={sending}
+                    >
+                        {sending ? (
+                            <ActivityIndicator color={COLORS.white} />
+                        ) : (
+                            <>
+                                <Send size={20} color={COLORS.white} />
+                                <Text style={styles.sendBtnText}>Send Message</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+                </View>
+
                 <View style={styles.section}>
                     <ContactItem 
                         icon={Mail} 
                         title="Email Us" 
-                        value="support@dropbest.in" 
-                        onPress={() => Linking.openURL('mailto:support@dropbest.in')}
+                        value="dropbest2@gmail.com" 
+                        onPress={() => Linking.openURL('mailto:dropbest2@gmail.com')}
                         color={COLORS.brand[500]}
                     />
                     <ContactItem 
                         icon={Phone} 
                         title="Call Us" 
-                        value="+91 12345 67890" 
-                        onPress={() => Linking.openURL('tel:+911234567890')}
+                        value="Coming Soon" 
+                        onPress={() => {}}
                         color={COLORS.accent.orange}
                     />
                     <ContactItem 
                         icon={Globe} 
                         title="Website" 
-                        value="www.dropbest.in" 
-                        onPress={() => Linking.openURL('https://dropbest.in')}
+                        value="dropbest.vercel.app" 
+                        onPress={() => Linking.openURL('https://dropbest.vercel.app')}
                         color="#10B981"
                     />
-                    <ContactItem 
-                        icon={MapPin} 
-                        title="Office" 
-                        value="Chennai, Tamil Nadu, India" 
-                        onPress={() => {}}
-                        color={COLORS.accent.pink}
-                    />
-                </View>
-
-                <View style={styles.faqCard}>
-                    <Text style={styles.faqTitle}>Check our FAQs</Text>
-                    <Text style={styles.faqText}>Most common questions are answered in our Help Center.</Text>
-                    <TouchableOpacity style={styles.faqBtn}>
-                        <Text style={styles.faqBtnText}>Open Help Center</Text>
-                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </View>
@@ -128,6 +191,58 @@ const styles = StyleSheet.create({
         color: COLORS.gray[500],
         textAlign: 'center',
         paddingHorizontal: 20,
+    },
+    formContainer: {
+        backgroundColor: COLORS.white,
+        padding: 20,
+        borderRadius: 24,
+        marginBottom: 30,
+        ...SHADOWS.sm,
+    },
+    formTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.gray[900],
+        marginBottom: 20,
+    },
+    inputGroup: {
+        marginBottom: 15,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: COLORS.gray[700],
+        marginBottom: 8,
+    },
+    input: {
+        backgroundColor: COLORS.gray[50],
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        height: 50,
+        borderWidth: 1,
+        borderColor: COLORS.gray[100],
+        fontSize: 15,
+        color: COLORS.gray[900],
+    },
+    textArea: {
+        height: 120,
+        paddingTop: 15,
+    },
+    sendBtn: {
+        backgroundColor: COLORS.brand[600],
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 56,
+        borderRadius: 16,
+        marginTop: 10,
+        gap: 10,
+        ...SHADOWS.md,
+    },
+    sendBtnText: {
+        color: COLORS.white,
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     section: {
         gap: 15,

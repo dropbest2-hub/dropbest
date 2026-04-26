@@ -14,7 +14,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
         const { data, error } = await userClient
             .from('users')
-            .select('*')
+            .select('*, referred_by:referred_by_id ( name )')
             .eq('id', userId)
             .single();
 
@@ -48,12 +48,27 @@ export const getReferrals = async (req: Request, res: Response) => {
 
         const { data, error } = await supabaseAdmin
             .from('users')
-            .select('id, name, avatar_url, created_at')
+            .select('id, name, avatar_url, created_at, referral_bonus_awarded')
             .eq('referred_by_id', userId)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        res.json(data);
+
+        // For each referred user, check if they have a confirmed order
+        const referralsWithStatus = await Promise.all(data.map(async (ref) => {
+            const { count } = await supabaseAdmin
+                .from('orders')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', ref.id)
+                .eq('status', 'CONFIRMED');
+            
+            return {
+                ...ref,
+                has_completed_order: (count || 0) > 0
+            };
+        }));
+
+        res.json(referralsWithStatus);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

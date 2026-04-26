@@ -3,18 +3,49 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaVi
 import { Menu, Plus, Search, TrendingUp, AlertCircle, MoreVertical, Edit2 } from 'lucide-react-native';
 import { CATEGORIES } from '../lib/categories';
 import SideMenuModal from '../components/SideMenuModal';
+import { useTheme } from '../context/ThemeContext';
 import api from '../api/api';
 
 const violetPrimary = '#6b38d4';
 const background = '#f8f9fa';
 
+// Stable Title and Search Section to prevent keyboard dismissal
+const AdminTitleSection = ({ 
+    isDark, 
+    searchQuery, 
+    setSearchQuery, 
+    handleNewItem 
+}: any) => (
+    <View style={styles.titleSection}>
+        <View style={styles.titleRow}>
+            <Text style={[styles.pageTitle, isDark && { color: '#ffffff' }]}>Products</Text>
+            <TouchableOpacity style={styles.addButton} onPress={handleNewItem}>
+                <Plus size={18} color="#ffffff" />
+                <Text style={styles.addButtonText}>NEW ITEM</Text>
+            </TouchableOpacity>
+        </View>
+
+        <View style={styles.searchContainer}>
+            <Search size={20} color={isDark ? "#666" : "#7b7486"} style={styles.searchIcon} />
+            <TextInput 
+                style={[styles.searchInput, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333', color: '#ffffff' }]}
+                placeholder="Search inventory..."
+                placeholderTextColor={isDark ? "#444" : "#7b7486"}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+        </View>
+    </View>
+);
+
 export default function AdminProductsScreen({ navigation }: any) {
+    const { isDark } = useTheme();
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All Items');
+    const [selectedCategory, setSelectedCategory] = useState('all');
     const [isMenuVisible, setIsMenuVisible] = useState(false);
 
     const fetchProducts = useCallback(async () => {
@@ -42,26 +73,20 @@ export default function AdminProductsScreen({ navigation }: any) {
         fetchProducts();
     };
 
-    // Filter products based on search query and selected category
     const filteredProducts = useMemo(() => {
         return products.filter(product => {
             const productTitle = product.title || '';
             const matchesSearch = productTitle.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesCategory = selectedCategory === 'All Items' || product.category === selectedCategory;
+            const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
             return matchesSearch && matchesCategory;
         });
     }, [products, searchQuery, selectedCategory]);
-
-    const handleMenuPress = () => {
-        setIsMenuVisible(true);
-    };
 
     const handleNewItem = () => {
         navigation.navigate('AdminAddProductScreen');
     };
 
     const handleEditProduct = (product: any) => {
-        // Pass the existing product data to the add screen in "Edit" mode
         navigation.navigate('AdminAddProductScreen', { product });
     };
 
@@ -81,7 +106,6 @@ export default function AdminProductsScreen({ navigation }: any) {
                             Alert.alert("Success", "Product deleted successfully.");
                             fetchProducts();
                         } catch (error) {
-                            console.error("Delete failed", error);
                             Alert.alert("Error", "Failed to delete product.");
                         } finally {
                             setLoading(false);
@@ -104,9 +128,18 @@ export default function AdminProductsScreen({ navigation }: any) {
         );
     };
 
+    const memoizedTitleSection = useMemo(() => (
+        <AdminTitleSection 
+            isDark={isDark}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            handleNewItem={handleNewItem}
+        />
+    ), [isDark, searchQuery, navigation]);
+
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+        <SafeAreaView style={[styles.safeArea, isDark && { backgroundColor: '#121212' }]}>
+            <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={isDark ? "#121212" : "#ffffff"} />
             
             <SideMenuModal 
                 visible={isMenuVisible} 
@@ -114,64 +147,34 @@ export default function AdminProductsScreen({ navigation }: any) {
                 navigation={navigation} 
             />
 
-            {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, isDark && { backgroundColor: '#121212', borderBottomColor: '#333' }]}>
                 <View style={styles.headerLeft}>
-                    <TouchableOpacity style={styles.iconButton} onPress={handleMenuPress}>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => setIsMenuVisible(true)}>
                         <Menu size={24} color={violetPrimary} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Dropbest Admin</Text>
-                </View>
-                <View style={styles.headerRight}>
-                    <View style={styles.avatarContainer}>
-                        <Image 
-                            source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150' }}
-                            style={styles.avatar}
-                        />
-                    </View>
+                    <Text style={[styles.headerTitle, isDark && { color: '#ffffff' }]}>Dropbest Admin</Text>
                 </View>
             </View>
 
             <ScrollView 
-                style={styles.container} 
+                style={[styles.container, isDark && { backgroundColor: '#121212' }]} 
                 contentContainerStyle={styles.contentPadding}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[violetPrimary]} />}
             >
-                
-                {/* Title and Search */}
-                <View style={styles.titleSection}>
-                    <View style={styles.titleRow}>
-                        <Text style={styles.pageTitle}>Products</Text>
-                        <TouchableOpacity style={styles.addButton} onPress={handleNewItem}>
-                            <Plus size={18} color="#ffffff" />
-                            <Text style={styles.addButtonText}>NEW ITEM</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.searchContainer}>
-                        <Search size={20} color="#7b7486" style={styles.searchIcon} />
-                        <TextInput 
-                            style={styles.searchInput}
-                            placeholder="Search inventory..."
-                            placeholderTextColor="#7b7486"
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                        />
-                    </View>
-                </View>
+                {memoizedTitleSection}
 
                 {/* Stats Grid */}
                 <View style={styles.statsGrid}>
-                    <View style={[styles.statCard, styles.shadow]}>
-                        <Text style={styles.statLabel}>ACTIVE INVENTORY</Text>
+                    <View style={[styles.statCard, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }, styles.shadow]}>
+                        <Text style={[styles.statLabel, isDark && { color: '#666' }]}>ACTIVE INVENTORY</Text>
                         <Text style={styles.statValue}>{products.length}</Text>
                         <View style={styles.statTrendRow}>
                             <TrendingUp size={12} color="#8a5100" />
                             <Text style={styles.statTrendText}>+12%</Text>
                         </View>
                     </View>
-                    <View style={[styles.statCard, styles.shadow]}>
-                        <Text style={styles.statLabel}>PENDING ORDERS</Text>
+                    <View style={[styles.statCard, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }, styles.shadow]}>
+                        <Text style={[styles.statLabel, isDark && { color: '#666' }]}>PENDING ORDERS</Text>
                         <Text style={[styles.statValue, { color: '#8a5100' }]}>42</Text>
                         <View style={styles.statTrendRow}>
                             <AlertCircle size={12} color="#ba1a1a" />
@@ -185,10 +188,10 @@ export default function AdminProductsScreen({ navigation }: any) {
                     {CATEGORIES.map(category => (
                         <TouchableOpacity 
                             key={category.id}
-                            style={[styles.chip, selectedCategory === category.name && styles.chipActive]}
-                            onPress={() => setSelectedCategory(category.name)}
+                            style={[styles.chip, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }, selectedCategory === category.id && styles.chipActive]}
+                            onPress={() => setSelectedCategory(category.id)}
                         >
-                            <Text style={[styles.chipText, selectedCategory === category.name && styles.chipTextActive]}>
+                            <Text style={[styles.chipText, isDark && { color: '#888' }, selectedCategory === category.id && styles.chipTextActive]}>
                                 {category.name}
                             </Text>
                         </TouchableOpacity>
@@ -200,11 +203,11 @@ export default function AdminProductsScreen({ navigation }: any) {
                     {loading ? (
                         <ActivityIndicator size="large" color={violetPrimary} style={{ marginTop: 40 }} />
                     ) : filteredProducts.length === 0 ? (
-                        <Text style={styles.emptyText}>No products found.</Text>
+                        <Text style={[styles.emptyText, isDark && { color: '#444' }]}>No products found.</Text>
                     ) : (
                         filteredProducts.map(product => (
-                            <TouchableOpacity key={product.id} style={[styles.productItem, styles.shadow]}>
-                                <View style={styles.productImageContainer}>
+                            <TouchableOpacity key={product.id} style={[styles.productItem, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }, styles.shadow]}>
+                                <View style={[styles.productImageContainer, isDark && { backgroundColor: '#252525' }]}>
                                     <Image 
                                         source={{ uri: product.image_url || 'https://via.placeholder.com/150' }}
                                         style={styles.productImage}
@@ -212,20 +215,20 @@ export default function AdminProductsScreen({ navigation }: any) {
                                 </View>
                                 <View style={styles.productInfo}>
                                     <View style={styles.productHeaderRow}>
-                                        <Text style={styles.productName} numberOfLines={1}>{product.title}</Text>
-                                        <View style={[styles.statusBadge, { backgroundColor: '#dcfce7' }]}>
-                                            <Text style={[styles.statusText, { color: '#15803d' }]}>Active</Text>
+                                        <Text style={[styles.productName, isDark && { color: '#ffffff' }]} numberOfLines={1}>{product.title}</Text>
+                                        <View style={[styles.statusBadge, { backgroundColor: isDark ? '#14532d' : '#dcfce7' }]}>
+                                            <Text style={[styles.statusText, { color: isDark ? '#4ade80' : '#15803d' }]}>Active</Text>
                                         </View>
                                     </View>
-                                    <Text style={styles.productCategory}>Category: {product.category}</Text>
+                                    <Text style={[styles.productCategory, isDark && { color: '#666' }]}>Category: {product.category}</Text>
                                     <View style={styles.productFooterRow}>
                                         <Text style={styles.productPrice}>₹{product.price}</Text>
                                         <View style={styles.actionButtons}>
                                             <TouchableOpacity style={styles.actionBtn} onPress={() => handleEditProduct(product)}>
-                                                <Edit2 size={20} color="#7b7486" />
+                                                <Edit2 size={20} color={isDark ? "#888" : "#7b7486"} />
                                             </TouchableOpacity>
                                             <TouchableOpacity style={styles.actionBtn} onPress={() => handleProductOptions(product)}>
-                                                <MoreVertical size={20} color="#7b7486" />
+                                                <MoreVertical size={20} color={isDark ? "#888" : "#7b7486"} />
                                             </TouchableOpacity>
                                         </View>
                                     </View>

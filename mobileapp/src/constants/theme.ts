@@ -30,6 +30,8 @@ export const COLORS = {
     },
     white: '#ffffff',
     black: '#000000',
+    success: '#10b981',
+    error: '#ef4444',
 };
 
 export const SPACING = {

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobileapp",
+    "name": "DropBest!",
     "slug": "mobileapp",
     "scheme": "dropbest",
     "version": "1.0.0",
@@ -17,6 +17,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.dropbest.app",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -27,7 +29,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
-    ]
+      "expo-router",
+      "expo-web-browser"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e3ba2961-8784-4a9d-ac7a-0e5f521aec3b"
+      }
+    }
   }
 }

@@ -5,6 +5,8 @@ import { useAuthStore } from './src/store/authStore';
 import { COLORS } from './src/constants/theme';
 import AppNavigator from './src/navigation/AppNavigator';
 
+import { ThemeProvider } from './src/context/ThemeContext';
+
 export default function App() {
   const { initializeAuth, initialized, loading } = useAuthStore();
 
@@ -22,9 +24,11 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <AppNavigator />
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <AppNavigator />
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }
 

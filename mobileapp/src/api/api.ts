@@ -1,10 +1,12 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://dropbest-api.vercel.app/api';
+// For Local Testing (Replace with your IP or 10.0.2.2 for emulator)
+const API_URL = 'https://dropbest-api.vercel.app/api'; 
 
 const api = axios.create({
     baseURL: API_URL,
+    timeout: 10000, // 10 seconds
     headers: {
         'Content-Type': 'application/json',
     },

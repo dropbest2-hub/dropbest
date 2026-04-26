@@ -41,7 +41,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
         // Use admin client (service role) to bypass RLS — this is safe since it's server-side
         const { data: dbUser, error: dbError } = await supabaseAdmin
             .from('users')
-            .select('*')
+            .select('*, referred_by:referred_by_id ( name )')
             .eq('id', user.id)
             .single();
 
@@ -55,7 +55,8 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
                     name: user.user_metadata?.full_name || user.email?.split('@')[0],
                     avatar_url: user.user_metadata?.avatar_url,
                     role: 'USER',
-                    badge_count: 0,
+                    badge_count: 20,
+                    coin_count: 20,
                     user_level: 'BRONZE',
                     notifications_enabled: true,
                     referral_code: user.id.split('-')[0].toUpperCase() // Generate code from ID
@@ -67,6 +68,14 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
                 console.error("Failed to insert user profile in public.users:", insertError);
             } else if (newUser) {
                 req.user.dbData = newUser;
+                
+                // Add Welcome Notification
+                await supabaseAdmin.from('notifications').insert([{
+                    user_id: user.id,
+                    type: 'REWARD',
+                    message: 'Welcome to DropBest! 🎁 You earned 20 coins as a signup bonus!',
+                    read: false
+                }]);
             }
         } else if (dbUser) {
             // Check if existing user has a referral code, if not, generate one

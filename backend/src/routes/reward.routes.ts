@@ -17,7 +17,7 @@ router.get('/', requireAuth, getUserRewards);
 router.post('/convert', requireAuth, convertCoinsToWallet);
 
 // Withdraw via UPI
-router.post('/withdraw', requireAuth, requestPayout);
+router.post('/payout', requireAuth, requestPayout);
 
 // Scratch Cards
 router.get('/scratch-cards', requireAuth, getScratchCards);

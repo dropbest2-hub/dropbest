@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaView, TextInput, StatusBar, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
-import { Menu, Search, Star, CreditCard, ChevronRight, Edit2, MessageSquare } from 'lucide-react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaView, TextInput, StatusBar, Platform, Alert, ActivityIndicator, RefreshControl, Modal } from 'react-native';
+import { Menu, Search, Star, CreditCard, ChevronRight, Edit2, MessageSquare, X, Send } from 'lucide-react-native';
 import SideMenuModal from '../components/SideMenuModal';
 import api from '../api/api';
 
@@ -9,6 +9,28 @@ const background = '#f8f9fa';
 
 const filters = ['All Messages', 'New', 'Replied'];
 
+// Stable Hero and Search Section to prevent keyboard dismissal
+const AdminMessagesHero = ({ 
+    searchQuery, 
+    setSearchQuery 
+}: any) => (
+    <View style={styles.heroSection}>
+        <Text style={styles.pageTitle}>Support Messages</Text>
+        <Text style={styles.pageSubtitle}>Manage user inquiries regarding rewards and marketplace issues.</Text>
+        
+        <View style={styles.searchContainer}>
+            <Search size={20} color="#7b7486" style={styles.searchIcon} />
+            <TextInput 
+                style={styles.searchInput}
+                placeholder="Search by user or subject..."
+                placeholderTextColor="#7b7486"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+        </View>
+    </View>
+);
+
 export default function AdminMessagesScreen({ navigation }: any) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('All Messages');
@@ -16,6 +38,10 @@ export default function AdminMessagesScreen({ navigation }: any) {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [selectedMessage, setSelectedMessage] = useState<any>(null);
+    const [replyText, setReplyText] = useState('');
+    const [isReplyModalVisible, setIsReplyModalVisible] = useState(false);
+    const [sendingReply, setSendingReply] = useState(false);
 
     const fetchMessages = useCallback(async () => {
         try {
@@ -44,7 +70,7 @@ export default function AdminMessagesScreen({ navigation }: any) {
     const filteredMessages = useMemo(() => {
         return messages.filter(msg => {
             const matchesSearch = (msg.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                  (msg.subject || '').toLowerCase().includes(searchQuery.toLowerCase());
+                                   (msg.subject || '').toLowerCase().includes(searchQuery.toLowerCase());
             
             let matchesFilter = true;
             if (selectedFilter !== 'All Messages') {
@@ -55,17 +81,46 @@ export default function AdminMessagesScreen({ navigation }: any) {
         });
     }, [messages, searchQuery, selectedFilter]);
 
-    const handleMenuPress = () => {
-        setIsMenuVisible(true);
+    const handleViewThread = (msg: any) => {
+        setSelectedMessage(msg);
+        setIsReplyModalVisible(true);
     };
 
-    const handleViewThread = (ticket: string) => {
-        Alert.alert("View Thread", `Opening thread for ${ticket}`);
+    const handleSendReply = async () => {
+        if (!replyText.trim()) {
+            Alert.alert('Error', 'Please enter a reply message.');
+            return;
+        }
+
+        setSendingReply(true);
+        try {
+            await api.post('/contacts/reply', {
+                messageId: selectedMessage.id,
+                userEmail: selectedMessage.email,
+                replyText: replyText
+            });
+
+            Alert.alert('Success', 'Reply sent successfully!');
+            setIsReplyModalVisible(false);
+            setReplyText('');
+            fetchMessages();
+        } catch (error) {
+            Alert.alert('Error', 'Failed to send reply. Please check your connection.');
+        } finally {
+            setSendingReply(false);
+        }
     };
 
     const handleNewMessage = () => {
         Alert.alert("New Message", "Compose new message...");
     };
+
+    const memoizedHero = useMemo(() => (
+        <AdminMessagesHero 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+        />
+    ), [searchQuery]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -77,24 +132,12 @@ export default function AdminMessagesScreen({ navigation }: any) {
                 navigation={navigation} 
             />
             
-            {/* Header */}
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <TouchableOpacity style={styles.iconButton} onPress={handleMenuPress}>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => setIsMenuVisible(true)}>
                         <Menu size={24} color={violetPrimary} />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Dropbest Admin</Text>
-                </View>
-                <View style={styles.headerRight}>
-                    <TouchableOpacity style={styles.searchIconButton}>
-                        <Search size={24} color="#7b7486" />
-                    </TouchableOpacity>
-                    <View style={styles.avatarContainer}>
-                        <Image 
-                            source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150' }}
-                            style={styles.avatar}
-                        />
-                    </View>
                 </View>
             </View>
 
@@ -103,23 +146,7 @@ export default function AdminMessagesScreen({ navigation }: any) {
                 contentContainerStyle={styles.contentPadding}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[violetPrimary]} />}
             >
-                
-                {/* Hero Search Section */}
-                <View style={styles.heroSection}>
-                    <Text style={styles.pageTitle}>Support Messages</Text>
-                    <Text style={styles.pageSubtitle}>Manage user inquiries regarding rewards and marketplace issues.</Text>
-                    
-                    <View style={styles.searchContainer}>
-                        <Search size={20} color="#7b7486" style={styles.searchIcon} />
-                        <TextInput 
-                            style={styles.searchInput}
-                            placeholder="Search by user or subject..."
-                            placeholderTextColor="#7b7486"
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                        />
-                    </View>
-                </View>
+                {memoizedHero}
 
                 {/* Filter Chips */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer} contentContainerStyle={styles.chipsContent}>
@@ -172,7 +199,7 @@ export default function AdminMessagesScreen({ navigation }: any) {
 
                                     <View style={styles.cardFooter}>
                                         <Text style={styles.timeText}>{new Date(msg.created_at).toLocaleDateString()}</Text>
-                                        <TouchableOpacity style={styles.viewThreadBtn} onPress={() => handleViewThread(msg.id)}>
+                                        <TouchableOpacity style={styles.viewThreadBtn} onPress={() => handleViewThread(msg)}>
                                             <Text style={styles.viewThreadText}>View Details</Text>
                                             <ChevronRight size={16} color={violetPrimary} />
                                         </TouchableOpacity>
@@ -190,6 +217,84 @@ export default function AdminMessagesScreen({ navigation }: any) {
             <TouchableOpacity style={styles.fab} onPress={handleNewMessage}>
                 <Edit2 size={24} color="#ffffff" />
             </TouchableOpacity>
+
+            {/* Reply Modal */}
+            <Modal
+                visible={isReplyModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setIsReplyModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Message Details</Text>
+                            <TouchableOpacity onPress={() => setIsReplyModalVisible(false)}>
+                                <X size={24} color="#494454" />
+                            </TouchableOpacity>
+                        </View>
+
+                        {selectedMessage && (
+                            <ScrollView style={styles.modalScroll}>
+                                <View style={styles.modalUserInfo}>
+                                    <View style={styles.userAvatarPlaceholder}>
+                                        <Text style={styles.userAvatarText}>{(selectedMessage.name || 'U').charAt(0)}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.modalUserName}>{selectedMessage.name}</Text>
+                                        <Text style={styles.modalUserEmail}>{selectedMessage.email}</Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.modalMessageSection}>
+                                    <Text style={styles.modalLabel}>SUBJECT</Text>
+                                    <Text style={styles.modalSubject}>{selectedMessage.subject}</Text>
+                                    
+                                    <Text style={styles.modalLabel}>MESSAGE</Text>
+                                    <View style={styles.messageBubble}>
+                                        <Text style={styles.modalMessageBody}>{selectedMessage.message}</Text>
+                                    </View>
+                                </View>
+
+                                {selectedMessage.admin_reply && (
+                                    <View style={styles.modalMessageSection}>
+                                        <Text style={styles.modalLabel}>PREVIOUS REPLY</Text>
+                                        <View style={[styles.messageBubble, styles.replyBubble]}>
+                                            <Text style={styles.modalMessageBody}>{selectedMessage.admin_reply}</Text>
+                                        </View>
+                                    </View>
+                                )}
+
+                                <View style={styles.replyInputSection}>
+                                    <Text style={styles.modalLabel}>SEND A REPLY</Text>
+                                    <TextInput
+                                        style={styles.replyInput}
+                                        placeholder="Type your response here..."
+                                        multiline
+                                        numberOfLines={4}
+                                        value={replyText}
+                                        onChangeText={setReplyText}
+                                    />
+                                    <TouchableOpacity 
+                                        style={[styles.sendReplyBtn, sendingReply && { opacity: 0.7 }]}
+                                        onPress={handleSendReply}
+                                        disabled={sendingReply}
+                                    >
+                                        {sendingReply ? (
+                                            <ActivityIndicator color="#ffffff" />
+                                        ) : (
+                                            <>
+                                                <Send size={18} color="#ffffff" />
+                                                <Text style={styles.sendReplyText}>Send Response</Text>
+                                            </>
+                                        )}
+                                    </TouchableOpacity>
+                                </View>
+                            </ScrollView>
+                        )}
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -459,5 +564,113 @@ const styles = StyleSheet.create({
                 elevation: 6,
             },
         }),
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        backgroundColor: '#ffffff',
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        height: '90%',
+        paddingTop: 20,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 25,
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: '900',
+        color: '#191c1d',
+    },
+    modalScroll: {
+        padding: 25,
+    },
+    modalUserInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 15,
+        marginBottom: 25,
+    },
+    modalUserName: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#191c1d',
+    },
+    modalUserEmail: {
+        fontSize: 14,
+        color: '#7b7486',
+    },
+    modalMessageSection: {
+        marginBottom: 25,
+    },
+    modalLabel: {
+        fontSize: 11,
+        fontWeight: '900',
+        color: '#7b7486',
+        letterSpacing: 1,
+        marginBottom: 8,
+        textTransform: 'uppercase',
+    },
+    modalSubject: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: violetPrimary,
+        marginBottom: 15,
+    },
+    messageBubble: {
+        backgroundColor: '#f1f5f9',
+        padding: 15,
+        borderRadius: 16,
+        borderBottomLeftRadius: 4,
+    },
+    modalMessageBody: {
+        fontSize: 15,
+        color: '#191c1d',
+        lineHeight: 22,
+    },
+    replyBubble: {
+        backgroundColor: '#ede9fe',
+        borderColor: '#ddd6fe',
+        borderWidth: 1,
+        borderBottomLeftRadius: 16,
+        borderBottomRightRadius: 4,
+    },
+    replyInputSection: {
+        marginBottom: 50,
+    },
+    replyInput: {
+        backgroundColor: '#ffffff',
+        borderWidth: 1,
+        borderColor: '#cbc3d7',
+        borderRadius: 16,
+        padding: 15,
+        height: 120,
+        textAlignVertical: 'top',
+        fontSize: 15,
+        color: '#191c1d',
+        marginBottom: 15,
+    },
+    sendReplyBtn: {
+        backgroundColor: violetPrimary,
+        height: 56,
+        borderRadius: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+    },
+    sendReplyText: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: '700',
     }
 });

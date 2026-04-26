@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, RefreshControl, Alert, Image, SafeAreaView, Platform, StatusBar, Clipboard } from 'react-native';
+import { COLORS, SHADOWS } from '../constants/theme';
 
 import { Menu, Wallet, Copy, X, CheckCircle2 } from 'lucide-react-native';
 import SideMenuModal from '../components/SideMenuModal';
@@ -116,12 +117,7 @@ export default function AdminPayoutsScreen({ navigation }: any) {
                     <Text style={styles.headerTitle}>Dropbest Admin</Text>
                 </View>
                 <View style={styles.headerRight}>
-                    <View style={styles.avatarContainer}>
-                        <Image 
-                            source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150' }}
-                            style={styles.avatar}
-                        />
-                    </View>
+                    {/* Image removed as requested */}
                 </View>
             </View>
 
@@ -130,9 +126,9 @@ export default function AdminPayoutsScreen({ navigation }: any) {
                 contentContainerStyle={styles.contentPadding}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[violetPrimary]} />}
             >
-                <View style={styles.heroSection}>
-                    <Text style={styles.pageTitle}>Payout Requests</Text>
-                    <Text style={styles.pageSubtitle}>Review and process user withdrawal requests.</Text>
+                <View style={styles.pageHeader}>
+                    <Text style={styles.title}>Payout Requests</Text>
+                    <Text style={styles.subtitle}>Review and process user withdrawal requests.</Text>
                 </View>
 
                 {payouts.length === 0 ? (
@@ -164,7 +160,12 @@ export default function AdminPayoutsScreen({ navigation }: any) {
                                     <Text style={styles.dateText}>{new Date(payout.created_at).toLocaleDateString()}</Text>
                                 </View>
 
-                                <Text style={styles.amount}>₹{payout.amount}</Text>
+                                <View style={styles.amountRow}>
+                                    <Text style={styles.amount}>₹{payout.amount}</Text>
+                                    <View style={styles.coinBadge}>
+                                        <Text style={styles.coinBadgeText}>{payout.coins_used || (payout.amount * 10)} Coins</Text>
+                                    </View>
+                                </View>
                                 
                                 <TouchableOpacity style={styles.upiRow} onPress={() => copyToClipboard(payout.upi_id)}>
                                     <Text style={styles.upiLabel}>UPI ID:</Text>
@@ -176,6 +177,12 @@ export default function AdminPayoutsScreen({ navigation }: any) {
 
                                 {payout.status === 'PENDING' && (
                                     <View style={styles.adminAction}>
+                                        <TextInput 
+                                            style={styles.utrInput}
+                                            placeholder="Enter UTR / Transaction ID"
+                                            value={utrInputs[payout.id] || ''}
+                                            onChangeText={(text) => setUtrInputs({ ...utrInputs, [payout.id]: text })}
+                                        />
                                         <View style={styles.btnRow}>
                                             <TouchableOpacity 
                                                 style={styles.approveBtn}
@@ -269,20 +276,18 @@ const styles = StyleSheet.create({
     contentPadding: {
         padding: 20,
     },
-    heroSection: {
+    pageHeader: {
         marginBottom: 24,
-        marginTop: 10,
     },
-    pageTitle: {
-        fontSize: 24,
-        fontWeight: '700',
-        color: '#191c1d',
-        marginBottom: 8,
-        letterSpacing: -0.5,
+    title: {
+        fontSize: 28,
+        fontWeight: '800',
+        color: '#1e293b',
+        marginBottom: 4,
     },
-    pageSubtitle: {
+    subtitle: {
         fontSize: 14,
-        color: '#494454',
+        color: '#64748b',
     },
     emptyState: {
         backgroundColor: '#ffffff',
@@ -353,12 +358,40 @@ const styles = StyleSheet.create({
         color: '#7b7486',
         fontWeight: '500',
     },
+    amountRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 12,
+    },
     amount: {
         fontSize: 32,
         fontWeight: '800',
         color: '#191c1d',
         letterSpacing: -1,
+    },
+    coinBadge: {
+        backgroundColor: '#fef3c7',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#fcd34d',
+    },
+    coinBadgeText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#92400e',
+    },
+    utrInput: {
+        backgroundColor: '#f8f9fa',
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        height: 48,
         marginBottom: 12,
+        fontSize: 14,
     },
     upiRow: {
         flexDirection: 'row',

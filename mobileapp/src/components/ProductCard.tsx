@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { COLORS, SHADOWS, SPACING } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { ExternalLink } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -13,25 +14,36 @@ interface Product {
     image_url: string;
     amazon_link?: string;
     flipkart_link?: string;
+    myntra_link?: string;
+    shopify_link?: string;
     description?: string;
 }
 
 export default function ProductCard({ product, onPress }: { product: Product, onPress?: () => void }) {
+    const { isDark } = useTheme();
+
     return (
-        <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
-            <View style={styles.imageContainer}>
+        <TouchableOpacity 
+            style={[
+                styles.container, 
+                isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' }
+            ]} 
+            onPress={onPress} 
+            activeOpacity={0.8}
+        >
+            <View style={[styles.imageContainer, isDark && { backgroundColor: '#2d2d2d' }]}>
                 <Image 
                     source={{ uri: product.image_url }} 
                     style={styles.image}
                     resizeMode="cover"
                 />
-                <View style={styles.priceTag}>
-                    <Text style={styles.priceText}>₹{product.price.toLocaleString()}</Text>
+                <View style={[styles.priceTag, isDark && { backgroundColor: 'rgba(30, 30, 30, 0.95)' }]}>
+                    <Text style={[styles.priceText, isDark && { color: COLORS.brand[400] }]}>₹{product.price.toLocaleString()}</Text>
                 </View>
             </View>
 
             <View style={styles.details}>
-                <Text style={styles.title} numberOfLines={2}>{product.title}</Text>
+                <Text style={[styles.title, isDark && { color: '#e0e0e0' }]} numberOfLines={2}>{product.title}</Text>
                 
                 <View style={styles.footer}>
                     <View style={styles.storeIcons}>
@@ -41,10 +53,45 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                         {product.flipkart_link && (
                             <View style={[styles.storeDot, { backgroundColor: '#2874F0' }]} />
                         )}
+                        {product.myntra_link && (
+                            <View style={[styles.storeDot, { backgroundColor: '#ff3f6c' }]} />
+                        )}
+                        {product.shopify_link && (
+                            <View style={[styles.storeDot, { backgroundColor: '#95bf47' }]} />
+                        )}
                     </View>
-                    <View style={styles.viewBadge}>
-                        <ExternalLink size={10} color={COLORS.brand[600]} />
-                        <Text style={styles.viewText}>VIEW</Text>
+                    <View style={[
+                        styles.viewBadge, 
+                        { 
+                            backgroundColor: product.amazon_link ? '#FF990020' : 
+                                            product.flipkart_link ? '#2874F020' :
+                                            product.myntra_link ? '#ff3f6c20' :
+                                            product.shopify_link ? '#95bf4720' : (isDark ? '#2d2d2d' : COLORS.brand[50]) 
+                        }
+                    ]}>
+                        <ExternalLink 
+                            size={10} 
+                            color={
+                                product.amazon_link ? '#FF9900' : 
+                                product.flipkart_link ? '#2874F0' :
+                                product.myntra_link ? '#ff3f6c' :
+                                product.shopify_link ? '#95bf47' : COLORS.brand[600]
+                            } 
+                        />
+                        <Text style={[
+                            styles.viewText, 
+                            { 
+                                color: product.amazon_link ? '#FF9900' : 
+                                       product.flipkart_link ? '#2874F0' :
+                                       product.myntra_link ? '#ff3f6c' :
+                                       product.shopify_link ? '#95bf47' : (isDark ? '#aaa' : COLORS.brand[600]) 
+                            }
+                        ]}>
+                            {product.amazon_link ? 'AMAZON' : 
+                             product.flipkart_link ? 'FLIPKART' :
+                             product.myntra_link ? 'MYNTRA' :
+                             product.shopify_link ? 'SHOPIFY' : 'VIEW'}
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -126,4 +173,3 @@ const styles = StyleSheet.create({
         color: COLORS.brand[600],
     }
 });
-

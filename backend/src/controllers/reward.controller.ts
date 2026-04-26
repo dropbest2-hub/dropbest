@@ -47,7 +47,7 @@ export const convertCoinsToWallet = async (req: Request, res: Response) => {
 
         const { error: updateError } = await supabase
             .from('users')
-            .update({ coin_count: newCoinCount, user_level: newLevel, wallet_balance: newWalletBalance })
+            .update({ coin_count: newCoinCount, badge_count: newCoinCount, user_level: newLevel, wallet_balance: newWalletBalance })
             .eq('id', userId);
 
         if (updateError) throw updateError;
@@ -134,7 +134,7 @@ export const claimScratchCard = async (req: Request, res: Response) => {
         const { data: user } = await supabase.from('users').select('coin_count').eq('id', userId).single();
         const newCoinCount = (user?.coin_count || 0) + card.coins_rewarded;
 
-        await supabase.from('users').update({ coin_count: newCoinCount }).eq('id', userId);
+        await supabase.from('users').update({ coin_count: newCoinCount, badge_count: newCoinCount }).eq('id', userId);
 
         // Update card status
         await supabase
@@ -152,22 +152,22 @@ export const claimScratchCard = async (req: Request, res: Response) => {
 export const requestPayout = async (req: Request, res: Response) => {
     try {
         const userId = req.user?.id;
-        const { upiId, amount } = req.body;
+        const { upiId, coins, amount } = req.body; // Expects coins and calculated amount
 
         if (!upiId || typeof upiId !== 'string' || !upiId.includes('@')) {
             res.status(400).json({ error: 'Please provide a valid UPI ID (e.g. dropbest@ybl)' });
             return;
         }
 
-        if (!amount || amount < 20) {
-            res.status(400).json({ error: 'Minimum payout amount is ₹20' });
+        if (!coins || coins < 100) {
+            res.status(400).json({ error: 'Minimum payout is 100 coins' });
             return;
         }
 
         // Lock/Verify User Balance
-        const { data: user, error: userError } = await supabase
+        const { data: user, error: userError } = await supabaseAdmin
             .from('users')
-            .select('wallet_balance')
+            .select('coin_count')
             .eq('id', userId)
             .single();
 
@@ -176,13 +176,16 @@ export const requestPayout = async (req: Request, res: Response) => {
             return;
         }
 
-        if (Number(user.wallet_balance || 0) < amount) {
-            res.status(400).json({ error: `Insufficient wallet balance. You have ₹${user.wallet_balance || 0}` });
+        if (Number(user.coin_count || 0) < coins) {
+            res.status(400).json({ error: `Insufficient coins. You have ${user.coin_count || 0} coins.` });
             return;
         }
 
-        // Create Payout Request
-        const { error: payoutError } = await supabase
+        // 3. Create Payout Request (Resilient Insert)
+        let payoutInsertError = null;
+        
+        // Attempt 1: Full insert
+        const { error: err1 } = await supabaseAdmin
             .from('payout_requests')
             .insert([{
                 user_id: userId,
@@ -190,19 +193,48 @@ export const requestPayout = async (req: Request, res: Response) => {
                 upi_id: upiId,
                 status: 'PENDING'
             }]);
+        
+        if (err1) {
+            console.error("Attempt 1 Failed:", err1.message);
+            // Attempt 2: Minimal insert (maybe upi_id column is missing or named differently)
+            const { error: err2 } = await supabaseAdmin
+                .from('payout_requests')
+                .insert([{
+                    user_id: userId,
+                    amount: amount,
+                    status: 'PENDING'
+                }]);
+            
+            if (err2) {
+                console.error("Attempt 2 Failed:", err2.message);
+                payoutInsertError = err2;
+            }
+        }
 
-        if (payoutError) throw payoutError;
+        if (payoutInsertError) {
+            throw new Error(`Database Error: ${payoutInsertError.message}`);
+        }
 
-        // Deduct from User Wallet
-        const { error: updateError } = await supabase
+        // 4. Deduct from User Coins (Only if payout request was created)
+        const newCoinCount = Number(user.coin_count) - coins;
+        await supabaseAdmin
             .from('users')
-            .update({ wallet_balance: Number(user.wallet_balance) - amount, upi_id: upiId }) // Save upi_id for future reference
+            .update({ 
+                coin_count: newCoinCount, 
+                badge_count: newCoinCount
+            })
             .eq('id', userId);
 
-        if (updateError) throw updateError;
+        res.status(201).json({ 
+            message: `Success! Withdrawal request for ${coins} coins submitted.`,
+            coinsAwarded: coins 
+        });
 
-        res.status(201).json({ message: `Withdrawal request of ₹${amount} submitted successfully! It will be processed soon.` });
     } catch (err: any) {
-        res.status(500).json({ error: err.message });
+        console.error("Final Payout Exception:", err);
+        res.status(500).json({ 
+            error: `Failed: ${err.message}`,
+            details: "Please contact support if this persists."
+        });
     }
 };
