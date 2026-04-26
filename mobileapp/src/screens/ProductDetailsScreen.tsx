@@ -51,8 +51,10 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
 
     const handleShare = async () => {
         try {
+            const shareUrl = `https://dropbest.vercel.app/products/${product.id}`;
             await Share.share({
-                message: `Check out this amazing deal on DropBest: ${product.title}\n\nDownload the app to see more!`,
+                message: `Check out this amazing deal on DropBest: ${product.title}\n\nView on Website: ${shareUrl}\n\nDownload the app for more rewards!`,
+                url: shareUrl, // For iOS support
             });
         } catch (error) {
             console.error('Error sharing:', error);
