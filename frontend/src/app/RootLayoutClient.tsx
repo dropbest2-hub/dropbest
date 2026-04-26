@@ -88,7 +88,6 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                                 )}
                                 <li><a href="/privacy-policy" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Privacy Policy</a></li>
                                 <li><a href="/disclaimer" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Affiliate Disclaimer</a></li>
-                                <li><a href="/dropbest.apk" download="dropbest.apk" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">App Download (Android)</a></li>
                             </ul>
                         </div>
                     </div>
