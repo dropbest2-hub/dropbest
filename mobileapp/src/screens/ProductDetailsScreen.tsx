@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Share, Alert } from 'react-native';
 import { COLORS, SPACING, SHADOWS } from '../constants/theme';
 import api from '../api/api';
+import { useAuthStore } from '../store/authStore';
 import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck, Package, CheckCircle2 } from 'lucide-react-native';
 import { Linking, Modal } from 'react-native';
 
