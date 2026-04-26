@@ -77,7 +77,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                                 <li><a href="/" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Home</a></li>
                                 <li><a href="/#trending" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Products</a></li>
                                 <li><a href="/rewards" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Rewards System</a></li>
-
+                                <li><a href="/dropbest.apk" download="dropbest.apk" className="text-brand-600 font-black hover:text-brand-700 transition-colors flex items-center gap-1">Download App (APK) ✨</a></li>
                             </ul>
                         </div>
                         <div className="space-y-4">
@@ -88,6 +88,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                                 )}
                                 <li><a href="/privacy-policy" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Privacy Policy</a></li>
                                 <li><a href="/disclaimer" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Affiliate Disclaimer</a></li>
+                                <li><a href="/dropbest.apk" download="dropbest.apk" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">App Download (Android)</a></li>
                             </ul>
                         </div>
                     </div>
