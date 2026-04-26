@@ -12,8 +12,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon-options/icon-option-2.png",
-    apple: "/icon-options/icon-option-2.png",
+    icon: "/icon-options/icon-option-2.png?v=2",
+    apple: "/icon-options/icon-option-2.png?v=2",
   },
   title: {
     default: "DropBest! - Discover, Review & Earn",
