@@ -5,44 +5,25 @@ import { Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PWAInstall() {
-    const [installPrompt, setInstallPrompt] = useState<any>(null);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const handleBeforeInstallPrompt = (e: any) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            setInstallPrompt(e);
+        // Show the banner after 3 seconds for better UX
+        const timer = setTimeout(() => {
             setIsVisible(true);
-        };
+        }, 3000);
 
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-        // Check if app is already installed
-        if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
-            setIsVisible(false);
-        }
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        };
+        return () => clearTimeout(timer);
     }, []);
 
-    const handleInstallClick = async () => {
-        if (!installPrompt) return;
-
-        // Show the install prompt
-        installPrompt.prompt();
-
-        // Wait for the user to respond to the prompt
-        const { outcome } = await installPrompt.userChoice;
-        
-        if (outcome === 'accepted') {
-            setIsVisible(false);
-        }
-        
-        setInstallPrompt(null);
+    const handleDownloadClick = () => {
+        const link = document.createElement('a');
+        link.href = '/dropbest.apk';
+        link.download = 'dropbest.apk';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setIsVisible(false);
     };
 
     if (!isVisible) return null;
@@ -58,17 +39,17 @@ export default function PWAInstall() {
                 <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                            <img src="/icon-options/icon-option-2.png?v=2" alt="Logo" className="w-8 h-8 object-contain" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900 leading-tight">Install DropBest!</h3>
-                            <p className="text-xs text-gray-500">Faster access to your rewards</p>
+                            <h3 className="font-bold text-gray-900 leading-tight">Download DropBest!</h3>
+                            <p className="text-xs text-gray-500">Get the full mobile experience</p>
                         </div>
                     </div>
                     
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={handleInstallClick}
+                            onClick={handleDownloadClick}
                             className="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center gap-2"
                         >
                             <Download size={16} />
