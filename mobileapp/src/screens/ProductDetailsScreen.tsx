@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Share } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions, Share, Alert } from 'react-native';
 import { COLORS, SPACING, SHADOWS } from '../constants/theme';
 import api from '../api/api';
 import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck, Package, CheckCircle2 } from 'lucide-react-native';
@@ -62,6 +62,20 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
     };
 
     const handleRedirect = async (link: string) => {
+        const currentUser = useAuthStore.getState().user;
+        
+        if (!currentUser) {
+            Alert.alert(
+                "Login Required",
+                "Please login to purchase products and earn smart rewards!",
+                [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Login", onPress: () => navigation.navigate('Login') }
+                ]
+            );
+            return;
+        }
+
         try {
             // Track the redirect on backend
             const response = await api.post('/orders/redirect', { productId: product.id });

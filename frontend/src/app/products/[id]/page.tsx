@@ -232,21 +232,30 @@ export default function ProductDetails() {
  fetchData();
  }, [fetchData]);
 
- const handleRedirect = async (link: string) => {
- if (user && session && product) {
- try {
- const response = await api.post(
- '/orders/redirect',
- { productId: product.id }
- );
- setLastOrderId(response.data.id || response.data.order?.id);
- setShowTrackerPrompt(true);
- } catch (error) {
- console.error('Error tracking redirect:', error);
- }
- }
- window.open(link, '_blank');
- };
+  const handleRedirect = async (link: string) => {
+    if (!user || !session) {
+      toast.error('Please login to buy and earn rewards!', {
+        icon: '🔒',
+        duration: 4000
+      });
+      router.push('/auth');
+      return;
+    }
+
+    if (product) {
+      try {
+        const response = await api.post(
+          '/orders/redirect',
+          { productId: product.id }
+        );
+        setLastOrderId(response.data.id || response.data.order?.id);
+        setShowTrackerPrompt(true);
+      } catch (error) {
+        console.error('Error tracking redirect:', error);
+      }
+    }
+    window.open(link, '_blank');
+  };
 
  const handleSubmitReview = async (e: React.FormEvent) => {
  e.preventDefault();
