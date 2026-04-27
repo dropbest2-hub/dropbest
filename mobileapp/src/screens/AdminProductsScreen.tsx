@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, SafeAreaView, TextInput, StatusBar, Platform, Alert, ActivityIndicator, RefreshControl } from 'react-native';
-import { Menu, Plus, Search, TrendingUp, AlertCircle, MoreVertical, Edit2 } from 'lucide-react-native';
+import { Menu, Plus, Search, TrendingUp, AlertCircle, MoreVertical, Edit2, RefreshCw } from 'lucide-react-native';
 import { CATEGORIES } from '../lib/categories';
 import SideMenuModal from '../components/SideMenuModal';
 import { useTheme } from '../context/ThemeContext';
@@ -23,6 +23,14 @@ const AdminTitleSection = ({
                 <Plus size={18} color="#ffffff" />
                 <Text style={styles.addButtonText}>NEW ITEM</Text>
             </TouchableOpacity>
+            <TouchableOpacity 
+                style={[styles.syncButton, isSyncing && { opacity: 0.7 }]} 
+                onPress={handleSyncPrices}
+                disabled={isSyncing}
+            >
+                <RefreshCw size={18} color={violetPrimary} style={isSyncing ? { transform: [{ rotate: '0deg' }] } : {}} />
+                <Text style={styles.syncButtonText}>{isSyncing ? 'SYNCING...' : 'SYNC'}</Text>
+            </TouchableOpacity>
         </View>
 
         <View style={styles.searchContainer}>
@@ -43,6 +51,7 @@ export default function AdminProductsScreen({ navigation }: any) {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
     
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
@@ -116,6 +125,31 @@ export default function AdminProductsScreen({ navigation }: any) {
         );
     };
 
+    const handleSyncPrices = async () => {
+        Alert.alert(
+            "Sync Prices",
+            "This will scrape Amazon/Flipkart for all products. It might take a minute and will notify users of price drops. Continue?",
+            [
+                { text: "Cancel", style: "cancel" },
+                { 
+                    text: "Sync Now", 
+                    onPress: async () => {
+                        try {
+                            setIsSyncing(true);
+                            const response = await api.post('/products/sync');
+                            Alert.alert("Success", `Sync completed! Updated ${response.data.updated.length} products.`);
+                            fetchProducts();
+                        } catch (error) {
+                            Alert.alert("Error", "Failed to sync prices. Check server connection.");
+                        } finally {
+                            setIsSyncing(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     const handleProductOptions = (product: any) => {
         Alert.alert(
             "Product Options",
@@ -134,6 +168,8 @@ export default function AdminProductsScreen({ navigation }: any) {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             handleNewItem={handleNewItem}
+            handleSyncPrices={handleSyncPrices}
+            isSyncing={isSyncing}
         />
     ), [isDark, searchQuery, navigation]);
 
@@ -335,6 +371,24 @@ const styles = StyleSheet.create({
     },
     addButtonText: {
         color: '#ffffff',
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
+    syncButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: violetPrimary,
+        gap: 8,
+        marginLeft: 8,
+    },
+    syncButtonText: {
+        color: violetPrimary,
         fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.5,
