@@ -16,6 +16,7 @@ interface Product {
     flipkart_link?: string;
     myntra_link?: string;
     shopify_link?: string;
+    ajio_link?: string;
     description?: string;
 }
 
@@ -59,6 +60,9 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                         {product.shopify_link && (
                             <View style={[styles.storeDot, { backgroundColor: '#95bf47' }]} />
                         )}
+                        {product.ajio_link && (
+                            <View style={[styles.storeDot, { backgroundColor: '#2c4152' }]} />
+                        )}
                     </View>
                     <View style={[
                         styles.viewBadge, 
@@ -90,7 +94,8 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                             {product.amazon_link ? 'AMAZON' : 
                              product.flipkart_link ? 'FLIPKART' :
                              product.myntra_link ? 'MYNTRA' :
-                             product.shopify_link ? 'SHOPIFY' : 'VIEW'}
+                             product.shopify_link ? 'SHOPIFY' : 
+                             product.ajio_link ? 'AJIO' : 'VIEW'}
                         </Text>
                     </View>
                 </View>

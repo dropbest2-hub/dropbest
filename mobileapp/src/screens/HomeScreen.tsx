@@ -14,6 +14,7 @@ const STORES = [
     { id: 'flipkart', name: 'Flipkart', color: '#2874F0', logo: 'https://seeklogo.com/images/F/flipkart-logo-3F33927DAA-seeklogo.com.png' },
     { id: 'myntra', name: 'Myntra', color: '#ff3f6c', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Myntra_Logo.png' },
     { id: 'shopify', name: 'Shopify', color: '#95bf47', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Shopify_Logo.png' },
+    { id: 'ajio', name: 'Ajio', color: '#2c4152', logo: 'https://assets.ajio.com/static/img/Ajio-Logo.svg' },
 ];
 
 const getCategoryIcon = (id: string) => {
@@ -237,7 +238,8 @@ export default function HomeScreen({ navigation }: any) {
                             (selectedStore === 'amazon' && p.amazon_link) ||
                             (selectedStore === 'flipkart' && p.flipkart_link) ||
                             (selectedStore === 'myntra' && p.myntra_link) ||
-                            (selectedStore === 'shopify' && p.shopify_link);
+                            (selectedStore === 'shopify' && p.shopify_link) ||
+                            (selectedStore === 'ajio' && p.ajio_link);
         const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
         return matchesSearch && matchesStore && matchesCategory;
     });

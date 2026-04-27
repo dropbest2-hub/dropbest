@@ -20,6 +20,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
     const [flipkartLink, setFlipkartLink] = useState(editingProduct?.flipkart_link || '');
     const [myntraLink, setMyntraLink] = useState(editingProduct?.myntra_link || '');
     const [shopifyLink, setShopifyLink] = useState(editingProduct?.shopify_link || '');
+    const [ajioLink, setAjioLink] = useState(editingProduct?.ajio_link || '');
     const [category, setCategory] = useState(editingProduct?.category || (CATEGORIES[1] ? CATEGORIES[1].id : ''));
 
     const handleSave = async () => {
@@ -28,8 +29,8 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
             return;
         }
 
-        if (!amazonLink && !flipkartLink && !myntraLink && !shopifyLink) {
-            Alert.alert("Error", "Please provide at least one store link (Amazon, Flipkart, Myntra, or Shopify).");
+        if (!amazonLink && !flipkartLink && !myntraLink && !shopifyLink && !ajioLink) {
+            Alert.alert("Error", "Please provide at least one store link (Amazon, Flipkart, Myntra, Shopify, or Ajio).");
             return;
         }
 
@@ -52,6 +53,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                 flipkart_link: ensureProtocol(flipkartLink),
                 myntra_link: ensureProtocol(myntraLink),
                 shopify_link: ensureProtocol(shopifyLink),
+                ajio_link: ensureProtocol(ajioLink),
                 category,
                 search_keywords: keywords
             };
@@ -225,6 +227,17 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                                 placeholderTextColor="#7b7486"
                                 value={shopifyLink}
                                 onChangeText={setShopifyLink}
+                            />
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Ajio Link</Text>
+                            <TextInput 
+                                style={styles.input}
+                                placeholder="https://ajio.com/..."
+                                placeholderTextColor="#7b7486"
+                                value={ajioLink}
+                                onChangeText={setAjioLink}
                             />
                         </View>
                     </View>

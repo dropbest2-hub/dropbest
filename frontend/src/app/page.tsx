@@ -19,6 +19,7 @@ interface Product {
     flipkart_link: string;
     myntra_link?: string;
     shopify_link?: string;
+    ajio_link?: string;
     watch_count?: number;
     category?: string;
     search_keywords?: string;
@@ -95,13 +96,17 @@ export default function Home() {
 
     const handleRedirect = async (productId: string, link: string) => {
         if (user) {
-            try {
-                await api.post('/orders/redirect', { productId });
-                setShowTrackerPrompt(true);
-            } catch (error) {
-                console.error('Error tracking redirect:', error);
-            }
+            // Track the redirect on backend in the background
+            api.post('/orders/redirect', { productId })
+                .then(() => {
+                    setShowTrackerPrompt(true);
+                })
+                .catch(error => {
+                    console.error('Error tracking redirect:', error);
+                });
         }
+        
+        // Open the external link immediately
         window.open(link, '_blank');
     };
 
@@ -284,7 +289,8 @@ export default function Home() {
                             { id: 'amazon', name: 'Amazon', color: '#FF9900', lightColor: 'bg-[#FF9900]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg' },
                             { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: '/flipkart.png' },
                             { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: '/myntra.jpg' },
-                            { id: 'shopify', name: 'Shopify', color: '#96bf48', lightColor: 'bg-[#96bf48]/10', logo: '/shopify.png' }
+                            { id: 'shopify', name: 'Shopify', color: '#96bf48', lightColor: 'bg-[#96bf48]/10', logo: '/shopify.png' },
+                            { id: 'ajio', name: 'Ajio', color: '#2c4152', lightColor: 'bg-[#2c4152]/10', logo: 'https://assets.ajio.com/static/img/Ajio-Logo.svg' }
                         ].map((brand) => (
                             <motion.button
                                 key={brand.id}
@@ -425,6 +431,7 @@ export default function Home() {
                                 if (selectedBrand === 'flipkart' && !p.flipkart_link) return false;
                                 if (selectedBrand === 'myntra' && !p.myntra_link) return false;
                                 if (selectedBrand === 'shopify' && !p.shopify_link) return false;
+                                if (selectedBrand === 'ajio' && !p.ajio_link) return false;
 
                                 const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
                                 const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -511,6 +518,14 @@ export default function Home() {
                                                     className="flex-1 flex items-center justify-center gap-2 bg-[#96bf48] hover:bg-[#96bf48]/90 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#96bf48]/10"
                                                 >
                                                     Shopify <ExternalLink size={16} />
+                                                </button>
+                                            )}
+                                            {product.ajio_link && (
+                                                <button
+                                                    onClick={() => handleRedirect(product.id, product.ajio_link!)}
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-[#2c4152] hover:bg-[#2c4152]/90 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#2c4152]/10"
+                                                >
+                                                    Ajio <ExternalLink size={16} />
                                                 </button>
                                             )}
                                         </div>

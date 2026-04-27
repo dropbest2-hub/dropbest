@@ -57,6 +57,8 @@ interface Product {
     amazon_link: string;
     flipkart_link: string;
     myntra_link?: string;
+    shopify_link?: string;
+    ajio_link?: string;
     external_rating?: number;
     external_review_count?: string;
 }
@@ -243,17 +245,18 @@ export default function ProductDetails() {
     }
 
     if (product) {
-      try {
-        const response = await api.post(
-          '/orders/redirect',
-          { productId: product.id }
-        );
-        setLastOrderId(response.data.id || response.data.order?.id);
-        setShowTrackerPrompt(true);
-      } catch (error) {
-        console.error('Error tracking redirect:', error);
-      }
+      // Track the redirect on backend in the background
+      api.post('/orders/redirect', { productId: product.id })
+        .then(response => {
+          setLastOrderId(response.data.id || response.data.order?.id);
+          setShowTrackerPrompt(true);
+        })
+        .catch(error => {
+          console.error('Error tracking redirect:', error);
+        });
     }
+    
+    // Open the external link immediately
     window.open(link, '_blank');
   };
 
@@ -418,6 +421,14 @@ export default function ProductDetails() {
  className="flex items-center justify-center gap-2 bg-[#ff3f6c] text-white py-4 rounded-2xl font-black shadow-lg shadow-[#ff3f6c]/20 hover:-translate-y-1 transition-all"
  >
  Buy on Myntra <ExternalLink size={20} />
+ </button>
+ )}
+ {product.ajio_link && (
+ <button 
+ onClick={() => handleRedirect(product.ajio_link!)}
+ className="flex items-center justify-center gap-2 bg-[#2c4152] text-white py-4 rounded-2xl font-black shadow-lg shadow-[#2c4152]/20 hover:-translate-y-1 transition-all"
+ >
+ Buy on Ajio <ExternalLink size={20} />
  </button>
  )}
  </div>

@@ -5,6 +5,8 @@ import api from '../api/api';
 import { useAuthStore } from '../store/authStore';
 import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck, Package, CheckCircle2 } from 'lucide-react-native';
 import { Linking, Modal } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+
 
 const { width } = Dimensions.get('window');
 
@@ -78,19 +80,27 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
         }
 
         try {
-            // Track the redirect on backend
-            const response = await api.post('/orders/redirect', { productId: product.id });
-            setLastOrderId(response.data.id);
+            // Track the redirect on backend in the background (don't wait for it)
+            api.post('/orders/redirect', { productId: product.id })
+                .then(response => {
+                    if (response.data && response.data.id) {
+                        setLastOrderId(response.data.id);
+                    }
+                })
+                .catch(err => console.error('Error tracking redirect in background:', err));
             
-            // Open the external link
-            await Linking.openURL(link);
+            // Open the external link immediately using WebBrowser for better reliability
+            await WebBrowser.openBrowserAsync(link);
             
-            // Show the modal to encourage tracking
+            // Show the modal to encourage tracking when they return
             setShowRedirectModal(true);
         } catch (error) {
-            console.error('Error tracking redirect:', error);
-            // Still try to open the link even if tracking fails
-            Linking.openURL(link).catch(e => console.error('Failed to open URL', e));
+            console.error('Error handling redirect:', error);
+            // Fallback to basic Linking if WebBrowser fails
+            Linking.openURL(link).catch(e => {
+                console.error('Failed to open URL completely', e);
+                Alert.alert("Link Error", "Could not open the store link. Please try again later.");
+            });
         }
     };
 
@@ -196,6 +206,15 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
                             onPress={() => handleRedirect(product.shopify_link)}
                         >
                             <Text style={styles.buyBtnText}>BUY ON SHOPIFY</Text>
+                            <ExternalLink size={16} color={COLORS.white} />
+                        </TouchableOpacity>
+                    )}
+                    {product.ajio_link && (
+                        <TouchableOpacity 
+                            style={[styles.buyBtn, { backgroundColor: '#2c4152' }]}
+                            onPress={() => handleRedirect(product.ajio_link)}
+                        >
+                            <Text style={styles.buyBtnText}>BUY ON AJIO</Text>
                             <ExternalLink size={16} color={COLORS.white} />
                         </TouchableOpacity>
                     )}
