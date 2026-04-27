@@ -64,10 +64,27 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+
+        // Manually delete related records first to avoid foreign key constraint errors
+        // (Use parallel deletes for speed)
+        await Promise.all([
+            supabaseAdmin.from('price_history').delete().eq('product_id', id),
+            supabaseAdmin.from('watchlist').delete().eq('product_id', id),
+            supabaseAdmin.from('reviews').delete().eq('product_id', id),
+            supabaseAdmin.from('orders').delete().eq('product_id', id)
+        ]);
+
+        // Now delete the product itself
         const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
-        if (error) throw error;
+        
+        if (error) {
+            console.error('Supabase Delete Error:', error);
+            throw error;
+        }
+        
         res.status(204).send();
     } catch (err: any) {
+        console.error('Delete Product Exception:', err);
         res.status(500).json({ error: err.message });
     }
 };
