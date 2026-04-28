@@ -15,7 +15,7 @@ interface Product {
     amazon_link?: string;
     flipkart_link?: string;
     myntra_link?: string;
-    shopify_link?: string;
+    shopsy_link?: string;
     ajio_link?: string;
     description?: string;
 }
@@ -57,8 +57,8 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                         {product.myntra_link && (
                             <View style={[styles.storeDot, { backgroundColor: '#ff3f6c' }]} />
                         )}
-                        {product.shopify_link && (
-                            <View style={[styles.storeDot, { backgroundColor: '#95bf47' }]} />
+                        {product.shopsy_link && (
+                            <View style={[styles.storeDot, { backgroundColor: '#ffd500' }]} />
                         )}
                         {product.ajio_link && (
                             <View style={[styles.storeDot, { backgroundColor: '#2c4152' }]} />
@@ -70,7 +70,7 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                             backgroundColor: product.amazon_link ? '#FF990020' : 
                                             product.flipkart_link ? '#2874F020' :
                                             product.myntra_link ? '#ff3f6c20' :
-                                            product.shopify_link ? '#95bf4720' : (isDark ? '#2d2d2d' : COLORS.brand[50]) 
+                                            product.shopsy_link ? '#ffd50020' : (isDark ? '#2d2d2d' : COLORS.brand[50]) 
                         }
                     ]}>
                         <ExternalLink 
@@ -79,7 +79,7 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                                 product.amazon_link ? '#FF9900' : 
                                 product.flipkart_link ? '#2874F0' :
                                 product.myntra_link ? '#ff3f6c' :
-                                product.shopify_link ? '#95bf47' : COLORS.brand[600]
+                                product.shopsy_link ? '#ffd500' : COLORS.brand[600]
                             } 
                         />
                         <Text style={[
@@ -88,13 +88,13 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                                 color: product.amazon_link ? '#FF9900' : 
                                        product.flipkart_link ? '#2874F0' :
                                        product.myntra_link ? '#ff3f6c' :
-                                       product.shopify_link ? '#95bf47' : (isDark ? '#aaa' : COLORS.brand[600]) 
+                                       product.shopsy_link ? '#ffd500' : (isDark ? '#aaa' : COLORS.brand[600]) 
                             }
                         ]}>
                             {product.amazon_link ? 'AMAZON' : 
                              product.flipkart_link ? 'FLIPKART' :
                              product.myntra_link ? 'MYNTRA' :
-                             product.shopify_link ? 'SHOPIFY' : 
+                             product.shopsy_link ? 'SHOPSY' : 
                              product.ajio_link ? 'AJIO' : 'VIEW'}
                         </Text>
                     </View>

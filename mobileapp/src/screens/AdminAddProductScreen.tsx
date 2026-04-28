@@ -19,7 +19,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
     const [amazonLink, setAmazonLink] = useState(editingProduct?.amazon_link || '');
     const [flipkartLink, setFlipkartLink] = useState(editingProduct?.flipkart_link || '');
     const [myntraLink, setMyntraLink] = useState(editingProduct?.myntra_link || '');
-    const [shopifyLink, setShopifyLink] = useState(editingProduct?.shopify_link || '');
+    const [shopsyLink, setShopsyLink] = useState(editingProduct?.shopsy_link || '');
     const [ajioLink, setAjioLink] = useState(editingProduct?.ajio_link || '');
     const [category, setCategory] = useState(editingProduct?.category || (CATEGORIES[1] ? CATEGORIES[1].id : ''));
 
@@ -29,8 +29,8 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
             return;
         }
 
-        if (!amazonLink && !flipkartLink && !myntraLink && !shopifyLink && !ajioLink) {
-            Alert.alert("Error", "Please provide at least one store link (Amazon, Flipkart, Myntra, Shopify, or Ajio).");
+        if (!amazonLink && !flipkartLink && !myntraLink && !shopsyLink && !ajioLink) {
+            Alert.alert("Error", "Please provide at least one store link (Amazon, Flipkart, Myntra, Shopsy, or Ajio).");
             return;
         }
 
@@ -52,7 +52,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                 amazon_link: ensureProtocol(amazonLink),
                 flipkart_link: ensureProtocol(flipkartLink),
                 myntra_link: ensureProtocol(myntraLink),
-                shopify_link: ensureProtocol(shopifyLink),
+                shopsy_link: ensureProtocol(shopsyLink),
                 ajio_link: ensureProtocol(ajioLink),
                 category,
                 search_keywords: keywords
@@ -220,13 +220,13 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                         </View>
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Shopify Link</Text>
+                            <Text style={styles.label}>Shopsy Link</Text>
                             <TextInput 
                                 style={styles.input}
-                                placeholder="https://yourstore.myshopify.com/..."
+                                placeholder="https://shopsy.in/..."
                                 placeholderTextColor="#7b7486"
-                                value={shopifyLink}
-                                onChangeText={setShopifyLink}
+                                value={shopsyLink}
+                                onChangeText={setShopsyLink}
                             />
                         </View>
 

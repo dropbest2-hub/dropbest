@@ -57,7 +57,7 @@ interface Product {
     amazon_link: string;
     flipkart_link: string;
     myntra_link?: string;
-    shopify_link?: string;
+    shopsy_link?: string;
     ajio_link?: string;
     external_rating?: number;
     external_review_count?: string;
@@ -423,6 +423,14 @@ export default function ProductDetails() {
  Buy on Myntra <ExternalLink size={20} />
  </button>
  )}
+ {product.shopsy_link && (
+  <button 
+  onClick={() => handleRedirect(product.shopsy_link!)}
+  className="flex items-center justify-center gap-2 bg-[#ffd500] text-gray-900 py-4 rounded-2xl font-black shadow-lg shadow-[#ffd500]/20 hover:-translate-y-1 transition-all"
+  >
+  Buy on Shopsy <ExternalLink size={20} />
+  </button>
+  )}
  {product.ajio_link && (
  <button 
  onClick={() => handleRedirect(product.ajio_link!)}

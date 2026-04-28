@@ -153,7 +153,7 @@ export default function GuidePage() {
                     </motion.div>
                 </section>
 
-                {/* Step 5 - Shopify */}
+                {/* Step 5 - Shopsy */}
                 <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <motion.div 
                         initial={{ opacity: 0, x: -30 }}
@@ -161,8 +161,8 @@ export default function GuidePage() {
                         viewport={{ once: true }}
                         className="space-y-6"
                     >
-                        <div className="w-12 h-12 bg-[#96bf48] text-white rounded-2xl flex items-center justify-center font-black text-xl">5</div>
-                        <h2 className="text-3xl font-black text-gray-900">Shopify / Global Stores</h2>
+                        <div className="w-12 h-12 bg-[#ffd500] text-gray-900 rounded-2xl flex items-center justify-center font-black text-xl">5</div>
+                        <h2 className="text-3xl font-black text-gray-900">Shopsy / Global Stores</h2>
                         <ul className="space-y-4">
                             {[
                                 "After purchase, check your Confirmation Email.",
@@ -177,10 +177,10 @@ export default function GuidePage() {
                         </ul>
                     </motion.div>
                     <div className="relative group">
-                        <div className="absolute inset-0 bg-green-500 blur-3xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                        <div className="absolute inset-0 bg-yellow-400 blur-3xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
                         <Image 
-                            src="/guide/shopify-guide.png" 
-                            alt="Shopify Guide" 
+                            src="/shopsy.webp" 
+                            alt="Shopsy Guide" 
                             width={500} 
                             height={600} 
                             className="relative rounded-[2.5rem] shadow-2xl border border-gray-100 group-hover:scale-[1.02] transition-transform"

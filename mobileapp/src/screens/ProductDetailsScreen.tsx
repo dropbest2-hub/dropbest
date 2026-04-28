@@ -200,13 +200,13 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
                             <ExternalLink size={16} color={COLORS.white} />
                         </TouchableOpacity>
                     )}
-                    {product.shopify_link && (
+                    {product.shopsy_link && (
                         <TouchableOpacity 
-                            style={[styles.buyBtn, { backgroundColor: '#95bf47' }]}
-                            onPress={() => handleRedirect(product.shopify_link)}
+                            style={[styles.buyBtn, { backgroundColor: '#ffd500' }]}
+                            onPress={() => handleRedirect(product.shopsy_link)}
                         >
-                            <Text style={styles.buyBtnText}>BUY ON SHOPIFY</Text>
-                            <ExternalLink size={16} color={COLORS.white} />
+                            <Text style={[styles.buyBtnText, { color: '#000' }]}>BUY ON SHOPSY</Text>
+                            <ExternalLink size={16} color="#000" />
                         </TouchableOpacity>
                     )}
                     {product.ajio_link && (

@@ -18,7 +18,7 @@ interface Product {
     amazon_link: string;
     flipkart_link: string;
     myntra_link?: string;
-    shopify_link?: string;
+    shopsy_link?: string;
     ajio_link?: string;
     watch_count?: number;
     category?: string;
@@ -289,8 +289,8 @@ export default function Home() {
                             { id: 'amazon', name: 'Amazon', color: '#FF9900', lightColor: 'bg-[#FF9900]/10', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg' },
                             { id: 'flipkart', name: 'Flipkart', color: '#2874F0', lightColor: 'bg-[#2874F0]/10', logo: '/flipkart.png' },
                             { id: 'myntra', name: 'Myntra', color: '#ff3f6c', lightColor: 'bg-[#ff3f6c]/10', logo: '/myntra.jpg' },
-                            { id: 'shopify', name: 'Shopify', color: '#96bf48', lightColor: 'bg-[#96bf48]/10', logo: '/shopify.png' },
-                            { id: 'ajio', name: 'Ajio', color: '#2c4152', lightColor: 'bg-[#2c4152]/10', logo: 'https://assets.ajio.com/static/img/Ajio-Logo.svg' }
+                            { id: 'shopsy', name: 'Shopsy', color: '#ffd500', lightColor: 'bg-[#ffd500]/10', logo: '/shopsy.webp' },
+                            { id: 'ajio', name: 'Ajio', color: '#2c4152', lightColor: 'bg-[#2c4152]/10', logo: '/Ajio.webp' }
                         ].map((brand) => (
                             <motion.button
                                 key={brand.id}
@@ -430,7 +430,7 @@ export default function Home() {
                                 if (selectedBrand === 'amazon' && !p.amazon_link) return false;
                                 if (selectedBrand === 'flipkart' && !p.flipkart_link) return false;
                                 if (selectedBrand === 'myntra' && !p.myntra_link) return false;
-                                if (selectedBrand === 'shopify' && !p.shopify_link) return false;
+                                if (selectedBrand === 'shopsy' && !p.shopsy_link) return false;
                                 if (selectedBrand === 'ajio' && !p.ajio_link) return false;
 
                                 const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
@@ -512,12 +512,12 @@ export default function Home() {
                                                     Myntra <ExternalLink size={16} />
                                                 </button>
                                             )}
-                                            {product.shopify_link && (
+                                            {product.shopsy_link && (
                                                 <button
-                                                    onClick={() => handleRedirect(product.id, product.shopify_link!)}
-                                                    className="flex-1 flex items-center justify-center gap-2 bg-[#96bf48] hover:bg-[#96bf48]/90 text-white py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#96bf48]/10"
+                                                    onClick={() => handleRedirect(product.id, product.shopsy_link!)}
+                                                    className="flex-1 flex items-center justify-center gap-2 bg-[#ffd500] hover:bg-[#ffd500]/90 text-gray-900 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-[#ffd500]/10"
                                                 >
-                                                    Shopify <ExternalLink size={16} />
+                                                    Shopsy <ExternalLink size={16} />
                                                 </button>
                                             )}
                                             {product.ajio_link && (
