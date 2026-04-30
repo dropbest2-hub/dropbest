@@ -233,7 +233,8 @@ export default function HomeScreen({ navigation }: any) {
 
     const filteredProducts = products.filter((p: any) => {
         const matchesSearch = p.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                             p.description?.toLowerCase().includes(searchQuery.toLowerCase());
+                             p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                             (p.search_keywords && p.search_keywords.toLowerCase().includes(searchQuery.toLowerCase()));
         const matchesStore = selectedStore === 'all' || 
                             (selectedStore === 'amazon' && p.amazon_link) ||
                             (selectedStore === 'flipkart' && p.flipkart_link) ||

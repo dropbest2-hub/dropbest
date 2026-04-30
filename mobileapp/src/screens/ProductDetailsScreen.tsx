@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, ActivityIn
 import { COLORS, SPACING, SHADOWS } from '../constants/theme';
 import api from '../api/api';
 import { useAuthStore } from '../store/authStore';
-import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck, Package, CheckCircle2 } from 'lucide-react-native';
+import { ExternalLink, ChevronLeft, Heart, Share2, ShoppingCart, Star, ShieldCheck, Package, CheckCircle2, Flame } from 'lucide-react-native';
 import { Linking, Modal } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -149,6 +149,12 @@ export default function ProductDetailsScreen({ route, navigation }: any) {
                             <Star size={12} color={COLORS.white} fill={COLORS.white} />
                             <Text style={styles.badgeText}>Top Choice</Text>
                         </View>
+                        {(product.watch_count || 0) >= 2 && (
+                            <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
+                                <Flame size={12} color={COLORS.white} fill={COLORS.white} />
+                                <Text style={styles.badgeText}>Hot Deal</Text>
+                            </View>
+                        )}
                     </View>
 
                     <Text style={styles.title}>{product.title}</Text>

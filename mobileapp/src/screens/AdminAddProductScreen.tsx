@@ -179,6 +179,7 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                                     onChangeText={setImageUrl}
                                 />
                             </View>
+                            <Text style={styles.hintText}>Tip: Use /shopsy.webp or /Ajio.webp for local brand icons.</Text>
                         </View>
                     </View>
 

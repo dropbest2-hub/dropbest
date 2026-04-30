@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { COLORS, SHADOWS, SPACING } from '../constants/theme';
 import { useTheme } from '../context/ThemeContext';
-import { ExternalLink } from 'lucide-react-native';
+import { ExternalLink, Flame } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - SPACING.lg * 2 - SPACING.md) / 2;
@@ -18,6 +18,7 @@ interface Product {
     shopsy_link?: string;
     ajio_link?: string;
     description?: string;
+    watch_count?: number;
 }
 
 export default function ProductCard({ product, onPress }: { product: Product, onPress?: () => void }) {
@@ -41,6 +42,12 @@ export default function ProductCard({ product, onPress }: { product: Product, on
                 <View style={[styles.priceTag, isDark && { backgroundColor: 'rgba(30, 30, 30, 0.95)' }]}>
                     <Text style={[styles.priceText, isDark && { color: COLORS.brand[400] }]}>₹{product.price.toLocaleString()}</Text>
                 </View>
+                {(product.watch_count || 0) >= 2 && (
+                    <View style={styles.hotDealBadge}>
+                        <Flame size={10} color="#fff" fill="#fff" />
+                        <Text style={styles.hotDealText}>HOT</Text>
+                    </View>
+                )}
             </View>
 
             <View style={styles.details}>
@@ -138,6 +145,24 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '900',
         color: COLORS.brand[700],
+    },
+    hotDealBadge: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        backgroundColor: '#f97316',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 2,
+        paddingHorizontal: 6,
+        paddingVertical: 3,
+        borderRadius: 8,
+        ...SHADOWS.sm,
+    },
+    hotDealText: {
+        color: '#fff',
+        fontSize: 8,
+        fontWeight: '900',
     },
     details: {
         padding: 12,
