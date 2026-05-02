@@ -14,7 +14,9 @@ const AdminTitleSection = ({
     isDark, 
     searchQuery, 
     setSearchQuery, 
-    handleNewItem 
+    handleNewItem,
+    isSyncing,
+    handleSyncPrices
 }: any) => (
     <View style={styles.titleSection}>
         <View style={styles.titleRow}>
@@ -171,7 +173,7 @@ export default function AdminProductsScreen({ navigation }: any) {
             handleSyncPrices={handleSyncPrices}
             isSyncing={isSyncing}
         />
-    ), [isDark, searchQuery, navigation]);
+    ), [isDark, searchQuery, navigation, isSyncing, handleSyncPrices]);
 
     return (
         <SafeAreaView style={[styles.safeArea, isDark && { backgroundColor: '#121212' }]}>
