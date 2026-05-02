@@ -17,12 +17,7 @@ export default function PWAInstall() {
     }, []);
 
     const handleDownloadClick = () => {
-        const link = document.createElement('a');
-        link.href = '/dropbest.apk';
-        link.download = 'dropbest.apk';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        window.open('https://expo.dev/artifacts/eas/ofV4pJ51pT4TokjDz48rTz.apk', '_blank');
         setIsVisible(false);
     };
 

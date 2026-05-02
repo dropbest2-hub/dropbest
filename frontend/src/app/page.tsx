@@ -244,8 +244,9 @@ export default function Home() {
                         <motion.a 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            href="/dropbest.apk" 
-                            download="dropbest.apk"
+                            href="https://expo.dev/artifacts/eas/ofV4pJ51pT4TokjDz48rTz.apk" 
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-3 bg-gray-900 text-white font-black px-10 py-5 rounded-2xl shadow-xl hover:bg-black transition-all group"
                         >
                             <Smartphone size={24} />
