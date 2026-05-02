@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   verification: {
     google: "YnegzouB973-LO9SJ__F7k2TkX9X9gwFOKqbfKrir2E",
     other: {
-      "verify-admitad": "395b9e9279",
+      "verify-admitad": "395b9e9e79",
     },
   }
 };
