@@ -4,6 +4,8 @@ import { Bus, Star, ExternalLink, ShieldCheck, Zap, ChevronRight, MapPin, Calend
 import { COLORS, SHADOWS } from '../constants/theme';
 import { useTheme } from '../context/ThemeContext';
 import api from '../api/api';
+import { useAuthStore } from '../store/authStore';
+import { useNavigation } from '@react-navigation/native';
 
 const BusTicket = ({ bus, isDark }: any) => {
     // Parse extra info from search_keywords: Partner|Duration|Source|Dest|Time|Seats
@@ -18,10 +20,23 @@ const BusTicket = ({ bus, isDark }: any) => {
     const [departure, arrival] = time.split(' - ');
     const savings = bus.old_price ? bus.old_price - bus.price : 0;
 
+    const navigation = useNavigation<any>();
+    const { user } = useAuthStore();
+
+    const handlePress = () => {
+        if (!user) {
+            navigation.navigate('Login');
+            return;
+        }
+        if (bus.amazon_link) {
+            Linking.openURL(bus.amazon_link);
+        }
+    };
+
     return (
         <TouchableOpacity 
             style={[styles.ticketContainer, { backgroundColor: isDark ? '#1e1e1e' : '#fff' }]}
-            onPress={() => Linking.openURL(bus.amazon_link)}
+            onPress={handlePress}
             activeOpacity={0.9}
         >
             {/* Top Promo Banner */}

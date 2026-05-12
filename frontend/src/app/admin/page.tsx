@@ -449,9 +449,8 @@ export default function AdminDashboard() {
   const handleDeleteBusRoute = async (id: string) => {
     if (!confirm('Are you sure you want to delete this route?')) return;
     try {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-        fetchData();
+        await axios.delete(`${API_URL}/products/${id}`, { headers: { Authorization: `Bearer ${session?.access_token}` } });
+        setProducts(prev => prev.filter(p => p.id !== id));
     } catch (err: any) {
         alert('Error deleting route: ' + err.message);
     }

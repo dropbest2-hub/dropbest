@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bus, MapPin, Calendar, Users, ChevronRight, Star, ExternalLink, ShieldCheck, Clock, Zap, AlertCircle, RefreshCcw } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 
 interface BusListing {
     id: string;
@@ -20,9 +21,19 @@ interface BusListing {
 }
 
 export default function BusBookingPage() {
+    const router = useRouter();
+    const { user } = useAuthStore();
     const [buses, setBuses] = useState<BusListing[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const handleRedirect = (link: string) => {
+        if (!user) {
+            router.push('/auth');
+            return;
+        }
+        window.open(link, '_blank');
+    };
 
     const fetchBuses = useCallback(async () => {
         setLoading(true);
@@ -235,14 +246,12 @@ export default function BusBookingPage() {
                                                 </div>
 
                                                 <div className="w-full">
-                                                    <a 
-                                                        href={bus.amazon_link || '#'} 
-                                                        target="_blank" 
-                                                        rel="noopener noreferrer" 
+                                                    <button 
+                                                        onClick={() => handleRedirect(bus.amazon_link || '#')}
                                                         className="block w-full bg-orange-600 text-white text-center py-4 rounded-2xl font-black shadow-lg shadow-orange-600/20 hover:bg-orange-700 hover:scale-[1.02] transition-all active:scale-95"
                                                     >
                                                         SELECT SEATS
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </motion.div>

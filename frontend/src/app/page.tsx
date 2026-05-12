@@ -95,16 +95,19 @@ export default function Home() {
     }, [fetchProducts, fetchWatchlist]);
 
     const handleRedirect = async (productId: string, link: string) => {
-        if (user) {
-            // Track the redirect on backend in the background
-            api.post('/orders/redirect', { productId })
-                .then(() => {
-                    setShowTrackerPrompt(true);
-                })
-                .catch(error => {
-                    console.error('Error tracking redirect:', error);
-                });
+        if (!user) {
+            router.push('/auth');
+            return;
         }
+        
+        // Track the redirect on backend in the background
+        api.post('/orders/redirect', { productId })
+            .then(() => {
+                setShowTrackerPrompt(true);
+            })
+            .catch(error => {
+                console.error('Error tracking redirect:', error);
+            });
         
         // Open the external link immediately
         window.open(link, '_blank');
