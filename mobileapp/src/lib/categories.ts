@@ -33,4 +33,5 @@ export const CATEGORIES: Category[] = [
     { id: 'sports', name: 'Sports' },
     { id: 'office', name: 'Office Items' },
     { id: 'industrial', name: 'Industrial' },
+    { id: 'bus-booking', name: 'Bus Booking' },
 ];

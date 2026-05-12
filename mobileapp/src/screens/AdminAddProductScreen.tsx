@@ -13,6 +13,9 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
     const [title, setTitle] = useState(editingProduct?.title || '');
     const [keywords, setKeywords] = useState(editingProduct?.search_keywords || '');
     const [price, setPrice] = useState(editingProduct?.price?.toString() || '');
+    const [priceOld, setPriceOld] = useState(editingProduct?.old_price?.toString() || '');
+    const [rating, setRating] = useState(editingProduct?.external_rating?.toString() || '');
+    const [reviews, setReviews] = useState(editingProduct?.external_review_count?.toString() || '');
     const [imageUrl, setImageUrl] = useState(editingProduct?.image_url || '');
     const [description, setDescription] = useState(editingProduct?.description || '');
     const [loading, setLoading] = useState(false);
@@ -55,7 +58,10 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                 shopsy_link: ensureProtocol(shopsyLink),
                 ajio_link: ensureProtocol(ajioLink),
                 category,
-                search_keywords: keywords
+                search_keywords: keywords,
+                old_price: priceOld ? parseFloat(priceOld) : null,
+                external_rating: rating ? parseFloat(rating) : null,
+                external_review_count: reviews ? parseInt(reviews) : null
             };
 
             if (editingProduct) {
@@ -162,6 +168,49 @@ export default function AdminAddProductScreen({ navigation, route }: any) {
                                 onChangeText={setDescription}
                             />
                         </View>
+
+                        {category === 'bus-booking' && (
+                            <View style={[styles.busSection, { backgroundColor: '#fff7ed', borderColor: '#ffedd5' }]}>
+                                <Text style={[styles.sectionTitle, { color: '#9a3412', marginBottom: 8 }]}>Bus Details</Text>
+                                <Text style={[styles.hintText, { color: '#c2410c', marginBottom: 15 }]}>
+                                    Keywords: Partner|Duration|Source|Dest|Time|Seats
+                                </Text>
+
+                                <View style={styles.inputGroup}>
+                                    <Text style={styles.label}>Original Price (₹)</Text>
+                                    <TextInput 
+                                        style={styles.input}
+                                        placeholder="e.g. 399"
+                                        keyboardType="numeric"
+                                        value={priceOld}
+                                        onChangeText={setPriceOld}
+                                    />
+                                </View>
+
+                                <View style={{ flexDirection: 'row', gap: 10 }}>
+                                    <View style={[styles.inputGroup, { flex: 1 }]}>
+                                        <Text style={styles.label}>Rating</Text>
+                                        <TextInput 
+                                            style={styles.input}
+                                            placeholder="3.6"
+                                            keyboardType="numeric"
+                                            value={rating}
+                                            onChangeText={setRating}
+                                        />
+                                    </View>
+                                    <View style={[styles.inputGroup, { flex: 1 }]}>
+                                        <Text style={styles.label}>Reviews</Text>
+                                        <TextInput 
+                                            style={styles.input}
+                                            placeholder="288"
+                                            keyboardType="numeric"
+                                            value={reviews}
+                                            onChangeText={setReviews}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
+                        )}
                     </View>
 
                     <View style={styles.formSection}>
@@ -308,6 +357,12 @@ const styles = StyleSheet.create({
                 elevation: 2,
             },
         }),
+    },
+    busSection: {
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+        borderWidth: 1,
     },
     sectionTitle: {
         fontSize: 16,

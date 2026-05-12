@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 
 export default function AuthPage() {
-    const { signInWithGoogle, loading, user } = useAuthStore();
+    const { signInWithGoogle, loading, authLoading, user } = useAuthStore();
     const router = useRouter();
 
     useEffect(() => {
@@ -84,11 +84,17 @@ export default function AuthPage() {
      <motion.button
          whileHover={{ scale: 1.02 }}
          whileTap={{ scale: 0.98 }}
-         onClick={() => signInWithGoogle()}
-         disabled={loading}
+         onClick={async () => {
+             try {
+                 await signInWithGoogle();
+             } catch (err: any) {
+                 toast.error(err.message || 'Google Login failed to start');
+             }
+         }}
+         disabled={authLoading}
          className="w-full bg-white border-2 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md text-gray-800 font-bold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-4"
      >
-         {loading ? (
+         {authLoading ? (
              <Loader2 className="animate-spin text-gray-400" size={24} />
          ) : (
              <>

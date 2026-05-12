@@ -64,6 +64,13 @@ export default function Navbar() {
                             {isActive('/rewards') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                         </Link>
 
+                        <Link href="/bus-booking" className={`relative py-2 font-medium transition-colors ${isActive('/bus-booking') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
+                            Bus Booking
+                            {isActive('/bus-booking') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
+                        </Link>
+
+
+
                         {user ? (
                             <>
                                 <Link href="/rewards" className="flex items-center gap-1.5 text-gray-600 hover:text-brand-600 font-medium transition-colors">
@@ -125,6 +132,12 @@ export default function Navbar() {
                             <Link href="/rewards" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
                                 Rewards
                             </Link>
+
+                            <Link href="/bus-booking" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
+                                Bus Booking
+                            </Link>
+
+
 
                             {user ? (
                                 <>

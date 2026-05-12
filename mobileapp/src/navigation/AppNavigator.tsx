@@ -28,6 +28,7 @@ import WatchlistScreen from '../screens/WatchlistScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import MyMessagesScreen from '../screens/MyMessagesScreen';
+import BusBookingScreen from '../screens/BusBookingScreen';
 
 import { useAuthStore } from '../store/authStore';
 
@@ -202,6 +203,7 @@ export default function AppNavigator() {
                         <Stack.Screen name="Settings" component={SettingsScreen} />
                         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
                         <Stack.Screen name="MyMessages" component={MyMessagesScreen} />
+                        <Stack.Screen name="BusBooking" component={BusBookingScreen} />
                     </Stack.Group>
                 ) : (
                     <Stack.Group>
@@ -216,6 +218,7 @@ export default function AppNavigator() {
                         <Stack.Screen name="Settings" component={SettingsScreen} />
                         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
                         <Stack.Screen name="MyMessages" component={MyMessagesScreen} />
+                        <Stack.Screen name="BusBooking" component={BusBookingScreen} />
                     </Stack.Group>
                 )}
             </Stack.Navigator>

@@ -7,7 +7,7 @@ import api from '../api/api';
 import { useAuthStore } from '../store/authStore';
 import { CATEGORIES } from '../lib/categories';
 import SideMenuModal from '../components/SideMenuModal';
-import { Search, ShoppingBag, Zap, Award, Gift, Smartphone, Filter, IndianRupee, Menu, Laptop, Camera, Gamepad2, Cpu, Shirt, Briefcase, Watch, Home, Hammer, Flower2, Sparkles, Stethoscope, Baby, ShoppingCart, PawPrint, Book, Film, Music as MusicIcon, Car, Trophy as TrophyIcon, Printer, Factory } from 'lucide-react-native';
+import { Search, ShoppingBag, Zap, Award, Gift, Smartphone, Filter, IndianRupee, Menu, Laptop, Camera, Gamepad2, Cpu, Shirt, Briefcase, Watch, Home, Hammer, Flower2, Sparkles, Stethoscope, Baby, ShoppingCart, PawPrint, Book, Film, Music as MusicIcon, Car, Trophy as TrophyIcon, Printer, Factory, Bus } from 'lucide-react-native';
 
 const STORES = [
     { id: 'amazon', name: 'Amazon', color: '#FF9900', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg' },
@@ -47,6 +47,7 @@ const getCategoryIcon = (id: string) => {
         case 'sports': return TrophyIcon;
         case 'office': return Printer;
         case 'industrial': return Factory;
+        case 'bus-booking': return Bus;
         default: return ShoppingBag;
     }
 };
@@ -59,248 +60,6 @@ const getCategoryColor = (id: string) => {
     }
     return colors[Math.abs(hash) % colors.length];
 };
-
-const HomeHeader = ({ 
-    user, 
-    searchQuery, 
-    setSearchQuery, 
-    isDark, 
-    navigation, 
-    setIsMenuVisible,
-    selectedStore,
-    setSelectedStore,
-    selectedCategory,
-    setSelectedCategory,
-    filteredProductsCount
-}: any) => (
-    <View style={styles.headerContainer}>
-        {/* Hero Section */}
-        <View style={styles.hero}>
-            <View style={styles.heroBlob1} />
-            <View style={styles.heroBlob2} />
-
-            <View style={styles.heroContent}>
-                <View style={styles.greetingRow}>
-                    <Text style={styles.greetingEmoji}>👋</Text>
-                    <Text style={styles.greetingText}>HELLO, {user?.name?.toUpperCase() || 'GUEST'}</Text>
-                </View>
-                <Text style={styles.heroTitle}>Curated Picks.{"\n"}<Text style={styles.heroHighlight}>Smart Rewards.</Text></Text>
-                <Text style={styles.heroSubtitle}>Earn coins for every purchase and redeem them for UPI cash.</Text>
-            </View>
-
-            <View style={styles.rightHeaderAction}>
-                <TouchableOpacity 
-                    style={styles.menuIconContainer}
-                    onPress={() => setIsMenuVisible(true)}
-                >
-                    <Menu size={28} color="#FFFFFF" strokeWidth={2.5} />
-                </TouchableOpacity>
-
-                {/* Coin Badge */}
-                <TouchableOpacity 
-                    style={styles.coinCapsule}
-                    onPress={() => navigation.navigate('RewardsTab')}
-                >
-                    <View style={styles.coinCircle}>
-                        <Text style={styles.coinSymbol}>₹</Text>
-                    </View>
-                    <Text style={styles.coinText}>{user?.coin_count || 0}</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-            <View style={[styles.searchBar, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333', borderWidth: 1 }]}>
-                <Search size={20} color={isDark ? COLORS.gray[500] : COLORS.gray[400]} />
-                <TextInput 
-                    placeholder="Search products..." 
-                    placeholderTextColor={isDark ? COLORS.gray[600] : COLORS.gray[300]}
-                    style={[styles.searchInput, isDark && { color: COLORS.white }]}
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                />
-            </View>
-            <TouchableOpacity style={styles.filterBtn}>
-                <Filter size={20} color={COLORS.white} />
-            </TouchableOpacity>
-        </View>
-
-        {/* Store Filters */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.storesRow}>
-            <TouchableOpacity 
-                style={[
-                    styles.storeTab, 
-                    isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' },
-                    selectedStore === 'all' && styles.activeStoreTab
-                ]}
-                onPress={() => setSelectedStore('all')}
-            >
-                <Text style={[styles.storeTabText, isDark && { color: '#888' }, selectedStore === 'all' && styles.activeStoreTabText]}>All Stores</Text>
-            </TouchableOpacity>
-            {STORES.map(store => (
-                <TouchableOpacity 
-                    key={store.id} 
-                    style={[
-                        styles.storeTab, 
-                        isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' },
-                        selectedStore === store.id && { borderColor: store.color, backgroundColor: store.color + '15' }
-                    ]}
-                    onPress={() => setSelectedStore(store.id)}
-                >
-                    <Text style={[styles.storeTabText, isDark && { color: '#888' }, selectedStore === store.id && { color: store.color }]}>{store.name}</Text>
-                </TouchableOpacity>
-            ))}
-        </ScrollView>
-
-        <View style={styles.categorySection}>
-            <Text style={[styles.miniSectionTitle, isDark && { color: '#e0e0e0' }]}>Explore Categories</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
-                {CATEGORIES.map(cat => {
-                    const Icon = getCategoryIcon(cat.id);
-                    const color = getCategoryColor(cat.id);
-                    const isSelected = selectedCategory === cat.id;
-                    
-                    return (
-                        <TouchableOpacity 
-                            key={cat.id} 
-                            style={[styles.categoryItem, isSelected && styles.categoryItemActive]}
-                            onPress={() => {
-                                setSelectedCategory(isSelected ? 'all' : cat.id);
-                            }}
-                        >
-                            <View style={[
-                                styles.categoryIcon, 
-                                { backgroundColor: color + (isSelected ? '30' : '15') },
-                                isSelected && { borderColor: color, borderWidth: 2 }
-                            ]}>
-                                <Icon size={24} color={color} />
-                            </View>
-                            <Text style={[
-                                styles.categoryName, 
-                                isDark && { color: isSelected ? COLORS.white : '#888' },
-                                isSelected && { color: color, fontWeight: '900' }
-                            ]} numberOfLines={1}>{cat.name}</Text>
-                        </TouchableOpacity>
-                    );
-                })}
-            </ScrollView>
-        </View>
-
-        <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, isDark && { color: COLORS.white }]}>Trending Deals</Text>
-            <Text style={styles.sectionSubtitle}>{filteredProductsCount} items found</Text>
-        </View>
-    </View>
-);
-
-export default function HomeScreen({ navigation }: any) {
-    const { isDark } = useTheme();
-    const { user, refreshUser } = useAuthStore();
-    
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedStore, setSelectedStore] = useState('all');
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [isMenuVisible, setIsMenuVisible] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [products, setProducts] = useState<any[]>([]);
-
-    const fetchProducts = useCallback(async () => {
-        try {
-            const response = await api.get('/products');
-            setProducts(response.data);
-        } catch (error) {
-            console.error('Fetch products failed', error);
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            fetchProducts();
-            refreshUser();
-        });
-        return unsubscribe;
-    }, [navigation, fetchProducts, refreshUser]);
-
-    const onRefresh = useCallback(() => {
-        setRefreshing(true);
-        fetchProducts();
-    }, [fetchProducts]);
-
-    const filteredProducts = products.filter((p: any) => {
-        const matchesSearch = p.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                             p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             (p.search_keywords && p.search_keywords.toLowerCase().includes(searchQuery.toLowerCase()));
-        const matchesStore = selectedStore === 'all' || 
-                            (selectedStore === 'amazon' && p.amazon_link) ||
-                            (selectedStore === 'flipkart' && p.flipkart_link) ||
-                            (selectedStore === 'myntra' && p.myntra_link) ||
-                            (selectedStore === 'shopsy' && p.shopsy_link) ||
-                            (selectedStore === 'ajio' && p.ajio_link);
-        const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-        return matchesSearch && matchesStore && matchesCategory;
-    });
-
-    const renderHeader = useMemo(() => (
-        <HomeHeader 
-            user={user}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            isDark={isDark}
-            navigation={navigation}
-            setIsMenuVisible={setIsMenuVisible}
-            selectedStore={selectedStore}
-            setSelectedStore={setSelectedStore}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            filteredProductsCount={filteredProducts.length}
-        />
-    ), [user, searchQuery, isDark, selectedStore, selectedCategory, filteredProducts.length, navigation]);
-
-    if (loading && !refreshing) {
-        return (
-            <View style={[styles.center, isDark && { backgroundColor: '#121212' }]}>
-                <ActivityIndicator size="large" color={COLORS.brand[500]} />
-            </View>
-        );
-    }
-
-    return (
-        <View style={[styles.container, isDark && { backgroundColor: '#121212' }]}>
-            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-            
-            <SideMenuModal 
-                visible={isMenuVisible} 
-                onClose={() => setIsMenuVisible(false)} 
-                navigation={navigation} 
-            />
-
-            <FlatList 
-                data={filteredProducts}
-                renderItem={({ item }) => (
-                    <ProductCard 
-                        product={item} 
-                        onPress={() => navigation.navigate('ProductDetails', { productId: item.id })} 
-                    />
-                )}
-                keyExtractor={(item: any) => item.id}
-                numColumns={2}
-                columnWrapperStyle={styles.row}
-                contentContainerStyle={styles.list}
-                ListHeaderComponent={renderHeader}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.brand[500]]} />
-                }
-            />
-        </View>
-    );
-}
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -535,5 +294,291 @@ const styles = StyleSheet.create({
     row: {
         justifyContent: 'space-between',
         paddingHorizontal: SPACING.lg,
+    },
+    emptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 100,
+        paddingHorizontal: 40,
+    },
+    emptyIconContainer: {
+        backgroundColor: 'rgba(0,0,0,0.02)',
+        padding: 30,
+        borderRadius: 40,
+        marginBottom: 20,
+    },
+    emptyTitle: {
+        fontSize: 22,
+        fontWeight: '900',
+        color: COLORS.gray[900],
+        textAlign: 'center',
+        textTransform: 'uppercase',
+    },
+    emptySubtitle: {
+        fontSize: 14,
+        color: COLORS.gray[500],
+        textAlign: 'center',
+        marginTop: 10,
+        lineHeight: 20,
+        fontWeight: '500',
     }
 });
+
+
+const HomeHeader = ({ 
+    user, 
+    searchQuery, 
+    setSearchQuery, 
+    isDark, 
+    navigation, 
+    setIsMenuVisible,
+    selectedStore,
+    setSelectedStore,
+    selectedCategory,
+    setSelectedCategory,
+    filteredProductsCount
+}: any) => (
+    <View style={styles.headerContainer}>
+        {/* Hero Section */}
+        <View style={styles.hero}>
+            <View style={styles.heroBlob1} />
+            <View style={styles.heroBlob2} />
+
+            <View style={styles.heroContent}>
+                <View style={styles.greetingRow}>
+                    <Text style={styles.greetingEmoji}>👋</Text>
+                    <Text style={styles.greetingText}>HELLO, {user?.name?.toUpperCase() || 'GUEST'}</Text>
+                </View>
+                <Text style={styles.heroTitle}>Curated Picks.{"\n"}<Text style={styles.heroHighlight}>Smart Rewards.</Text></Text>
+                <Text style={styles.heroSubtitle}>Earn coins for every purchase and redeem them for UPI cash.</Text>
+            </View>
+
+            <View style={styles.rightHeaderAction}>
+                <TouchableOpacity 
+                    style={styles.menuIconContainer}
+                    onPress={() => setIsMenuVisible(true)}
+                >
+                    <Menu size={28} color="#FFFFFF" strokeWidth={2.5} />
+                </TouchableOpacity>
+
+                {/* Coin Badge */}
+                <TouchableOpacity 
+                    style={styles.coinCapsule}
+                    onPress={() => navigation.navigate('RewardsTab')}
+                >
+                    <View style={styles.coinCircle}>
+                        <Text style={styles.coinSymbol}>₹</Text>
+                    </View>
+                    <Text style={styles.coinText}>{user?.coin_count || 0}</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+            <View style={[styles.searchBar, isDark && { backgroundColor: '#1e1e1e', borderColor: '#333', borderWidth: 1 }]}>
+                <Search size={20} color={isDark ? COLORS.gray[500] : COLORS.gray[400]} />
+                <TextInput 
+                    placeholder="Search products..." 
+                    placeholderTextColor={isDark ? COLORS.gray[600] : COLORS.gray[300]}
+                    style={[styles.searchInput, isDark && { color: COLORS.white }]}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+            </View>
+            <TouchableOpacity style={styles.filterBtn}>
+                <Filter size={20} color={COLORS.white} />
+            </TouchableOpacity>
+        </View>
+
+        {/* Store Filters */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.storesRow}>
+            <TouchableOpacity 
+                style={[
+                    styles.storeTab, 
+                    isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' },
+                    selectedStore === 'all' && styles.activeStoreTab
+                ]}
+                onPress={() => setSelectedStore('all')}
+            >
+                <Text style={[styles.storeTabText, isDark && { color: '#888' }, selectedStore === 'all' && styles.activeStoreTabText]}>All Stores</Text>
+            </TouchableOpacity>
+            {STORES.map(store => (
+                <TouchableOpacity 
+                    key={store.id} 
+                    style={[
+                        styles.storeTab, 
+                        isDark && { backgroundColor: '#1e1e1e', borderColor: '#333' },
+                        selectedStore === store.id && { borderColor: store.color, backgroundColor: store.color + '15' }
+                    ]}
+                    onPress={() => setSelectedStore(store.id)}
+                >
+                    <Text style={[styles.storeTabText, isDark && { color: '#888' }, selectedStore === store.id && { color: store.color }]}>{store.name}</Text>
+                </TouchableOpacity>
+            ))}
+        </ScrollView>
+
+        <View style={styles.categorySection}>
+            <Text style={[styles.miniSectionTitle, isDark && { color: '#e0e0e0' }]}>Explore Categories</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
+                {CATEGORIES.map(cat => {
+                    const Icon = getCategoryIcon(cat.id);
+                    const color = getCategoryColor(cat.id);
+                    const isSelected = selectedCategory === cat.id;
+                    
+                    return (
+                        <TouchableOpacity 
+                            key={cat.id} 
+                            style={[styles.categoryItem, isSelected && styles.categoryItemActive]}
+                            onPress={() => {
+                                if (cat.id === 'bus-booking') {
+                                    navigation.navigate('BusBooking');
+                                } else {
+                                    setSelectedCategory(isSelected ? 'all' : cat.id);
+                                }
+                            }}
+                        >
+                            <View style={[
+                                styles.categoryIcon, 
+                                { backgroundColor: color + (isSelected ? '30' : '15') },
+                                isSelected && { borderColor: color, borderWidth: 2 }
+                            ]}>
+                                <Icon size={24} color={color} />
+                            </View>
+                            <Text style={[
+                                styles.categoryName, 
+                                isDark && { color: isSelected ? COLORS.white : '#888' },
+                                isSelected && { color: color, fontWeight: '900' }
+                            ]} numberOfLines={1}>{cat.name}</Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </ScrollView>
+        </View>
+
+        <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, isDark && { color: COLORS.white }]}>Trending Deals</Text>
+            <Text style={styles.sectionSubtitle}>{filteredProductsCount} items found</Text>
+        </View>
+    </View>
+);
+
+export default function HomeScreen({ navigation }: any) {
+    const { isDark } = useTheme();
+    const { user, refreshUser } = useAuthStore();
+    
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedStore, setSelectedStore] = useState('all');
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [products, setProducts] = useState<any[]>([]);
+
+    const fetchProducts = useCallback(async () => {
+        try {
+            const response = await api.get('/products');
+            setProducts(response.data);
+        } catch (error) {
+            console.error('Fetch products failed', error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchProducts();
+            refreshUser();
+        });
+        return unsubscribe;
+    }, [navigation, fetchProducts, refreshUser]);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        fetchProducts();
+    }, [fetchProducts]);
+
+    const filteredProducts = products.filter((p: any) => {
+        const matchesSearch = p.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                             p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                             (p.search_keywords && p.search_keywords.toLowerCase().includes(searchQuery.toLowerCase()));
+        const matchesStore = selectedStore === 'all' || 
+                            (selectedStore === 'amazon' && p.amazon_link) ||
+                            (selectedStore === 'flipkart' && p.flipkart_link) ||
+                            (selectedStore === 'myntra' && p.myntra_link) ||
+                            (selectedStore === 'shopsy' && p.shopsy_link) ||
+                            (selectedStore === 'ajio' && p.ajio_link);
+        const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+        return matchesSearch && matchesStore && matchesCategory;
+    });
+
+    const renderHeader = useMemo(() => (
+        <HomeHeader 
+            user={user}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isDark={isDark}
+            navigation={navigation}
+            setIsMenuVisible={setIsMenuVisible}
+            selectedStore={selectedStore}
+            setSelectedStore={setSelectedStore}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            filteredProductsCount={filteredProducts.length}
+        />
+    ), [user, searchQuery, isDark, selectedStore, selectedCategory, filteredProducts.length, navigation]);
+
+    if (loading && !refreshing) {
+        return (
+            <View style={[styles.center, isDark && { backgroundColor: '#121212' }]}>
+                <ActivityIndicator size="large" color={COLORS.brand[500]} />
+            </View>
+        );
+    }
+
+    const renderEmpty = () => (
+        <View style={styles.emptyContainer}>
+            <View style={styles.emptyIconContainer}>
+                <ShoppingCart size={48} color={isDark ? COLORS.gray[700] : COLORS.gray[200]} />
+            </View>
+            <Text style={[styles.emptyTitle, isDark && { color: COLORS.white }]}>Admin team will add soon</Text>
+            <Text style={styles.emptySubtitle}>We're currently selecting the best deals for this category. Stay tuned!</Text>
+        </View>
+    );
+
+    return (
+        <View style={[styles.container, isDark && { backgroundColor: '#121212' }]}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+            
+            <SideMenuModal 
+                visible={isMenuVisible} 
+                onClose={() => setIsMenuVisible(false)} 
+                navigation={navigation} 
+            />
+
+            <FlatList 
+                data={filteredProducts}
+                ListEmptyComponent={renderEmpty}
+                renderItem={({ item }) => (
+                    <ProductCard 
+                        product={item} 
+                        onPress={() => navigation.navigate('ProductDetails', { productId: item.id })} 
+                    />
+                )}
+                keyExtractor={(item: any) => item.id}
+                numColumns={2}
+                columnWrapperStyle={styles.row}
+                contentContainerStyle={styles.list}
+                ListHeaderComponent={renderHeader}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.brand[500]]} />
+                }
+            />
+        </View>
+    );
+}
+

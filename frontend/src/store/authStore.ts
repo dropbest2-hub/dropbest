@@ -22,6 +22,7 @@ interface AuthState {
     user: User | null;
     session: Session | null;
     loading: boolean;
+    authLoading: boolean;
     initialized: boolean;
     setUser: (user: User | null) => void;
     initializeAuth: () => Promise<void>;
@@ -37,6 +38,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     session: null,
     loading: true,
+    authLoading: false,
     initialized: false,
 
     setUser: (user) => set({ user }),
@@ -78,8 +80,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 initialized: true
             });
 
-        } catch (error) {
-            console.error('Failed to initialize auth:', error);
+        } catch (error: any) {
+            console.error('Failed to initialize auth:', error.response?.data || error.message);
+            // If the backend says 401, our local session is invalid or stale
+            if (error.response?.status === 401) {
+                console.warn('Session invalid, signing out...');
+                await supabase.auth.signOut().catch(() => {});
+            }
             set({ session: null, user: null, loading: false, initialized: true });
         }
 
@@ -132,12 +139,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     },
 
     signInWithGoogle: async () => {
-        await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
-        });
+        set({ authLoading: true });
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`
+                }
+            });
+            if (error) throw error;
+        } catch (error) {
+            set({ authLoading: false });
+            throw error;
+        }
     },
 
     signInWithEmail: async (email, password) => {

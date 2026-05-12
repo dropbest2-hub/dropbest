@@ -4,10 +4,17 @@ import { scrapePrice } from '../utils/scraper';
 
 export const getProducts = async (req: Request, res: Response) => {
     try {
-        // Fetch products along with their watchlist counts
-        const { data, error } = await supabaseAdmin
+        const { category } = req.query;
+        
+        let query = supabaseAdmin
             .from('products')
             .select('*, watchlist(count)');
+            
+        if (category) {
+            query = query.eq('category', category);
+        }
+
+        const { data, error } = await query;
             
         if (error) {
             console.error('Supabase Error:', error);
@@ -106,7 +113,13 @@ export const syncPrices = async (req: Request, res: Response) => {
                 let scrapedRating: number | null = null;
                 let scrapedReviewCount: string | null = null;
                 
-                const links = [product.amazon_link, product.flipkart_link].filter(Boolean);
+                const links = [
+                    product.amazon_link, 
+                    product.flipkart_link, 
+                    product.myntra_link, 
+                    product.shopsy_link, 
+                    product.ajio_link
+                ].filter(Boolean);
                 
                 for (const link of links) {
                     try {
@@ -162,13 +175,18 @@ export const syncPrices = async (req: Request, res: Response) => {
                         }
                     }
 
-                    return { id: product.id, title: product.title, old: oldPrice, new: scrapedPrice };
+                    return { id: product.id, title: product.title, image_url: product.image_url, old: oldPrice, new: scrapedPrice };
                 }
                 return null;
             });
 
             const batchResults = await Promise.all(batchPromises);
             results.push(...batchResults.filter(Boolean));
+            
+            // Wait 2-3 seconds between batches to avoid being blocked
+            if (i + batchSize < products.length) {
+                await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
+            }
         }
 
         res.json({ message: 'Sync completed', updated: results });
@@ -196,5 +214,48 @@ export const getProductPriceHistory = async (req: Request, res: Response) => {
         res.json(data || []);
     } catch (err: any) {
         res.json([]);
+    }
+};
+
+export const bulkImport = async (req: Request, res: Response) => {
+    try {
+        const products = req.body;
+        if (!Array.isArray(products)) {
+            return res.status(400).json({ error: 'Invalid data format. Expected an array of products.' });
+        }
+
+        // Clean and validate products
+        const cleanedProducts = products.map(p => ({
+            title: p.title,
+            description: p.description,
+            price: Number(p.price) || 0,
+            old_price: p.old_price ? Number(p.old_price) : null,
+            image_url: p.image_url,
+            amazon_link: p.amazon_link || p.affiliate_link || p.affiliate_links,
+            flipkart_link: p.flipkart_link,
+            myntra_link: p.myntra_link,
+            shopsy_link: p.shopsy_link,
+            ajio_link: p.ajio_link,
+            category: p.category || 'bus-booking',
+            search_keywords: p.search_keywords || p.search_keyword
+        }));
+
+        const { data, error } = await supabaseAdmin
+            .from('products')
+            .insert(cleanedProducts)
+            .select();
+
+        if (error) {
+            console.error('Bulk Import Supabase Error:', error);
+            throw error;
+        }
+
+        res.status(201).json({ 
+            message: `${data?.length || 0} products imported successfully`, 
+            count: data?.length || 0 
+        });
+    } catch (err: any) {
+        console.error('Bulk Import Exception:', err);
+        res.status(500).json({ error: err.message });
     }
 };

@@ -29,7 +29,8 @@ import {
     Trophy,
     Briefcase,
     Beaker,
-    ShoppingBag
+    ShoppingBag,
+    Bus
 } from 'lucide-react';
 
 export interface Category {
@@ -92,4 +93,7 @@ export const CATEGORIES: Category[] = [
     // Office & Industrial
     { id: 'office', name: 'Office Items', icon: <Briefcase size={24} />, color: 'bg-cyan-50 text-cyan-700', group: 'Office' },
     { id: 'industrial', name: 'Industrial', icon: <Beaker size={24} />, color: 'bg-indigo-100 text-indigo-800', group: 'Office' },
+    
+    // Travel & Booking
+    { id: 'bus-booking', name: 'Bus Booking', icon: <Bus size={24} />, color: 'bg-orange-100 text-orange-600', group: 'Travel' },
 ];

@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw, MessageSquare, Bus, MapPin, Clock, Star as StarIcon, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/categories';
 
@@ -26,6 +26,9 @@ interface AdminProduct {
     title: string;
     description: string;
     price: number | string;
+    old_price?: number | string;
+    external_rating?: number;
+    external_review_count?: number;
     image_url: string;
     category?: string;
     amazon_link?: string;
@@ -50,7 +53,7 @@ interface AdminUser {
 export default function AdminDashboard() {
   const { user, session } = useAuthStore();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages' | 'payouts'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages' | 'payouts' | 'bus_routes'>('orders');
 
   // Data State
   const [pendingOrders, setPendingOrders] = useState<AdminOrder[]>([]);
@@ -68,10 +71,49 @@ export default function AdminDashboard() {
  const [rejectionMessage, setRejectionMessage] = useState<Record<string, string>>({});
  const [purchaseValue, setPurchaseValue] = useState<Record<string, string>>({});
  const [manualCoins, setManualCoins] = useState<Record<string, string>>({});
- const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopsy_link: '', ajio_link: '', category: 'electronics', search_keywords: '' });
+ const [newProduct, setNewProduct] = useState({ 
+    title: '', 
+    description: '', 
+    price: '', 
+    old_price: '',
+    external_rating: '',
+    external_review_count: '',
+    image_url: '', 
+    amazon_link: '', 
+    flipkart_link: '', 
+    myntra_link: '', 
+    shopsy_link: '', 
+    ajio_link: '', 
+    category: 'electronics', 
+    search_keywords: '' 
+  });
  const [isAddingProduct, setIsAddingProduct] = useState(false);
  const [editingProductId, setEditingProductId] = useState<string | null>(null);
- const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncResults, setSyncResults] = useState<any[]>([]);
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [isBulkImporting, setIsBulkImporting] = useState(false);
+  const [isBusBulkImporting, setIsBusBulkImporting] = useState(false);
+  const [bulkJson, setBulkJson] = useState('');
+
+  // Bus Route specific form state
+  const [busForm, setBusForm] = useState({
+      partner: '',
+      title: '', // Bus Operator Name
+      description: 'NON-AC Seater/Sleeper', // Bus Type
+      duration: '',
+      source: '',
+      destination: '',
+      departure_time: '',
+      arrival_time: '',
+      price: '',
+      old_price: '',
+      rating: '4.2',
+      review_count: '288',
+      link: '',
+      promo_code: ''
+  });
+
 
  const is40DaysPassed = (dateString: string) => {
  const createdDate = new Date(dateString);
@@ -191,19 +233,31 @@ export default function AdminDashboard() {
      if (editingProductId) {
          await axios.put(
              `${API_URL}/products/${editingProductId}`,
-             { ...newProduct, price: parseFloat(newProduct.price.toString()) },
+             { 
+                 ...newProduct, 
+                 price: parseFloat(newProduct.price.toString()),
+                 old_price: newProduct.old_price ? parseFloat(newProduct.old_price.toString()) : null,
+                 external_rating: newProduct.external_rating ? parseFloat(newProduct.external_rating.toString()) : null,
+                 external_review_count: newProduct.external_review_count ? parseInt(newProduct.external_review_count.toString()) : null
+             },
              { headers: { Authorization: `Bearer ${session?.access_token}` } }
          );
      } else {
-         await axios.post(
-             `${API_URL}/products`,
-             { ...newProduct, price: parseFloat(newProduct.price.toString()) },
-             { headers: { Authorization: `Bearer ${session?.access_token}` } }
-         );
+          await axios.post(
+              `${API_URL}/products`,
+              { 
+                  ...newProduct, 
+                  price: parseFloat(newProduct.price.toString()),
+                  old_price: newProduct.old_price ? parseFloat(newProduct.old_price.toString()) : null,
+                  external_rating: newProduct.external_rating ? parseFloat(newProduct.external_rating.toString()) : null,
+                  external_review_count: newProduct.external_review_count ? parseInt(newProduct.external_review_count.toString()) : null
+              },
+              { headers: { Authorization: `Bearer ${session?.access_token}` } }
+          );
      }
  setIsAddingProduct(false);
  setEditingProductId(null);
- setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopsy_link: '', ajio_link: '', category: 'electronics', search_keywords: '' });
+ setNewProduct({ title: '', description: '', price: '', old_price: '', external_rating: '', external_review_count: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopsy_link: '', ajio_link: '', category: 'electronics', search_keywords: '' });
  fetchData();
  } catch (error) {
  alert('Failed to save product');
@@ -222,7 +276,10 @@ export default function AdminDashboard() {
          shopsy_link: product.shopsy_link || '',
          ajio_link: product.ajio_link || '',
          category: product.category || 'electronics',
-         search_keywords: product.search_keywords || ''
+         search_keywords: product.search_keywords || '',
+         old_price: product.old_price ? product.old_price.toString() : '',
+         external_rating: product.external_rating ? product.external_rating.toString() : '',
+         external_review_count: product.external_review_count ? product.external_review_count.toString() : ''
      });
      setEditingProductId(product.id);
      setIsAddingProduct(true);
@@ -242,26 +299,67 @@ export default function AdminDashboard() {
  }
  };
 
- const handleSyncPrices = async () => {
- if (!confirm('This will scrape Amazon/Flipkart for all products. It might take a minute. Continue?')) return;
- 
- setIsSyncing(true);
- try {
- const response = await axios.post(
- `${API_URL}/products/sync`,
- {},
- { headers: { Authorization: `Bearer ${session?.access_token}` } }
- );
- 
- alert(`Sync Successful! Updated ${response.data.updated.length} products.`);
- fetchData();
-  } catch (error: unknown) {
-  const message = error instanceof Error ? error.message : 'Failed to sync prices';
-  alert(message);
-  } finally {
- setIsSyncing(false);
- }
- };
+  const handleDeleteFromSync = async (productId: string) => {
+    if (!confirm('Delete this product?')) return;
+    try {
+        await axios.delete(
+            `${API_URL}/products/${productId}`,
+            { headers: { Authorization: `Bearer ${session?.access_token}` } }
+        );
+        setSyncResults(prev => prev.filter(p => p.id !== productId));
+        setProducts(prev => prev.filter(p => p.id !== productId));
+    } catch (error) {
+        alert('Failed to delete product');
+    }
+  };
+
+  const handleSyncPrices = async () => {
+    if (!confirm('This will scrape Amazon/Flipkart for all products. It might take a minute. Continue?')) return;
+    
+    setIsSyncing(true);
+    try {
+        const response = await axios.post(
+            `${API_URL}/products/sync`,
+            {},
+            { headers: { Authorization: `Bearer ${session?.access_token}` } }
+        );
+        
+        setSyncResults(response.data.updated || []);
+        setShowSyncModal(true);
+        fetchData();
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Failed to sync prices';
+        alert(message);
+    } finally {
+        setIsSyncing(false);
+    }
+  };
+
+  const handleBulkImport = async (forceCategory?: string) => {
+    if (!bulkJson.trim()) return;
+    try {
+        let data = JSON.parse(bulkJson);
+        if (!Array.isArray(data)) data = [data];
+
+        // Force category if provided (for Bus Routes tab)
+        if (forceCategory) {
+            data = data.map((item: any) => ({ ...item, category: forceCategory }));
+        }
+
+        const response = await axios.post(
+            `${API_URL}/products/bulk-import`,
+            data,
+            { headers: { Authorization: `Bearer ${session?.access_token}` } }
+        );
+        alert(response.data.message);
+        setBulkJson('');
+        setIsBulkImporting(false);
+        setIsBusBulkImporting(false);
+        fetchData();
+    } catch (err: any) {
+        alert('Bulk Import Failed: ' + (err.response?.data?.error || err.message || 'Invalid JSON format'));
+    }
+  };
 
   const handleSendReply = async (messageId: string, userEmail: string) => {
     if (!replyText.trim()) return;
@@ -309,7 +407,57 @@ export default function AdminDashboard() {
       }
   };
 
- if (!user || user.role !== 'ADMIN') return null;
+  const handleAddBusRoute = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+        const busData = {
+            title: busForm.title,
+            description: busForm.description,
+            price: parseFloat(busForm.price),
+            old_price: busForm.old_price ? parseFloat(busForm.old_price) : null,
+            category: 'bus-booking',
+            image_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=200', // Placeholder
+            external_rating: parseFloat(busForm.rating),
+            external_review_count: parseInt(busForm.review_count),
+            search_keywords: `${busForm.partner} ${busForm.source} ${busForm.destination} ${busForm.title}`,
+            amazon_link: busForm.link,
+            // In a real app, these would be separate columns. 
+            // For now we might store them in a JSON field or use keywords.
+            // But based on previous implementation, we likely added them to the products table.
+        };
+
+        const { data, error } = await supabase.from('products').insert([busData]).select();
+        if (error) throw error;
+        
+        alert('Bus Route Added Successfully!');
+        setBusForm({
+            partner: '', title: '', description: 'NON-AC Seater/Sleeper',
+            duration: '', source: '', destination: '',
+            departure_time: '', arrival_time: '',
+            price: '', old_price: '', rating: '4.2',
+            review_count: '288', link: '', promo_code: ''
+        });
+        fetchData();
+    } catch (err: any) {
+        alert('Error adding bus route: ' + err.message);
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleDeleteBusRoute = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this route?')) return;
+    try {
+        const { error } = await supabase.from('products').delete().eq('id', id);
+        if (error) throw error;
+        fetchData();
+    } catch (err: any) {
+        alert('Error deleting route: ' + err.message);
+    }
+  };
+
+  if (!user || user.role !== 'ADMIN') return null;
 
  return (
  <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 animate-fade-in">
@@ -353,12 +501,18 @@ export default function AdminDashboard() {
  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
  User Registrations
  </button>
- <button
- onClick={() => setActiveTab('messages')}
- className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'messages' ? 'bg-violet-50 text-violet-700' : 'text-gray-600 hover:bg-gray-50'}`}
- >
- <MessageSquare size={18} /> User Messages
- </button>
+  <button
+  onClick={() => setActiveTab('messages')}
+  className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'messages' ? 'bg-violet-50 text-violet-700' : 'text-gray-600 hover:bg-gray-50'}`}
+  >
+  <MessageSquare size={18} /> User Messages
+  </button>
+  <button
+  onClick={() => setActiveTab('bus_routes')}
+  className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'bus_routes' ? 'bg-violet-50 text-violet-700' : 'text-gray-600 hover:bg-gray-50'}`}
+  >
+  <Bus size={18} /> Bus Routes
+  </button>
  <button
  onClick={() => setActiveTab('payouts')}
  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'payouts' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}
@@ -507,14 +661,24 @@ export default function AdminDashboard() {
      if (isAddingProduct) {
          setIsAddingProduct(false);
          setEditingProductId(null);
-         setNewProduct({ title: '', description: '', price: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopsy_link: '', ajio_link: '', category: 'electronics', search_keywords: '' });
+         setNewProduct({ title: '', description: '', price: '', old_price: '', external_rating: '', external_review_count: '', image_url: '', amazon_link: '', flipkart_link: '', myntra_link: '', shopsy_link: '', ajio_link: '', category: 'electronics', search_keywords: '' });
      } else {
          setIsAddingProduct(true);
+         setIsBulkImporting(false);
      }
  }}
  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 sm:px-5 py-2.5 rounded-xl font-medium transition-colors text-sm"
  >
  {isAddingProduct ? 'Cancel' : <><Plus size={16} /> Add Product</>}
+ </button>
+ <button
+ onClick={() => {
+     setIsBulkImporting(!isBulkImporting);
+     setIsAddingProduct(false);
+ }}
+ className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2.5 rounded-xl font-medium transition-colors text-sm"
+ >
+ <PackagePlus size={16} /> {isBulkImporting ? 'Cancel' : 'Bulk Import'}
  </button>
  </div>
  </div>
@@ -543,10 +707,22 @@ export default function AdminDashboard() {
  <input placeholder="Shopsy Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.shopsy_link} onChange={e => setNewProduct({ ...newProduct, shopsy_link: e.target.value })} />
  <input placeholder="Ajio Affiliate URL (Optional)" className="p-3 rounded-xl border" value={newProduct.ajio_link} onChange={e => setNewProduct({ ...newProduct, ajio_link: e.target.value })} />
  <select required className="p-3 rounded-xl border md:col-span-2 bg-white" value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}>
-     {CATEGORIES.filter(c => c.id !== 'all').map(category => (
+     {CATEGORIES.filter(c => c.id !== 'all' && c.id !== 'bus-booking').map(category => (
          <option key={category.id} value={category.id}>{category.name}</option>
      ))}
  </select>
+
+ {newProduct.category === 'bus-booking' && (
+      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-orange-50 p-4 rounded-2xl border border-orange-100">
+          <div className="md:col-span-3">
+              <h4 className="text-sm font-black text-orange-800 uppercase tracking-widest mb-2">Bus Details (Custom Fields)</h4>
+              <p className="text-[10px] text-orange-600 font-bold mb-4">Use 'Keywords' field to enter: Partner|Duration|Source|Dest|Time|Seats (e.g. RedBus|06h 20m|Gobichettipalayam|Bangalore|23:25 - 05:45|31 Seats Left)</p>
+          </div>
+          <input placeholder="Original Price (₹)" className="p-3 rounded-xl border bg-white" type="number" value={newProduct.old_price} onChange={e => setNewProduct({ ...newProduct, old_price: e.target.value })} />
+          <input placeholder="Rating (e.g. 3.6)" className="p-3 rounded-xl border bg-white" type="number" step="0.1" value={newProduct.external_rating} onChange={e => setNewProduct({ ...newProduct, external_rating: e.target.value })} />
+          <input placeholder="Review Count (e.g. 288)" className="p-3 rounded-xl border bg-white" type="number" value={newProduct.external_review_count} onChange={e => setNewProduct({ ...newProduct, external_review_count: e.target.value })} />
+      </div>
+  )}
  </div>
  <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl">
      {editingProductId ? 'Update Product' : 'Save Product'}
@@ -556,8 +732,64 @@ export default function AdminDashboard() {
  )}
  </AnimatePresence>
 
+  <AnimatePresence>
+ {isBulkImporting && (
+     <motion.div
+         initial={{ height: 0, opacity: 0 }}
+         animate={{ height: 'auto', opacity: 1 }}
+         exit={{ height: 0, opacity: 0 }}
+         className="overflow-hidden mb-8"
+     >
+         <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+             <h4 className="text-lg font-black text-blue-900 mb-2">Bulk JSON Import</h4>
+             <p className="text-sm text-blue-700 mb-4 font-medium">
+                 Paste a JSON array of products. Format: 
+                 <code className="bg-white/50 px-2 py-0.5 rounded ml-1 text-xs">
+                     [{"{ \"title\": \"Bus 1\", \"price\": 500, \"category\": \"bus-booking\", ... }"}]
+                 </code>
+             </p>
+             <textarea 
+                 className="w-full p-4 rounded-xl border border-blue-200 bg-white font-mono text-xs mb-4" 
+                 rows={10} 
+                 placeholder='[ { "title": "Example Bus", "price": 450, "category": "bus-booking" } ]'
+                 value={bulkJson}
+                 onChange={e => setBulkJson(e.target.value)}
+             />
+             <div className="flex gap-3">
+                 <button 
+                     onClick={() => handleBulkImport()}
+                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-lg shadow-blue-600/20"
+                 >
+                     IMPORT ALL
+                 </button>
+                 <button 
+                     onClick={() => {
+                         const template = [
+                             {
+                                 title: "Bus Operator Name",
+                                 description: "Non-AC Seater/Sleeper",
+                                 price: 350,
+                                 old_price: 399,
+                                 category: "bus-booking",
+                                 amazon_link: "https://affiliate-link.com",
+                                 search_keywords: "Partner|Duration|Source|Dest|Time|Seats",
+                                 image_url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957"
+                             }
+                         ];
+                         setBulkJson(JSON.stringify(template, null, 2));
+                     } }
+                     className="px-6 bg-white border border-blue-200 text-blue-600 font-bold rounded-xl"
+                 >
+                     Load Template
+                 </button>
+             </div>
+         </div>
+     </motion.div>
+ )}
+ </AnimatePresence>
+
  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
- {products.map(product => (
+ {products.filter(p => p.category !== 'bus-booking').map(product => (
  <div key={product.id} className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm group">
  <div className="h-32 bg-gray-50 relative overflow-hidden">
  <Image src={product.image_url} alt="" width={300} height={128} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
@@ -735,12 +967,12 @@ export default function AdminDashboard() {
                           </motion.div>
                       )}
                   </AnimatePresence>
-              </div>
-          ))}
-      </div>
-  )}
-  </motion.div>
-  )}
+               </div>
+           ))}
+       </div>
+   )}
+   </motion.div>
+   )}
 
   {activeTab === 'payouts' && (
       <motion.div
@@ -809,11 +1041,296 @@ export default function AdminDashboard() {
             </div>
         )}
       </motion.div>
-  )}
- </AnimatePresence>
- )}
+   )}
+   {activeTab === 'bus_routes' && (
+       <motion.div
+         key="bus_routes"
+         initial={{ opacity: 0, x: 10 }}
+         animate={{ opacity: 1, x: 0 }}
+         exit={{ opacity: 0, x: -10 }}
+         className="space-y-8"
+       >
+         {/* Add Bus Route Form */}
+         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                 <div className="flex items-center gap-3">
+                     <div className="bg-orange-100 p-3 rounded-2xl">
+                         <Bus className="text-orange-600" size={24} />
+                     </div>
+                     <div>
+                         <h3 className="text-2xl font-black text-gray-900">Add New Bus Route</h3>
+                         <p className="text-gray-500 text-sm">Add affiliate bus listings from RedBus, AbhiBus, etc.</p>
+                     </div>
+                 </div>
+                 <button
+                    onClick={() => {
+                        setIsBusBulkImporting(!isBusBulkImporting);
+                    }}
+                    className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all text-sm shadow-lg shadow-orange-200"
+                 >
+                    <PackagePlus size={18} /> {isBusBulkImporting ? 'Cancel' : 'Bulk Import Buses'}
+                 </button>
+             </div>
 
- </div>
- </div>
- );
+             <AnimatePresence>
+                {isBusBulkImporting && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden mb-8"
+                    >
+                        <div className="bg-orange-50 rounded-2xl p-6 border border-orange-100">
+                            <h4 className="text-lg font-black text-orange-900 mb-2">Bus Routes Bulk Import</h4>
+                            <p className="text-sm text-orange-700 mb-4 font-medium italic">
+                                Paste your Excel-converted JSON here. Category will be set to 'bus-booking' automatically.
+                            </p>
+                            <textarea 
+                                className="w-full p-4 rounded-xl border border-orange-200 bg-white font-mono text-xs mb-4" 
+                                rows={10} 
+                                placeholder='[ { "title": "SRS Travels", "price": 850, "search_keyword": "RedBus|08h|Bangalore|Chennai|..." } ]'
+                                value={bulkJson}
+                                onChange={e => setBulkJson(e.target.value)}
+                            />
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => handleBulkImport('bus-booking')}
+                                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-black py-3 rounded-xl shadow-lg shadow-orange-200"
+                                >
+                                    IMPORT ALL BUSES
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        const template = [
+                                            {
+                                                title: "Example Travels",
+                                                description: "AC Sleeper (2+1)",
+                                                price: 750,
+                                                old_price: 850,
+                                                affiliate_links: "https://your-link.com",
+                                                search_keyword: "Partner|Duration|Source|Dest|Time|Seats",
+                                                image_url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957"
+                                            }
+                                        ];
+                                        setBulkJson(JSON.stringify(template, null, 2));
+                                    } }
+                                    className="px-6 bg-white border border-orange-200 text-orange-600 font-bold rounded-xl"
+                                >
+                                    Load Bus Template
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+             </AnimatePresence>
+
+             <form onSubmit={handleAddBusRoute} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 <div>
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Partner Platform</label>
+                     <select 
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                         value={busForm.partner}
+                         onChange={e => setBusForm({...busForm, partner: e.target.value})}
+                         required
+                     >
+                         <option value="">Select Partner</option>
+                         <option value="RedBus">RedBus</option>
+                         <option value="AbhiBus">AbhiBus</option>
+                         <option value="ZingBus">ZingBus</option>
+                         <option value="MakeMyTrip">MakeMyTrip</option>
+                     </select>
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Bus Operator Name</label>
+                     <input 
+                         type="text" 
+                         placeholder="e.g. SRS Travels"
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                         value={busForm.title}
+                         onChange={e => setBusForm({...busForm, title: e.target.value})}
+                         required
+                     />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Bus Type</label>
+                     <input 
+                         type="text" 
+                         placeholder="e.g. AC Sleeper (2+1)"
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                         value={busForm.description}
+                         onChange={e => setBusForm({...busForm, description: e.target.value})}
+                     />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Source City</label>
+                     <input 
+                         type="text" 
+                         placeholder="e.g. Bangalore"
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                         value={busForm.source}
+                         onChange={e => setBusForm({...busForm, source: e.target.value})}
+                     />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Destination City</label>
+                     <input 
+                         type="text" 
+                         placeholder="e.g. Chennai"
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                         value={busForm.destination}
+                         onChange={e => setBusForm({...busForm, destination: e.target.value})}
+                     />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Price (₹)</label>
+                     <input 
+                         type="number" 
+                         placeholder="e.g. 850"
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none font-bold"
+                         value={busForm.price}
+                         onChange={e => setBusForm({...busForm, price: e.target.value})}
+                         required
+                     />
+                 </div>
+                 <div className="md:col-span-3">
+                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Affiliate Booking Link (URL)</label>
+                     <input 
+                         type="url" 
+                         placeholder="https://www.redbus.in/bus-tickets/..."
+                         className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                         value={busForm.link}
+                         onChange={e => setBusForm({...busForm, link: e.target.value})}
+                         required
+                     />
+                 </div>
+                 <div className="md:col-span-3">
+                     <button 
+                         type="submit" 
+                         disabled={loading}
+                         className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-orange-200 transition-all disabled:opacity-50"
+                     >
+                         {loading ? 'Adding Route...' : 'Add Bus Route Listing'}
+                     </button>
+                 </div>
+             </form>
+         </div>
+
+         {/* Existing Bus Routes */}
+         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+             <h3 className="text-xl font-bold text-gray-900 mb-6">Active Bus Listings</h3>
+             <div className="grid grid-cols-1 gap-4">
+                 {products.filter(p => p.category === 'bus-booking').map(bus => (
+                     <div key={bus.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:border-orange-100 transition-colors">
+                         <div className="flex items-center gap-4">
+                             <div className="bg-orange-50 p-3 rounded-xl">
+                                 <Bus size={20} className="text-orange-600" />
+                             </div>
+                             <div>
+                                 <h4 className="font-bold text-gray-900">{bus.title}</h4>
+                                 <p className="text-xs text-gray-500">{bus.description} • ₹{bus.price}</p>
+                             </div>
+                         </div>
+                         <button 
+                             onClick={() => handleDeleteBusRoute(bus.id)}
+                             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                         >
+                             <Trash2 size={18} />
+                         </button>
+                     </div>
+                 ))}
+                 {products.filter(p => p.category === 'bus-booking').length === 0 && (
+                     <p className="text-center py-8 text-gray-400 italic">No bus routes found. Add your first one above!</p>
+                 )}
+             </div>
+         </div>
+       </motion.div>
+   )}
+  </AnimatePresence>
+  )}
+
+      {/* Sync Results Modal */}
+      <AnimatePresence>
+        {showSyncModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[32px] w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-violet-50 to-white">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900 leading-tight">Price Sync Results</h2>
+                  <p className="text-sm text-violet-600 font-bold uppercase tracking-widest mt-1">
+                    {syncResults.length} Products Updated Successfully
+                  </p>
+                </div>
+                <button 
+                  onClick={() => setShowSyncModal(false)}
+                  className="p-3 hover:bg-gray-100 rounded-2xl transition-colors text-gray-400"
+                >
+                  <XCircle size={24} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {syncResults.length === 0 ? (
+                  <div className="text-center py-12">
+                    <RefreshCcw size={48} className="mx-auto text-gray-200 mb-4" />
+                    <p className="text-gray-500 font-medium">No products were updated during this sync.</p>
+                  </div>
+                ) : (
+                  syncResults.map((result) => (
+                    <div key={result.id} className="group relative bg-gray-50/50 rounded-2xl p-4 border border-gray-100 hover:border-violet-200 transition-all hover:bg-white hover:shadow-md">
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-white border border-gray-100 shrink-0">
+                          <img 
+                            src={result.image_url || '/placeholder.png'} 
+                            alt="" 
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-gray-900 truncate pr-8">{result.title}</h4>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="text-sm text-gray-400 line-through font-medium">₹{result.old}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className={`text-base font-black ${result.new < result.old ? 'text-green-600' : 'text-violet-600'}`}>
+                              ₹{result.new}
+                            </span>
+                            {result.new < result.old && (
+                              <span className="bg-green-100 text-green-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                                Price Drop!
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => handleDeleteFromSync(result.id)}
+                          className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                          title="Delete Product"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="p-6 bg-gray-50 border-t border-gray-100">
+                <button 
+                  onClick={() => setShowSyncModal(false)}
+                  className="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98]"
+                >
+                  Done, Review Dashboard
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  </div>
+  );
 }

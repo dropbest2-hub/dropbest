@@ -19,6 +19,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
         }
 
         const token = authHeader.split(' ')[1];
+        console.log(`Received token starting with: ${token.substring(0, 10)}...`);
 
         // DEVELOPMENT BYPASS: Allow mock token for UI testing
         if (token === 'mock-admin-token') {
@@ -28,9 +29,10 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
         }
 
         // Verify token with Supabase
-        const { data: { user }, error } = await supabase.auth.getUser(token);
+        const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
 
         if (error || !user) {
+            console.error('Supabase auth error:', error?.message);
             res.status(401).json({ error: 'Unauthorized', details: error?.message });
             return;
         }

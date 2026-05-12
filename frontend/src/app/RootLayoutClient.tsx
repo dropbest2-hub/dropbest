@@ -69,6 +69,8 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                             <h3 className="text-2xl font-black text-gray-900 tracking-tight">DropBest!</h3>
                             <p className="text-gray-500 font-medium leading-relaxed">
                                 Discover the best products, reviewed by the community. Shop smart and earn rewards for your engagement.
+                                <br />
+                                <span className="text-xs">Registered Email: dropbest2@gmail.com</span>
                             </p>
                         </div>
                         <div className="space-y-4">

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import api from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search, Package, HelpCircle } from 'lucide-react';
+import { ShoppingCart, Star, ExternalLink, ChevronRight, AlertCircle, RefreshCcw, Eye, EyeOff, Award, Zap, Gift, Smartphone, Flame, Search, Package, HelpCircle, Bus } from 'lucide-react';
 import CategoryList from '@/components/CategoryList';
 import { useAuthStore } from '@/store/authStore';
 
@@ -278,6 +278,97 @@ export default function Home() {
                 </div>
             </motion.section>
 
+
+
+            {/* Bus Booking Banner - Premium Redesign */}
+            <motion.section 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="px-6 mb-20"
+            >
+                <Link href="/bus-booking" className="block group">
+                    <div className="relative min-h-[360px] md:h-[400px] rounded-[3rem] overflow-hidden bg-gradient-to-br from-orange-600 via-red-500 to-rose-600 shadow-[0_20px_50px_-20px_rgba(249,115,22,0.5)] transition-all duration-500 group-hover:shadow-[0_30px_60px_-15px_rgba(249,115,22,0.6)] group-hover:-translate-y-1">
+                        {/* High-end decorative background */}
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')] opacity-10 mix-blend-overlay"></div>
+                        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[120px] -mr-48 -mt-48 animate-pulse"></div>
+                        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-black/20 rounded-full blur-[80px]"></div>
+                        
+                        <div className="relative h-full flex flex-col md:flex-row items-center justify-between px-8 md:px-20 py-16 md:py-12 gap-10">
+                            <div className="text-white max-w-2xl text-center md:text-left z-10">
+                                <motion.div 
+                                    initial={{ x: -20, opacity: 0 }}
+                                    whileInView={{ x: 0, opacity: 1 }}
+                                    className="flex items-center gap-3 mb-8 justify-center md:justify-start"
+                                >
+                                    <span className="bg-yellow-400 text-black px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase shadow-lg shadow-yellow-400/20">NEW FEATURE</span>
+                                    <div className="flex gap-1 items-center bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                                        {[1,2,3,4,5].map(i => <Star key={i} size={10} fill="#facc15" className="text-yellow-400" />)}
+                                        <span className="text-[10px] font-bold ml-1 opacity-80">5.0</span>
+                                    </div>
+                                </motion.div>
+                                
+                                <h2 className="text-4xl md:text-7xl font-black mb-6 leading-[1.05] tracking-tight">
+                                    Travel & <br className="hidden md:block" /> 
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-orange-100 drop-shadow-sm">Earn Coins</span>
+                                </h2>
+                                
+                                <p className="text-orange-50 text-lg md:text-xl font-medium mb-10 opacity-90 max-w-lg leading-relaxed">
+                                    Book bus tickets via <span className="font-bold text-white">RedBus, AbhiBus</span> & more. Get exclusive DropBest rewards on every ride!
+                                </p>
+                                
+                                <div className="flex flex-wrap gap-6 justify-center md:justify-start items-center">
+                                    <div className="bg-white text-orange-600 px-12 py-5 rounded-[1.5rem] font-black shadow-2xl shadow-orange-950/20 group-hover:scale-105 transition-all flex items-center gap-3 text-xl">
+                                        Book Now <ChevronRight size={24} strokeWidth={3} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bus & Visuals */}
+                            <div className="relative flex-shrink-0 z-10 hidden lg:block">
+                                <motion.div 
+                                    animate={{ 
+                                        y: [0, -15, 0],
+                                        rotate: [3, 1, 3]
+                                    }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                    className="relative"
+                                >
+                                    <div className="bg-white/10 backdrop-blur-2xl p-12 rounded-[4rem] border border-white/20 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)]">
+                                        <Bus size={200} className="text-white drop-shadow-[0_10px_30px_rgba(255,255,255,0.3)]" strokeWidth={1} />
+                                    </div>
+                                    
+                                    {/* Floating Coins */}
+                                    <motion.div 
+                                        animate={{ y: [0, -20, 0], rotate: [0, 360, 0] }}
+                                        transition={{ duration: 5, repeat: Infinity }}
+                                        className="absolute -top-8 -left-8 w-20 h-20 bg-gradient-to-br from-yellow-300 to-orange-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20"
+                                    >
+                                        <span className="text-white font-black text-2xl">₵</span>
+                                    </motion.div>
+                                    <motion.div 
+                                        animate={{ y: [0, 20, 0], rotate: [0, -360, 0] }}
+                                        transition={{ duration: 6, repeat: Infinity, delay: 1 }}
+                                        className="absolute -bottom-6 -right-12 w-14 h-14 bg-gradient-to-br from-yellow-200 to-orange-400 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20"
+                                    >
+                                        <span className="text-white font-black text-lg">₵</span>
+                                    </motion.div>
+                                    
+                                    {/* Promo Badge */}
+                                    <motion.div 
+                                        whileHover={{ scale: 1.1, rotate: 0 }}
+                                        className="absolute top-1/2 -right-12 -translate-y-1/2 bg-yellow-400 text-black font-black px-8 py-4 rounded-2xl shadow-[0_10px_30px_-5px_rgba(250,204,21,0.5)] -rotate-12 cursor-pointer transition-transform"
+                                    >
+                                        <div className="text-[10px] uppercase tracking-widest opacity-70 leading-none mb-1">FLAT DISCOUNT</div>
+                                        <div className="text-3xl leading-none">₹200 OFF</div>
+                                    </motion.div>
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            </motion.section>
+
             {/* Product Grid */}
             <section id="trending" className="scroll-mt-24 pt-10">
                 <ProductStats count={products.length} />
@@ -415,18 +506,37 @@ export default function Home() {
                             Try Again
                         </button>
                     </div>
-                ) : products.length === 0 ? (
+                ) : products.filter(p => {
+                    // EXCLUDE bus bookings from general product lists
+                    if (p.category === 'bus-booking') return false;
+
+                    // Store-based filtering logic
+                    if (selectedBrand === 'amazon' && !p.amazon_link) return false;
+                    if (selectedBrand === 'flipkart' && !p.flipkart_link) return false;
+                    if (selectedBrand === 'myntra' && !p.myntra_link) return false;
+                    if (selectedBrand === 'shopsy' && !p.shopsy_link) return false;
+                    if (selectedBrand === 'ajio' && !p.ajio_link) return false;
+
+                    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+                    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                         p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                         (p.search_keywords && p.search_keywords.toLowerCase().includes(searchQuery.toLowerCase()));
+                    return matchesCategory && matchesSearch;
+                }).length === 0 ? (
                     <div className="text-center py-24 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
                         <div className="bg-gray-50 p-6 rounded-full w-fit mx-auto mb-6">
                             <ShoppingCart size={48} className="text-gray-300" />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900">Catalogue is Empty</h3>
-                        <p className="text-gray-500 mt-2">New products are arriving soon. Stay tuned!</p>
+                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Admin team will add soon</h3>
+                        <p className="text-gray-500 mt-2 font-medium">New products for this category are arriving soon. Stay tuned!</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" style={{ perspective: '1000px' }}>
                         {products
                             .filter(p => {
+                                // EXCLUDE bus bookings from general product lists
+                                if (p.category === 'bus-booking') return false;
+
                                 // Store-based filtering logic
                                 if (selectedBrand === 'amazon' && !p.amazon_link) return false;
                                 if (selectedBrand === 'flipkart' && !p.flipkart_link) return false;

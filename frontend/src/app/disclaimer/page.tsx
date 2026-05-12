@@ -33,6 +33,9 @@ export default function DisclaimerPage() {
                             <p>
                                 As an Amazon Associate, we earn from qualifying purchases. This means that if you click on a product link and make a purchase, we may receive a small commission at no additional cost to you.
                             </p>
+                            <p className="pt-2 text-sm text-brand-100 italic">
+                                Registered Affiliate Email: dropbest2@gmail.com
+                            </p>
                         </div>
                         <div className="mt-8 flex items-center gap-3 bg-white/10 backdrop-blur-md p-4 rounded-2xl w-fit">
                             <ShoppingBag className="text-white" />
