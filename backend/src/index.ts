@@ -79,13 +79,12 @@ app.use('/api/contacts', contactRoutes);
 // Error Handler
 app.use(errorHandler);
 
-if (env.NODE_ENV !== 'production') {
-  app.listen(Number(port), '0.0.0.0', () => {
-    console.log(`Server is running on all interfaces at http://0.0.0.0:${port}`);
-    console.log(`Local network access: http://10.27.81.194:${port}`);
-    console.log(`Supabase URL: ${env.SUPABASE_URL}`);
-  });
-}
+app.listen(Number(port), '0.0.0.0', () => {
+  console.log(`Server is running on port ${port}`);
+  if (env.NODE_ENV !== 'production') {
+    console.log(`Development URL: http://localhost:${port}`);
+  }
+});
 
 export default app;
 

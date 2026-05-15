@@ -32,10 +32,7 @@ interface AuthState {
     signUpWithEmail: (email: string, password: string, name: string) => Promise<User>;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 
-    (typeof window !== 'undefined' 
-        ? `http://${window.location.hostname}:8000/api` 
-        : 'http://127.0.0.1:8000/api');
+import { API_URL } from '@/lib/api';
 
 export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
@@ -56,14 +53,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
             if (error || !session) {
                 if (error) {
-                    console.warn('Auth session error, clearing stale data:', error.message);
-                    // If there's an error like invalid refresh token, clear out local storage
-                    // Use a more aggressive cleanup if it's the specific refresh token error
+                    console.warn('Auth session error:', error.message);
                     if (error.message.includes('Refresh Token Not Found')) {
-                        localStorage.removeItem('supabase.auth.token'); // Fallback for standard key
-                        // Actually signOut clears it better
-                        await supabase.auth.signOut().catch(() => {});
-                    } else {
                         await supabase.auth.signOut().catch(() => {});
                     }
                 }
@@ -72,24 +63,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             }
 
             // We have a session, fetch DB user data from our backend
-            const response = await axios.get(`${API_URL}/auth/me`, {
-                headers: { Authorization: `Bearer ${session.access_token}` }
-            });
+            try {
+                const response = await axios.get(`${API_URL}/auth/me`, {
+                    headers: { Authorization: `Bearer ${session.access_token}` }
+                });
 
-            set({
-                session,
-                user: response.data.user,
-                loading: false,
-                initialized: true
-            });
+                set({
+                    session,
+                    user: response.data.user,
+                    loading: false,
+                    initialized: true
+                });
+            } catch (backendError: any) {
+                console.error('Backend user fetch failed:', backendError.message);
+                // If the backend says 401 explicitly, then sign out
+                if (backendError.response?.status === 401) {
+                    await supabase.auth.signOut().catch(() => {});
+                    set({ session: null, user: null, loading: false, initialized: true });
+                } else {
+                    // Just set user to null but keep the session, maybe the backend is just down
+                    set({ session, user: null, loading: false, initialized: true });
+                }
+            }
 
         } catch (error: any) {
-            console.error('Failed to initialize auth:', error.response?.data || error.message);
-            // If the backend says 401, our local session is invalid or stale
-            if (error.response?.status === 401) {
-                console.warn('Session invalid, signing out...');
-                await supabase.auth.signOut().catch(() => {});
-            }
+            console.error('Failed to initialize auth:', error.message);
             set({ session: null, user: null, loading: false, initialized: true });
         }
 

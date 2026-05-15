@@ -5,7 +5,7 @@ import { Zap, Clock, Save, Trash2, Plus, Search, Tag, Percent } from 'lucide-rea
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { API_URL } from '@/lib/api';
 
 interface Product {
     id: string;
