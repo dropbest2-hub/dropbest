@@ -79,12 +79,14 @@ app.use('/api/contacts', contactRoutes);
 // Error Handler
 app.use(errorHandler);
 
-app.listen(Number(port), '0.0.0.0', () => {
-  console.log(`Server is running on port ${port}`);
-  if (env.NODE_ENV !== 'production') {
-    console.log(`Development URL: http://localhost:${port}`);
-  }
-});
+if (process.env.VERCEL !== '1') {
+  app.listen(Number(port), '0.0.0.0', () => {
+    console.log(`Server is running on port ${port}`);
+    if (env.NODE_ENV !== 'production') {
+      console.log(`Development URL: http://localhost:${port}`);
+    }
+  });
+}
 
 export default app;
 
