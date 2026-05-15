@@ -56,69 +56,60 @@ export default function BusBookingPage() {
     return (
         <div className="min-h-screen bg-[#fafafa]">
             <main className="pt-24 pb-20">
-                {/* Hero Section */}
+                {/* Hero Section - Compact Version */}
                 <section className="px-6 mb-12">
-                    <div className="max-w-7xl mx-auto relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-orange-600 via-orange-500 to-red-500 p-8 md:p-16">
+                    <div className="max-w-7xl mx-auto relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-orange-600 via-orange-500 to-red-500 p-6 md:p-10">
                         <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 skew-x-[-20deg] translate-x-32" />
                         
-                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="max-w-2xl text-center md:text-left">
                                 <motion.div 
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm font-bold mb-6"
+                                    className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-[10px] font-black mb-4 uppercase tracking-widest"
                                 >
-                                    <Zap size={16} className="text-yellow-300" />
-                                    <span>FLAT 40% OFF ON FIRST BOOKING</span>
+                                    <Zap size={14} className="text-yellow-300" />
+                                    <span>FLAT 40% OFF FIRST BOOKING</span>
                                 </motion.div>
                                 <motion.h1 
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 }}
-                                    className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight"
+                                    className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight"
                                 >
-                                    Travel Better, <br />
-                                    <span className="text-orange-100">Earn More.</span>
+                                    Travel Better, <span className="text-orange-100">Earn More.</span>
                                 </motion.h1>
-                                <motion.p 
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="text-orange-50 text-lg md:text-xl font-medium mb-10 opacity-90"
-                                >
-                                    Book your favorite bus routes via DropBest & get exclusive coins on every ticket.
-                                </motion.p>
-
-                                {/* Search Box Mockup */}
-                                <div className="bg-white p-4 md:p-6 rounded-3xl shadow-2xl flex flex-col md:flex-row gap-4 items-center">
+                                <p className="text-orange-50 text-sm md:text-lg font-medium mb-8 opacity-90">
+                                    Book your favorite bus routes via DropBest & get exclusive coins.
+                                </p>
+ 
+                                {/* Search Box Mockup - Slimmed */}
+                                <div className="bg-white p-3 md:p-4 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-3 items-center">
                                     <div className="flex-1 w-full relative">
-                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
-                                        <input type="text" placeholder="From City" className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold" readOnly value="Bangalore" />
-                                    </div>
-                                    <div className="bg-orange-100 p-3 rounded-full hidden md:block">
-                                        <RefreshCcw className="text-orange-600" size={20} />
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={16} />
+                                        <input type="text" placeholder="From City" className="w-full pl-10 pr-3 py-3 bg-gray-50 border-none rounded-xl outline-none font-bold text-sm" readOnly value="Bangalore" />
                                     </div>
                                     <div className="flex-1 w-full relative">
-                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
-                                        <input type="text" placeholder="To City" className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold" readOnly value="Chennai" />
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={16} />
+                                        <input type="text" placeholder="To City" className="w-full pl-10 pr-3 py-3 bg-gray-50 border-none rounded-xl outline-none font-bold text-sm" readOnly value="Chennai" />
                                     </div>
-                                    <button className="w-full md:w-auto bg-black text-white px-10 py-4 rounded-2xl font-black hover:scale-105 transition-transform">
+                                    <button className="w-full md:w-auto bg-black text-white px-8 py-3 rounded-xl font-black hover:scale-105 transition-transform text-xs">
                                         SEARCH
                                     </button>
                                 </div>
                             </div>
-
+ 
                             <motion.div 
-                                initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
-                                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                                transition={{ delay: 0.3, type: 'spring' }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.3 }}
                                 className="hidden lg:block relative"
                             >
-                                <div className="bg-white/10 backdrop-blur-2xl p-12 rounded-[3rem] border border-white/20 shadow-2xl">
-                                    <Bus size={200} className="text-white drop-shadow-3xl" strokeWidth={0.5} />
+                                <div className="bg-white/10 backdrop-blur-2xl p-8 rounded-[2rem] border border-white/20 shadow-2xl">
+                                    <Bus size={120} className="text-white drop-shadow-2xl" strokeWidth={0.5} />
                                 </div>
-                                <div className="absolute -top-6 -right-6 bg-yellow-400 text-black font-black px-6 py-3 rounded-2xl shadow-xl -rotate-12 animate-pulse">
-                                    TRUSTED PARTNERS
+                                <div className="absolute -top-4 -right-4 bg-yellow-400 text-black font-black px-4 py-2 rounded-xl shadow-xl text-[8px] tracking-widest uppercase">
+                                    TRUSTED
                                 </div>
                             </motion.div>
                         </div>
@@ -262,14 +253,25 @@ export default function BusBookingPage() {
                     </div>
                 </section>
 
-                {/* Partners Section */}
+                {/* Partners Section - Trust Building */}
                 <section className="px-6 mt-20">
-                    <div className="max-w-7xl mx-auto text-center">
-                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-10">Our Booking Partners</h3>
-                        <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                            {['RedBus', 'AbhiBus', 'ZingBus', 'MakeMyTrip'].map(partner => (
-                                <div key={partner} className="font-black text-2xl text-gray-400">{partner}</div>
-                            ))}
+                    <div className="max-w-7xl mx-auto">
+                        <div className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-sm text-center">
+                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] mb-12">Authorized Booking Partners</h3>
+                            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24">
+                                <div className="flex flex-col items-center gap-4 group">
+                                    <div className="text-3xl font-black text-red-600 grayscale group-hover:grayscale-0 transition-all">redBus</div>
+                                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Booking Partner</div>
+                                </div>
+                                <div className="flex flex-col items-center gap-4 group scale-110">
+                                    <div className="text-3xl font-black text-brand-600 group-hover:text-brand-500 transition-all">AbhiBus</div>
+                                    <div className="bg-brand-100 text-brand-600 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">Affiliate Partner</div>
+                                </div>
+                                <div className="flex flex-col items-center gap-4 group">
+                                    <div className="text-3xl font-black text-blue-600 grayscale group-hover:grayscale-0 transition-all">MMT</div>
+                                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Booking Affiliate</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

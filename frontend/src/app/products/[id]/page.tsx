@@ -205,11 +205,22 @@ export default function ProductDetails() {
         api.get(`/products/${id}/history`),
         api.get(`/products`)
       ]);
-      setProduct(prodRes.data);
+      const currentProduct = prodRes.data;
+      setProduct(currentProduct);
       setReviews(revRes.data);
       setHistory(histRes.data);
-      // Filter out current product and take 4 random others
-      const others = moreRes.data.filter((p: any) => p.id !== id).sort(() => 0.5 - Math.random()).slice(0, 4);
+
+      // Better Related Products Logic: Same Category first
+      const allOthers = moreRes.data.filter((p: any) => p.id !== id);
+      const sameCategory = allOthers.filter((p: any) => p.category === currentProduct.category);
+      
+      let others;
+      if (sameCategory.length >= 4) {
+          others = sameCategory.sort(() => 0.5 - Math.random()).slice(0, 4);
+      } else {
+          const differentCategory = allOthers.filter((p: any) => p.category !== currentProduct.category);
+          others = [...sameCategory, ...differentCategory.sort(() => 0.5 - Math.random())].slice(0, 4);
+      }
       setOtherProducts(others);
 
  // Check if user can review (has ANY order for this product)
@@ -235,6 +246,9 @@ export default function ProductDetails() {
  }, [fetchData]);
 
   const handleRedirect = async (link: string) => {
+    // Open the external link immediately for maximum speed
+    const newWindow = window.open(link, '_blank');
+    
     if (!user || !session) {
       toast.error('Please login to buy and earn rewards!', {
         icon: '🔒',
@@ -255,9 +269,6 @@ export default function ProductDetails() {
           console.error('Error tracking redirect:', error);
         });
     }
-    
-    // Open the external link immediately
-    window.open(link, '_blank');
   };
 
  const handleSubmitReview = async (e: React.FormEvent) => {

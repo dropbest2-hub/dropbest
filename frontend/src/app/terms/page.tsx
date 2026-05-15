@@ -34,7 +34,7 @@ export default function TermsOfServicePage() {
                             <span className="w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center text-sm">2</span>
                             User Accounts and Rewards
                         </h2>
-                        <p className="text-gray-600 leading-relaxed font-medium space-y-3">
+                        <div className="text-gray-600 leading-relaxed font-medium space-y-3">
                             <ul className="list-none space-y-3 mt-4">
                                 {[
                                     "You must provide accurate and complete information when creating an account.",
@@ -48,7 +48,7 @@ export default function TermsOfServicePage() {
                                     </li>
                                 ))}
                             </ul>
-                        </p>
+                        </div>
                     </section>
 
                     <section>

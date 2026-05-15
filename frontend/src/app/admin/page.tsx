@@ -6,9 +6,10 @@ import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw, MessageSquare, Bus, MapPin, Clock, Star as StarIcon, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, PackagePlus, CheckSquare, XCircle, Plus, Edit2, Trash2, Award, RefreshCcw, MessageSquare, Bus, MapPin, Clock, Zap, Star as StarIcon, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/categories';
+import AdminDailyDeals from '@/components/AdminDailyDeals';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -53,7 +54,7 @@ interface AdminUser {
 export default function AdminDashboard() {
   const { user, session } = useAuthStore();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages' | 'payouts' | 'bus_routes'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users' | 'messages' | 'payouts' | 'bus_routes' | 'daily_deals' | 'sync_reports'>('orders');
 
   // Data State
   const [pendingOrders, setPendingOrders] = useState<AdminOrder[]>([]);
@@ -122,6 +123,18 @@ export default function AdminDashboard() {
  };
 
  useEffect(() => {
+  // Load Price Sync Results
+  const savedSync = localStorage.getItem('price_sync_results');
+  if (savedSync) {
+    const { results, timestamp } = JSON.parse(savedSync);
+    const hoursPassed = (Date.now() - timestamp) / (1000 * 60 * 60);
+    if (hoursPassed < 24) {
+      setSyncResults(results);
+    } else {
+      localStorage.removeItem('price_sync_results');
+    }
+  }
+
  if (!useAuthStore.getState().loading) {
  if (!user || user.role !== 'ADMIN') {
  router.push('/');
@@ -513,6 +526,19 @@ export default function AdminDashboard() {
   <Bus size={18} /> Bus Routes
   </button>
  <button
+ onClick={() => setActiveTab('daily_deals')}
+ className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'daily_deals' ? 'bg-orange-50 text-orange-700' : 'text-gray-600 hover:bg-gray-50'}`}
+ >
+ <Zap size={18} /> Daily Deals
+ </button>
+ <button
+ onClick={() => setActiveTab('sync_reports')}
+ className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'sync_reports' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
+ >
+ <span className="flex items-center gap-2"><RefreshCcw size={18} /> Price Sync Reports</span>
+ {syncResults.length > 0 && <span className="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">New</span>}
+ </button>
+ <button
  onClick={() => setActiveTab('payouts')}
  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all ${activeTab === 'payouts' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}
  >
@@ -845,7 +871,7 @@ export default function AdminDashboard() {
  <td className="py-4 px-4">
  <div className="flex items-center gap-3">
  {usr.avatar_url ? (
- <img src={usr.avatar_url} alt="" className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 object-cover" />
+ <img src={usr.avatar_url} referrerPolicy="no-referrer" alt="" className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 object-cover" />
  ) : (
  <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm shadow-inner shrink-0">
  {(usr.name || usr.email).charAt(0).toUpperCase()}
@@ -1041,6 +1067,68 @@ export default function AdminDashboard() {
         )}
       </motion.div>
    )}
+
+ {activeTab === 'daily_deals' && (
+ <motion.div
+ key="daily_deals"
+ initial={{ opacity: 0, x: 10 }}
+ animate={{ opacity: 1, x: 0 }}
+ exit={{ opacity: 0, x: -10 }}
+ >
+ <AdminDailyDeals session={session} />
+ </motion.div>
+ )}
+
+ {activeTab === 'sync_reports' && (
+ <motion.div
+ key="sync_reports"
+ initial={{ opacity: 0, x: 10 }}
+ animate={{ opacity: 1, x: 0 }}
+ exit={{ opacity: 0, x: -10 }}
+ className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
+ >
+ <div className="flex justify-between items-center mb-8">
+ <div>
+ <h3 className="text-2xl font-bold text-gray-900">Price Sync Report</h3>
+ <p className="text-sm text-gray-500">Products updated in the last 24 hours.</p>
+ </div>
+ <button 
+ onClick={() => { setSyncResults([]); localStorage.removeItem('price_sync_results'); }}
+ className="px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-all flex items-center gap-2"
+ >
+ <Trash2 size={18} /> Clear Report
+ </button>
+ </div>
+
+ {syncResults.length === 0 ? (
+ <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+ <RefreshCcw size={48} className="mx-auto text-gray-300 mb-4" />
+ <p className="text-gray-500 font-medium">No recent price updates found.</p>
+ </div>
+ ) : (
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ {syncResults.map((res: any) => (
+ <div key={res.id} className="p-4 border border-gray-100 rounded-2xl flex items-center gap-4 hover:border-blue-100 transition-all">
+ <div className="w-16 h-16 rounded-xl bg-gray-50 relative overflow-hidden shrink-0">
+ <img src={res.image_url} alt="" className="w-full h-full object-cover" />
+ </div>
+ <div className="min-w-0 flex-grow">
+ <h4 className="font-bold text-gray-900 text-sm truncate">{res.title}</h4>
+ <div className="flex items-center gap-3 mt-1">
+ <span className="text-xs text-gray-400 line-through">₹{res.old?.toLocaleString()}</span>
+ <span className="text-sm font-black text-green-600">₹{res.new?.toLocaleString()}</span>
+ <span className="text-[10px] font-black bg-green-100 text-green-700 px-1.5 py-0.5 rounded">SAVE ₹{(res.old - res.new).toLocaleString()}</span>
+ </div>
+ </div>
+ <a href={`/products/${res.id}`} target="_blank" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg">
+ <ExternalLink size={18} />
+ </a>
+ </div>
+ ))}
+ </div>
+ )}
+ </motion.div>
+ )}
    {activeTab === 'bus_routes' && (
        <motion.div
          key="bus_routes"

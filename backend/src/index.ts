@@ -25,14 +25,18 @@ app.use(express.json());
 // Rate Limiting: Prevent brute force and DDoS
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: env.NODE_ENV === 'production' ? 100 : 10000, // much higher limit for dev
   message: 'Too many requests from this IP, please try again after 15 minutes',
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 // Apply rate limiter to all routes
-app.use('/api/', limiter);
+if (env.NODE_ENV === 'production') {
+  app.use('/api/', limiter);
+} else {
+  console.log('Rate limiter disabled for development');
+}
 
 // CORS Configuration
 app.use(cors({

@@ -55,8 +55,20 @@ export default function Navbar() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8 -mt-4 sm:-mt-8">
                         <Link href="/" className={`relative py-2 font-medium transition-colors ${isActive('/') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
-                            Discover
+                            Home
                             {isActive('/') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
+                        </Link>
+
+                        <Link href="/daily-deals" className={`relative py-2 font-medium transition-colors ${isActive('/daily-deals') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
+                            <span className="flex items-center gap-1">
+                                Daily Deals <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
+                            </span>
+                            {isActive('/daily-deals') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
+                        </Link>
+
+                        <Link href="/discover" className={`relative py-2 font-medium transition-colors ${isActive('/discover') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
+                            Discover
+                            {isActive('/discover') && <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full" />}
                         </Link>
 
                         <Link href="/rewards" className={`relative py-2 font-medium transition-colors ${isActive('/rewards') ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
@@ -126,6 +138,15 @@ export default function Navbar() {
                     >
                         <div className="px-4 pt-2 pb-6 space-y-1">
                             <Link href="/" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
+                                Home
+                            </Link>
+
+                            <Link href="/daily-deals" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600 flex items-center justify-between">
+                                Daily Deals
+                                <span className="bg-orange-100 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Hot</span>
+                            </Link>
+
+                            <Link href="/discover" className="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:bg-brand-50 hover:text-brand-600">
                                 Discover Products
                             </Link>
 

@@ -67,31 +67,47 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
                         <div className="space-y-4">
                             <h3 className="text-2xl font-black text-gray-900 tracking-tight">DropBest!</h3>
-                            <p className="text-gray-500 font-medium leading-relaxed">
-                                Discover the best products, reviewed by the community. Shop smart and earn rewards for your engagement.
-                                <br />
-                                <span className="text-xs">Registered Email: dropbest2@gmail.com</span>
-                            </p>
+                            <div className="space-y-4 text-gray-500 font-medium text-sm leading-relaxed">
+                                <p>
+                                    <strong>DropBest</strong> is a participant in the Amazon Services LLC Associates Program and the <strong>AbhiBus Affiliate Program</strong>. These programs are designed to provide a means for sites to earn advertising fees by advertising and linking to official stores.
+                                </p>
+                                <p>
+                                    As an Amazon Associate, we earn from qualifying purchases. For bus bookings, we may receive a commission from AbhiBus or RedBus for successful bookings made through our links. This comes at no additional cost to you and often includes exclusive DropBest rewards!
+                                </p>
+                                <p className="pt-2 text-xs text-gray-400 italic">
+                                    Registered Entity: DropBest! Community Platform
+                                </p>
+                            </div>
                         </div>
                         <div className="space-y-4">
                             <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest">Quick Links</h4>
                             <ul className="space-y-2">
-                                <li><a href="/" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Home</a></li>
-                                <li><a href="/#trending" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Products</a></li>
-                                <li><a href="/rewards" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Rewards System</a></li>
+                                <li><Link href="/" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Home</Link></li>
+                                <li><Link href="/daily-deals" className="text-gray-600 font-bold hover:text-brand-600 transition-colors flex items-center gap-2">Daily Deals <span className="bg-orange-100 text-orange-600 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">New</span></Link></li>
+                                <li><Link href="/discover" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Products</Link></li>
+                                <li><Link href="/rewards" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Rewards System</Link></li>
                                 <li><a href="/dropbest.apk" download="dropbest.apk" className="text-brand-600 font-black hover:text-brand-700 transition-colors flex items-center gap-1">Download App (APK) ✨</a></li>
                             </ul>
                         </div>
                         <div className="space-y-4">
                             <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest">Legal & Support</h4>
                             <ul className="space-y-2">
+                                <li><Link href="/about" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">About Us</Link></li>
                                 {useAuthStore.getState().user?.role !== 'ADMIN' && (
-                                    <li><a href="/contact" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Contact Us</a></li>
+                                    <li><Link href="/contact" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Contact Us</Link></li>
                                 )}
-                                <li><a href="/privacy-policy" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Privacy Policy</a></li>
-                                <li><a href="/disclaimer" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Affiliate Disclaimer</a></li>
+                                <li><Link href="/privacy-policy" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Privacy Policy</Link></li>
+                                <li><Link href="/terms" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Terms & Conditions</Link></li>
+                                <li><Link href="/disclaimer" className="text-gray-600 font-bold hover:text-brand-600 transition-colors">Affiliate Disclaimer</Link></li>
                             </ul>
                         </div>
+                    </div>
+                    
+                    {/* Mandatory Affiliate Statement */}
+                    <div className="mt-12 p-6 bg-white/50 rounded-2xl border border-brand-100/50 text-center">
+                        <p className="text-[11px] text-gray-500 font-medium leading-relaxed max-w-3xl mx-auto">
+                            <span className="font-bold text-gray-700">Affiliate Disclosure:</span> As an Amazon Associate, DropBest! earns from qualifying purchases. We also participate in affiliate programs with Flipkart, Myntra, Shopsy, Ajio, and travel platforms like AbhiBus and RedBus. Our goal is to provide honest recommendations while earning a small commission to keep this platform free for our community.
+                        </p>
                     </div>
                     <div className="pt-8 border-t border-brand-200/50 text-center">
                         <p className="text-gray-500 font-bold text-sm">© {new Date().getFullYear()} DropBest! All rights reserved.</p>

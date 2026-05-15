@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { broadcastPushNotification } from '../utils/notification';
 import { supabaseAdmin } from '../config/supabase';
 import { scrapePrice } from '../utils/scraper';
 
@@ -47,8 +48,22 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { title, description, price, image_url, amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, category, search_keywords } = req.body;
-        const { data, error } = await supabaseAdmin.from('products').insert([{ title, description, price, image_url, amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, category, search_keywords }]).select().single();
+        const { 
+            title, description, price, image_url, 
+            amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, 
+            category, search_keywords,
+            is_daily_deal, deal_discount_text, deal_tag, deal_expires_at
+        } = req.body;
+        
+        const { data, error } = await supabaseAdmin.from('products').insert([{ 
+            title, description, price, image_url, 
+            amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, 
+            category, search_keywords,
+            is_daily_deal: !!is_daily_deal,
+            deal_discount_text,
+            deal_tag,
+            deal_expires_at
+        }]).select().single();
         if (error) throw error;
         res.status(201).json(data);
     } catch (err: any) {
@@ -59,11 +74,59 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { title, description, price, image_url, amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, category, search_keywords } = req.body;
-        const { data, error } = await supabaseAdmin.from('products').update({ title, description, price, image_url, amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, category, search_keywords }).eq('id', id).select().single();
+        const { 
+            title, description, price, image_url, 
+            amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, 
+            category, search_keywords,
+            is_daily_deal, deal_discount_text, deal_tag, deal_expires_at
+        } = req.body;
+        
+        const { data, error } = await supabaseAdmin.from('products').update({ 
+            title, description, price, image_url, 
+            amazon_link, flipkart_link, myntra_link, shopsy_link, ajio_link, 
+            category, search_keywords,
+            is_daily_deal,
+            deal_discount_text,
+            deal_tag,
+            deal_expires_at
+        }).eq('id', id).select().single();
+        
         if (error) throw error;
+
+        // AUTOMATIC NOTIFICATION: If a product was JUST marked as a daily deal
+        if (is_daily_deal === true) {
+            try {
+                // Fetch all users (IDs only for efficiency)
+                const { data: users } = await supabaseAdmin.from('users').select('id');
+                
+                if (users && users.length > 0) {
+                    const notifications = users.map(u => ({
+                        user_id: u.id,
+                        message: `🔥 New Flash Deal: "${title}" is now on sale! Check it out before it expires.`,
+                        type: 'DAILY_DEAL',
+                        action_data: { product_id: id }
+                    }));
+
+                    // Bulk insert notifications
+                    await supabaseAdmin.from('notifications').insert(notifications);
+                    console.log(`Broadcasted daily deal notification to ${users.length} users.`);
+
+                    // PUSH NOTIFICATION (FCM)
+                    await broadcastPushNotification({
+                        title: `🔥 Flash Deal Alert!`,
+                        body: `"${title}" is now available at a special price. Don't miss out!`,
+                        data: { type: 'daily_deal', product_id: id }
+                    });
+                }
+            } catch (notifyErr) {
+                console.error('Failed to broadcast daily deal notification:', notifyErr);
+                // We don't fail the product update if notification fails
+            }
+        }
+
         res.json(data);
     } catch (err: any) {
+        console.error('Update Product Error:', err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -237,7 +300,11 @@ export const bulkImport = async (req: Request, res: Response) => {
             shopsy_link: p.shopsy_link,
             ajio_link: p.ajio_link,
             category: p.category || 'bus-booking',
-            search_keywords: p.search_keywords || p.search_keyword
+            search_keywords: p.search_keywords || p.search_keyword,
+            is_daily_deal: !!p.is_daily_deal,
+            deal_discount_text: p.deal_discount_text,
+            deal_tag: p.deal_tag,
+            deal_expires_at: p.deal_expires_at
         }));
 
         const { data, error } = await supabaseAdmin

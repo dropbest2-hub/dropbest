@@ -5,14 +5,23 @@ import { useAuthStore } from './src/store/authStore';
 import { COLORS } from './src/constants/theme';
 import AppNavigator from './src/navigation/AppNavigator';
 
+import { requestUserPermission, notificationListener } from './src/services/NotificationService';
 import { ThemeProvider } from './src/context/ThemeContext';
 
 export default function App() {
-  const { initializeAuth, initialized, loading } = useAuthStore();
+  const { initializeAuth, initialized, loading, user } = useAuthStore();
 
   useEffect(() => {
     initializeAuth();
   }, []);
+
+  useEffect(() => {
+    if (initialized && user) {
+        requestUserPermission();
+        const unsubscribe = notificationListener();
+        return () => unsubscribe();
+    }
+  }, [initialized, user]);
 
   if (!initialized || loading) {
     return (

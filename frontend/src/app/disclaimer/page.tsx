@@ -28,13 +28,13 @@ export default function DisclaimerPage() {
                         <h2 className="text-3xl font-black mb-6">Affiliate Disclosure</h2>
                         <div className="space-y-4 text-brand-50 font-medium text-lg leading-relaxed">
                             <p>
-                                <strong>DropBest</strong> is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.in.
+                                <strong>DropBest</strong> is a participant in the Amazon Services LLC Associates Program and the <strong>AbhiBus Affiliate Program</strong>. These programs are designed to provide a means for sites to earn advertising fees by advertising and linking to official stores.
                             </p>
                             <p>
-                                As an Amazon Associate, we earn from qualifying purchases. This means that if you click on a product link and make a purchase, we may receive a small commission at no additional cost to you.
+                                As an Amazon Associate, we earn from qualifying purchases. For bus bookings, we may receive a commission from AbhiBus or RedBus for successful bookings made through our links. This comes at no additional cost to you and often includes exclusive DropBest rewards!
                             </p>
                             <p className="pt-2 text-sm text-brand-100 italic">
-                                Registered Affiliate Email: dropbest2@gmail.com
+                                Registered Entity: DropBest! Community Platform
                             </p>
                         </div>
                         <div className="mt-8 flex items-center gap-3 bg-white/10 backdrop-blur-md p-4 rounded-2xl w-fit">

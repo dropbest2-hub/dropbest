@@ -337,7 +337,8 @@ const HomeHeader = ({
     setSelectedStore,
     selectedCategory,
     setSelectedCategory,
-    filteredProductsCount
+    filteredProductsCount,
+    products,
 }: any) => (
     <View style={styles.headerContainer}>
         {/* Hero Section */}
@@ -418,6 +419,72 @@ const HomeHeader = ({
                 </TouchableOpacity>
             ))}
         </ScrollView>
+
+        {/* Daily Deals Section */}
+        {products.filter((p: any) => p.is_daily_deal).length > 0 && (
+            <View style={{ marginBottom: 25 }}>
+                <View style={[styles.sectionHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                    <View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <Zap size={20} color={COLORS.accent.yellow} fill={COLORS.accent.yellow} />
+                            <Text style={[styles.sectionTitle, isDark && { color: COLORS.white }]}>Today's Flash Deals</Text>
+                        </View>
+                        <Text style={styles.sectionSubtitle}>Limited time offers refreshed daily</Text>
+                    </View>
+                </View>
+                
+                <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false} 
+                    contentContainerStyle={{ paddingHorizontal: SPACING.lg, gap: 16 }}
+                >
+                    {products.filter((p: any) => p.is_daily_deal).map((deal: any) => (
+                        <TouchableOpacity 
+                            key={deal.id}
+                            onPress={() => navigation.navigate('ProductDetails', { productId: deal.id })}
+                            style={{
+                                width: 200,
+                                backgroundColor: isDark ? '#1e1e1e' : COLORS.white,
+                                borderRadius: 25,
+                                overflow: 'hidden',
+                                borderWidth: 1,
+                                borderColor: isDark ? '#333' : COLORS.gray[100],
+                                ...SHADOWS.sm,
+                            }}
+                        >
+                            <View style={{ height: 120, position: 'relative' }}>
+                                <Image 
+                                    source={{ uri: deal.image_url }} 
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                />
+                                <View style={{
+                                    position: 'absolute',
+                                    top: 10,
+                                    left: 10,
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    borderRadius: 10,
+                                }}>
+                                    <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: 'bold' }}>{deal.deal_tag || 'FLASH'}</Text>
+                                </View>
+                            </View>
+                            <View style={{ padding: 12 }}>
+                                <Text style={{ color: isDark ? COLORS.white : COLORS.gray[900], fontWeight: 'bold', fontSize: 13 }} numberOfLines={1}>
+                                    {deal.title}
+                                </Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                    <Text style={{ color: COLORS.brand[600], fontWeight: '900', fontSize: 15 }}>₹{deal.price.toLocaleString()}</Text>
+                                    <View style={{ backgroundColor: '#FEE2E2', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                                        <Text style={{ color: '#EF4444', fontSize: 10, fontWeight: '900' }}>{deal.deal_discount_text}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+        )}
 
         <View style={styles.categorySection}>
             <Text style={[styles.miniSectionTitle, isDark && { color: '#e0e0e0' }]}>Explore Categories</Text>
@@ -528,8 +595,9 @@ export default function HomeScreen({ navigation }: any) {
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             filteredProductsCount={filteredProducts.length}
+            products={products}
         />
-    ), [user, searchQuery, isDark, selectedStore, selectedCategory, filteredProducts.length, navigation]);
+    ), [user, searchQuery, isDark, selectedStore, selectedCategory, filteredProducts.length, navigation, products]);
 
     if (loading && !refreshing) {
         return (

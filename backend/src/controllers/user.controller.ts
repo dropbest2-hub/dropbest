@@ -84,11 +84,11 @@ export const updateUserProfile = async (req: Request, res: Response) => {
             global: { headers: { Authorization: `Bearer ${token}` } }
         });
 
-        const { name, notifications_enabled } = req.body;
+        const { name, notifications_enabled, fcm_token } = req.body;
 
         const { data, error } = await userClient
             .from('users')
-            .update({ name, notifications_enabled })
+            .update({ name, notifications_enabled, fcm_token })
             .eq('id', userId)
             .select()
             .single();
