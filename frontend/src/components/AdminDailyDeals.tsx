@@ -30,6 +30,45 @@ export default function AdminDailyDeals({ session }: { session: any }) {
         tag: 'FLASH DEAL',
         hours: ''
     });
+    const [addMode, setAddMode] = useState<'existing' | 'custom'>('existing');
+    const [customDeal, setCustomDeal] = useState({
+        title: '', description: '', price: '', image_url: '', affiliate_link: '', discount_text: '', hours: '10'
+    });
+
+    const handleCreateCustomDeal = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        let expiryDate = null;
+        if (customDeal.hours) {
+            const now = new Date();
+            now.setHours(now.getHours() + parseInt(customDeal.hours));
+            expiryDate = now.toISOString();
+        }
+
+        try {
+            await axios.post(
+                `${API_URL}/products`,
+                {
+                    title: customDeal.title,
+                    description: customDeal.description,
+                    price: parseFloat(customDeal.price),
+                    image_url: customDeal.image_url,
+                    amazon_link: customDeal.affiliate_link,
+                    category: 'electronics',
+                    is_daily_deal: true,
+                    deal_discount_text: customDeal.discount_text ? `${customDeal.discount_text}% OFF` : 'SPECIAL OFFER',
+                    deal_tag: 'FLASH DEAL',
+                    deal_expires_at: expiryDate
+                },
+                { headers: { Authorization: `Bearer ${session?.access_token}` } }
+            );
+            alert('Custom Deal Created!');
+            setCustomDeal({ title: '', description: '', price: '', image_url: '', affiliate_link: '', discount_text: '', hours: '10' });
+            fetchProducts();
+        } catch (err) {
+            alert('Failed to create custom deal');
+        }
+    };
 
     useEffect(() => {
         fetchProducts();
@@ -119,8 +158,16 @@ export default function AdminDailyDeals({ session }: { session: any }) {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Add New Deal Form */}
                     <div className="space-y-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                        <h4 className="font-bold text-gray-900">Add New Daily Deal</h4>
-                        
+                        <div className="flex justify-between items-center mb-4">
+                            <h4 className="font-bold text-gray-900">Add New Daily Deal</h4>
+                            <div className="flex gap-2">
+                                <button onClick={() => setAddMode('existing')} className={`text-xs font-bold px-3 py-1.5 rounded-lg ${addMode === 'existing' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-200'}`}>From Existing</button>
+                                <button onClick={() => setAddMode('custom')} className={`text-xs font-bold px-3 py-1.5 rounded-lg ${addMode === 'custom' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-200'}`}>Create Custom</button>
+                            </div>
+                        </div>
+
+                        {addMode === 'existing' ? (
+                            <>
                         <div className="relative">
                             <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Search Product</label>
                             <div className="relative">
@@ -211,6 +258,31 @@ export default function AdminDailyDeals({ session }: { session: any }) {
                                     <Plus size={20} /> ACTIVATE DEAL
                                 </button>
                             </motion.div>
+                        )}
+                        </>
+                        ) : (
+                            <form onSubmit={handleCreateCustomDeal} className="space-y-4">
+                                <input required placeholder="Product Title" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.title} onChange={e => setCustomDeal({...customDeal, title: e.target.value})} />
+                                <input required placeholder="Image URL" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.image_url} onChange={e => setCustomDeal({...customDeal, image_url: e.target.value})} />
+                                <input required placeholder="Affiliate Link" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.affiliate_link} onChange={e => setCustomDeal({...customDeal, affiliate_link: e.target.value})} />
+                                <input required type="number" placeholder="Price / Rate (₹)" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.price} onChange={e => setCustomDeal({...customDeal, price: e.target.value})} />
+                                <textarea required placeholder="Description..." rows={2} className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.description} onChange={e => setCustomDeal({...customDeal, description: e.target.value})} />
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">% Offer (Optional)</label>
+                                        <input type="number" placeholder="e.g. 50" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.discount_text} onChange={e => setCustomDeal({...customDeal, discount_text: e.target.value})} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Hours Active</label>
+                                        <input type="number" placeholder="10" className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm" value={customDeal.hours} onChange={e => setCustomDeal({...customDeal, hours: e.target.value})} />
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
+                                    <Plus size={20} /> CREATE CUSTOM DEAL
+                                </button>
+                            </form>
                         )}
                     </div>
 

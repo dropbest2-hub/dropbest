@@ -22,11 +22,31 @@ export const getProducts = async (req: Request, res: Response) => {
             throw error;
         }
 
-        // Map data to include a simple watch_count property
-        const productsWithCounts = data.map(p => ({
-            ...p,
-            watch_count: p.watchlist?.[0]?.count || 0
-        }));
+        const now = new Date().getTime();
+
+        // Background cleanup for expired deals
+        supabaseAdmin
+            .from('products')
+            .update({ is_daily_deal: false, deal_expires_at: null, deal_discount_text: null, deal_tag: null })
+            .eq('is_daily_deal', true)
+            .lt('deal_expires_at', new Date().toISOString())
+            .then()
+            .catch(console.error);
+
+        // Map data to include a simple watch_count property and override expired deals dynamically
+        const productsWithCounts = data.map(p => {
+            let isDeal = p.is_daily_deal;
+            if (isDeal && p.deal_expires_at) {
+                if (now > new Date(p.deal_expires_at).getTime()) {
+                    isDeal = false;
+                }
+            }
+            return {
+                ...p,
+                is_daily_deal: isDeal,
+                watch_count: p.watchlist?.[0]?.count || 0
+            };
+        });
 
         res.json(productsWithCounts);
     } catch (err: any) {
@@ -202,16 +222,29 @@ export const syncPrices = async (req: Request, res: Response) => {
                     const oldPrice = product.price;
                     const isPriceDrop = scrapedPrice < oldPrice;
 
+                    const updatePayload: any = {
+                        old_price: oldPrice, 
+                        price: scrapedPrice,
+                        external_rating: scrapedRating,
+                        external_review_count: scrapedReviewCount,
+                        last_scraped_at: new Date().toISOString() 
+                    };
+
+                    if (isPriceDrop) {
+                        const expiryDate = new Date();
+                        expiryDate.setHours(expiryDate.getHours() + 10);
+                        const discountPercent = Math.round(((oldPrice - scrapedPrice) / oldPrice) * 100);
+                        
+                        updatePayload.is_daily_deal = true;
+                        updatePayload.deal_discount_text = `${discountPercent}% OFF`;
+                        updatePayload.deal_tag = 'PRICE DROP';
+                        updatePayload.deal_expires_at = expiryDate.toISOString();
+                    }
+
                     // Update Product
                     await supabaseAdmin
                         .from('products')
-                        .update({ 
-                            old_price: oldPrice, 
-                            price: scrapedPrice,
-                            external_rating: scrapedRating,
-                            external_review_count: scrapedReviewCount,
-                            last_scraped_at: new Date().toISOString() 
-                        })
+                        .update(updatePayload)
                         .eq('id', product.id);
 
                     if (scrapedPrice !== oldPrice) {

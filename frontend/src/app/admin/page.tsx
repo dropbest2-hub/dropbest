@@ -129,7 +129,7 @@ export default function AdminDashboard() {
     const { results, timestamp } = JSON.parse(savedSync);
     const hoursPassed = (Date.now() - timestamp) / (1000 * 60 * 60);
     if (hoursPassed < 24) {
-      setSyncResults(results);
+      setSyncResults(results.filter((r: any) => r.old !== r.new));
     } else {
       localStorage.removeItem('price_sync_results');
     }
@@ -337,7 +337,9 @@ export default function AdminDashboard() {
             { headers: { Authorization: `Bearer ${session?.access_token}` } }
         );
         
-        setSyncResults(response.data.updated || []);
+        const changedOnly = (response.data.updated || []).filter((r: any) => r.old !== r.new);
+        setSyncResults(changedOnly);
+        localStorage.setItem('price_sync_results', JSON.stringify({ results: changedOnly, timestamp: Date.now() }));
         setShowSyncModal(true);
         fetchData();
     } catch (error: unknown) {
