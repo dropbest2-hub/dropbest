@@ -772,13 +772,13 @@ export default function AdminDashboard() {
              <p className="text-sm text-blue-700 mb-4 font-medium">
                  Paste a JSON array of products. Format: 
                  <code className="bg-white/50 px-2 py-0.5 rounded ml-1 text-xs">
-                     [{"{ \"title\": \"Bus 1\", \"price\": 500, \"category\": \"bus-booking\", ... }"}]
+                     [{"{ \"product name\": \"Example\", \"price\": 500, \"platform\": \"amazon\", ... }"}]
                  </code>
              </p>
              <textarea 
                  className="w-full p-4 rounded-xl border border-blue-200 bg-white font-mono text-xs mb-4" 
                  rows={10} 
-                 placeholder='[ { "title": "Example Bus", "price": 450, "category": "bus-booking" } ]'
+                 placeholder='[ { "product name": "Example Product", "search key": "keywords", "price": 450, "img url": "...", "description": "...", "platform": "amazon", "afflite link": "...", "category": "electronics" } ]'
                  value={bulkJson}
                  onChange={e => setBulkJson(e.target.value)}
              />
@@ -793,14 +793,14 @@ export default function AdminDashboard() {
                      onClick={() => {
                          const template = [
                              {
-                                 title: "Bus Operator Name",
-                                 description: "Non-AC Seater/Sleeper",
-                                 price: 350,
-                                 old_price: 399,
-                                 category: "bus-booking",
-                                 amazon_link: "https://affiliate-link.com",
-                                 search_keywords: "Partner|Duration|Source|Dest|Time|Seats",
-                                 image_url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957"
+                                 "product name": "Example Product",
+                                 "search key": "example, keywords",
+                                 "price": 500,
+                                 "img url": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
+                                 "description": "Product Description",
+                                 "platform": "amazon",
+                                 "afflite link": "https://amzn.to/example",
+                                 "category": "electronics"
                              }
                          ];
                          setBulkJson(JSON.stringify(template, null, 2));

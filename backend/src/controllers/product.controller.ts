@@ -30,8 +30,9 @@ export const getProducts = async (req: Request, res: Response) => {
             .update({ is_daily_deal: false, deal_expires_at: null, deal_discount_text: null, deal_tag: null })
             .eq('is_daily_deal', true)
             .lt('deal_expires_at', new Date().toISOString())
-            .then()
-            .catch(console.error);
+            .then(({ error }) => {
+                if (error) console.error('Background cleanup error:', error);
+            });
 
         // Map data to include a simple watch_count property and override expired deals dynamically
         const productsWithCounts = data.map(p => {
@@ -321,24 +322,44 @@ export const bulkImport = async (req: Request, res: Response) => {
         }
 
         // Clean and validate products
-        const cleanedProducts = products.map(p => ({
-            title: p.title,
-            description: p.description,
-            price: Number(p.price) || 0,
-            old_price: p.old_price ? Number(p.old_price) : null,
-            image_url: p.image_url,
-            amazon_link: p.amazon_link || p.affiliate_link || p.affiliate_links,
-            flipkart_link: p.flipkart_link,
-            myntra_link: p.myntra_link,
-            shopsy_link: p.shopsy_link,
-            ajio_link: p.ajio_link,
-            category: p.category || 'bus-booking',
-            search_keywords: p.search_keywords || p.search_keyword,
-            is_daily_deal: !!p.is_daily_deal,
-            deal_discount_text: p.deal_discount_text,
-            deal_tag: p.deal_tag,
-            deal_expires_at: p.deal_expires_at
-        }));
+        const cleanedProducts = products.map(p => {
+            const platform = (p.platform || '').toLowerCase();
+            const affliteLink = p['afflite link'] || p.affiliate_link || p.affiliate_links || p.amazon_link;
+            
+            let amazon_link = p.amazon_link;
+            let flipkart_link = p.flipkart_link;
+            let myntra_link = p.myntra_link;
+            let shopsy_link = p.shopsy_link;
+            let ajio_link = p.ajio_link;
+
+            if (platform === 'amazon') amazon_link = affliteLink;
+            else if (platform === 'flipkart') flipkart_link = affliteLink;
+            else if (platform === 'myntra') myntra_link = affliteLink;
+            else if (platform === 'shopsy') shopsy_link = affliteLink;
+            else if (platform === 'ajio') ajio_link = affliteLink;
+            else if (affliteLink && !amazon_link && !flipkart_link && !myntra_link && !shopsy_link && !ajio_link) {
+                amazon_link = affliteLink; // Fallback
+            }
+
+            return {
+                title: p['product name'] || p.title,
+                description: p.description,
+                price: Number(p.price) || 0,
+                old_price: p.old_price ? Number(p.old_price) : null,
+                image_url: p['img url'] || p.image_url,
+                amazon_link,
+                flipkart_link,
+                myntra_link,
+                shopsy_link,
+                ajio_link,
+                category: p.category || 'bus-booking',
+                search_keywords: p['search key'] || p.search_keywords || p.search_keyword,
+                is_daily_deal: !!p.is_daily_deal,
+                deal_discount_text: p.deal_discount_text,
+                deal_tag: p.deal_tag,
+                deal_expires_at: p.deal_expires_at
+            };
+        });
 
         const { data, error } = await supabaseAdmin
             .from('products')
