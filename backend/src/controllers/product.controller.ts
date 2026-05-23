@@ -322,7 +322,10 @@ export const bulkImport = async (req: Request, res: Response) => {
         }
 
         // Clean and validate products
-        const cleanedProducts = products.map(p => {
+        // Filter out completely empty rows that might come from empty Excel rows
+        const validProducts = products.filter(p => p['product name'] || p.title || p['afflite link'] || p.amazon_link);
+
+        const cleanedProducts = validProducts.map(p => {
             const platform = (p.platform || '').toLowerCase();
             const affliteLink = p['afflite link'] || p.affiliate_link || p.affiliate_links || p.amazon_link;
             
@@ -333,8 +336,8 @@ export const bulkImport = async (req: Request, res: Response) => {
             let ajio_link = p.ajio_link;
 
             if (platform === 'amazon') amazon_link = affliteLink;
-            else if (platform === 'flipkart') flipkart_link = affliteLink;
-            else if (platform === 'myntra') myntra_link = affliteLink;
+            else if (platform === 'flipkart' || platform === 'flipkard') flipkart_link = affliteLink;
+            else if (platform === 'myntra' || platform === 'mythra') myntra_link = affliteLink;
             else if (platform === 'shopsy') shopsy_link = affliteLink;
             else if (platform === 'ajio') ajio_link = affliteLink;
             else if (affliteLink && !amazon_link && !flipkart_link && !myntra_link && !shopsy_link && !ajio_link) {
@@ -343,7 +346,7 @@ export const bulkImport = async (req: Request, res: Response) => {
 
             return {
                 title: p['product name'] || p.title,
-                description: p.description,
+                description: p.descrip || p.description,
                 price: Number(p.price) || 0,
                 old_price: p.old_price ? Number(p.old_price) : null,
                 image_url: p['img url'] || p.image_url,
@@ -353,7 +356,7 @@ export const bulkImport = async (req: Request, res: Response) => {
                 shopsy_link,
                 ajio_link,
                 category: p.category || 'bus-booking',
-                search_keywords: p['search key'] || p.search_keywords || p.search_keyword,
+                search_keywords: p['srch key'] || p['search key'] || p.search_keywords || p.search_keyword,
                 is_daily_deal: !!p.is_daily_deal,
                 deal_discount_text: p.deal_discount_text,
                 deal_tag: p.deal_tag,
