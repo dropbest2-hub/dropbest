@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DropBest – 30s Promo Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #6B30B8;
+    --purple-dark: #26215C;
+    --purple-mid: #3C3489;
+    --lavender: #AFA9EC;
+    --lavender-light: #EEEDFE;
+    --white: #ffffff;
+    --bg: #0a0a0a;
+  }
+
+  body {
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+  }
+
+  .stage {
+    width: 390px;
+    height: 844px;
+    background: #f0f0f5;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    border: 10px solid #1a1a1a;
+    box-shadow: 0 0 0 2px #333, 0 40px 80px rgba(0,0,0,0.8);
+  }
+
+  .notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 34px;
+    background: #1a1a1a;
+    border-radius: 0 0 20px 20px;
+    z-index: 100;
+  }
+
+  /* ===== SCENES ===== */
+  .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .scene.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ===== SCENE 1: HOOK – Scratch Card ===== */
+  #s1 {
+    background: var(--purple);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .s1-bg-circles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .s1-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .s1-circle.c1 { width: 300px; height: 300px; top: -80px; right: -80px; }
+  .s1-circle.c2 { width: 200px; height: 200px; bottom: 80px; left: -60px; }
+  .s1-circle.c3 { width: 120px; height: 120px; top: 200px; left: 30px; }
+
+  .s1-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: none;
+  }
+
+  .scratch-container {
+    width: 260px;
+    height: 160px;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.8);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .scratch-base {
+    position: absolute;
+    inset: 0;
+    background: white;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .prize-rupee {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--purple);
+    line-height: 1;
+  }
+
+  .prize-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--purple-mid);
+    letter-spacing: 1px;
+  }
+
+  .scratch-layer {
+    position: absolute;
+    inset: 0;
+    background: var(--lavender);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: left center;
+  }
+
+  .scratch-lines {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.15) 0px,
+      rgba(255,255,255,0.15) 2px,
+      transparent 2px,
+      transparent 8px
+    );
+    border-radius: 20px;
+  }
+
+  .scratch-icon {
+    position: absolute;
+    font-size: 28px;
+    opacity: 0.5;
+  }
+
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .conf {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    opacity: 0;
+  }
+
+  .s1-won-text {
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    margin-top: 24px;
+    opacity: 0;
+    transform: scale(0.5);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+
+  .s1-sub {
+    font-size: 14px;
+    color: var(--lavender-light);
+    margin-top: 6px;
+    opacity: 0;
+  }
+
+  .logo-reveal {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+  }
+
+  .logo-circle-big {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    overflow: hidden;
+    padding: 8px;
+  }
+
+  .logo-name { font-size: 18px; font-weight: 700; color: white; letter-spacing: 1px; }
+
+  /* ===== SCENE 1.5: REAL APP ====== */
+  #s_app { background: white; }
+  
+  .app-overlay {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(107, 48, 184, 0.9);
+    padding: 14px 28px;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(107,48,184,0.4);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .app-overlay-text {
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  .app-overlay-icon {
+    font-size: 20px;
+    animation: bounceRight 1s infinite alternate;
+  }
+
+  @keyframes bounceRight {
+    from { transform: translateX(0); }
+    to { transform: translateX(4px); }
+  }
+
+  /* ===== SCENE 2: DEALS ===== */
+  #s2 { background: #f5f4fb; display: flex; flex-direction: column; }
+
+  .app-header {
+    background: var(--purple);
+    padding: 50px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .hdr-logo { 
+    width: 36px; height: 36px; border-radius: 50%; background: white; 
+    display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px;
+  }
+  .hdr-title { font-size: 18px; font-weight: 700; color: white; }
+  .hdr-bell { font-size: 22px; color: white; opacity: 0.8; }
+
+  .deals-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+
+  .flash-bar {
+    background: linear-gradient(135deg, #ff4444, #ff0055);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transform: translateY(-30px);
+    opacity: 0;
+    box-shadow: 0 4px 12px rgba(255,68,68,0.2);
+  }
+
+  .flash-text { font-size: 13px; font-weight: 800; color: white; letter-spacing: 0.5px; }
+  .flash-timer { font-size: 13px; font-weight: 700; color: white; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 6px; letter-spacing: 1px; }
+
+  .deal-card {
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 16px rgba(107,48,184,0.06);
+    transform: translateX(-40px);
+    opacity: 0;
+    border: 1px solid rgba(107,48,184,0.05);
+  }
+
+  .deal-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .deal-info { flex: 1; }
+  .deal-name { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+  .deal-price { font-size: 14px; color: var(--purple); font-weight: 800; margin-top: 4px; }
+  .deal-old { font-size: 12px; color: #aaa; text-decoration: line-through; margin-left: 6px; font-weight: 500;}
+
+  .deal-badge-big {
+    background: var(--purple);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(107,48,184,0.3);
+  }
+
+  /* ===== SCENE 3: PRICE COMPARE ===== */
+  #s3 { background: #f5f4fb; display: flex; flex-direction: column; }
+
+  .compare-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+
+  .product-preview {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    transform: translateY(20px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  }
+
+  .product-img { width: 72px; height: 72px; border-radius: 16px; background: var(--lavender-light); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .product-name { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+  .product-cat { font-size: 13px; color: #888; margin-top: 4px; font-weight: 500; }
+
+  .price-compare {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .price-row + .price-row { border-top: 1px dashed #e0e0e0; }
+  .price-label { font-size: 15px; color: #666; font-weight: 500;}
+  .price-label.best { color: var(--purple); font-weight: 800; font-size: 16px;}
+  .price-val { font-size: 16px; font-weight: 600; color: #bbb; text-decoration: line-through; }
+  .price-val.best { color: var(--purple); text-decoration: none; font-size: 24px; font-weight: 800;}
+
+  .savings-pill {
+    background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.8);
+    box-shadow: 0 8px 24px rgba(107,48,184,0.3);
+  }
+
+  .savings-amt { font-size: 24px; font-weight: 800; color: white; }
+  .savings-label { font-size: 13px; color: var(--lavender-light); margin-top: 4px; font-weight: 500;}
+
+  .goto-btn {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .goto-txt { font-size: 16px; font-weight: 700; color: white; }
+
+  /* ===== SCENE 4: BUS BOOKING ===== */
+  #s4 { background: #f5f4fb; display: flex; flex-direction: column; }
+
+  .bus-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+
+  .route-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  }
+
+  .route-cities {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .city-name { font-size: 22px; font-weight: 800; color: #1a1a2e; }
+  .route-arrow { font-size: 24px; color: var(--purple); font-weight: 800;}
+  .route-detail { font-size: 13px; color: #666; display: flex; gap: 12px; font-weight: 500; align-items: center;}
+  .route-tag { background: #FFE5E5; color: #D32F2F; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+
+  .seats-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    opacity: 0;
+    justify-content: center;
+  }
+
+  .seat {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #888;
+    transition: all 0.3s ease;
+  }
+
+  .seat.selected { border-color: var(--purple); background: var(--lavender-light); color: var(--purple); transform: scale(1.05); }
+  .seat.taken { background: #f0f0f0; color: #ccc; border-color: #f0f0f0;}
+
+  .pay-btn {
+    background: var(--purple);
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.9);
+    box-shadow: 0 8px 24px rgba(107,48,184,0.3);
+  }
+
+  .pay-txt { font-size: 18px; font-weight: 800; color: white; }
+
+  .ticket-confirm {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 2px dashed #4CAF50;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.8);
+    position: absolute;
+    bottom: 40px;
+    left: 20px;
+    right: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .tick-icon { font-size: 40px; margin-bottom: 8px; }
+  .tick-text { font-size: 18px; font-weight: 800; color: #4CAF50; }
+  .tick-sub { font-size: 13px; color: #666; margin-top: 4px; font-weight: 500;}
+
+  /* ===== SCENE 5: REWARDS ===== */
+  #s5 {
+    background: linear-gradient(135deg, var(--purple-dark), #1a1a2e);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .rewards-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+
+  .big-scratch {
+    width: 320px;
+    height: 200px;
+    border-radius: 28px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  .big-scratch-base {
+    position: absolute;
+    inset: 0;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .big-prize { font-size: 64px; font-weight: 800; color: var(--purple); line-height: 1; }
+  .big-prize-label { font-size: 18px; font-weight: 700; color: var(--purple-mid); letter-spacing: 2px; margin-top: 4px;}
+
+  .big-scratch-cover {
+    position: absolute;
+    inset: 0;
+    background: var(--lavender);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: right center;
+  }
+
+  .scratch-texture {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.2) 0px,
+      rgba(255,255,255,0.2) 3px,
+      transparent 3px,
+      transparent 10px
+    );
+  }
+
+  .points-counter {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 16px 32px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+  }
+
+  .points-num { font-size: 42px; font-weight: 800; color: white; text-shadow: 0 4px 12px rgba(0,0,0,0.3);}
+  .points-label { font-size: 13px; color: var(--lavender); letter-spacing: 2px; margin-top: 4px; font-weight: 600;}
+
+  .reward-tags {
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .rtag {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ===== SCENE 6: CTA ===== */
+  #s6 {
+    background: var(--purple-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .s6-bg-glow {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(107,48,184,0.4);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(40px);
+  }
+
+  .cta-logo-wrap {
+    opacity: 0;
+    transform: scale(0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    z-index: 1;
+  }
+
+  .cta-logo-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 50px rgba(107,48,184,0.8);
+    overflow: hidden;
+    padding: 12px;
+  }
+
+  .cta-brandname { font-size: 38px; font-weight: 800; color: white; letter-spacing: 1px; }
+  .cta-brand-sub { font-size: 15px; color: var(--lavender); letter-spacing: 4px; margin-top: -8px; font-weight: 600;}
+
+  .store-btns {
+    display: flex;
+    gap: 16px;
+    margin-top: 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    z-index: 1;
+  }
+
+  .store-btn-big {
+    background: white;
+    border-radius: 14px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 130px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  .store-name { font-size: 12px; color: #666; font-weight: 500;}
+  .store-platform { font-size: 16px; font-weight: 800; color: #1a1a2e; margin-top: 2px;}
+
+  .link-bio {
+    font-size: 16px;
+    color: var(--lavender);
+    margin-top: 24px;
+    opacity: 0;
+    z-index: 1;
+    font-weight: 600;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-wrap {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    right: 24px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    z-index: 200;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* ===== SCENE LABELS (for reference) ===== */
+  .scene-indicator {
+    position: absolute;
+    top: 44px;
+    right: 14px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: white;
+    font-weight: 700;
+    z-index: 200;
+    font-family: 'Outfit', sans-serif;
+    backdrop-filter: blur(4px);
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="notch"></div>
+  <div class="scene-indicator" id="sceneInd">Scene 1 / 7</div>
+
+  <!-- SCENE 1: HOOK -->
+  <div class="scene active" id="s1">
+    <div class="s1-bg-circles">
+      <div class="s1-circle c1"></div>
+      <div class="s1-circle c2"></div>
+      <div class="s1-circle c3"></div>
+    </div>
+    <div class="confetti-container" id="confetti1"></div>
+    <div class="s1-label" id="s1label">SCRATCH & WIN</div>
+    <div class="scratch-container" id="scratchBox">
+      <div class="scratch-base">
+        <div class="prize-rupee">₹500</div>
+        <div class="prize-text">CASHBACK WON!</div>
+      </div>
+      <div class="scratch-layer" id="scratchLayer">
+        <div class="scratch-lines"></div>
+        <div class="scratch-icon">🪙</div>
+      </div>
+    </div>
+    <div class="s1-won-text" id="s1won">🎉 You Won!</div>
+    <div class="s1-sub" id="s1sub">Scratch · Win · Repeat</div>
+    <div class="logo-reveal" id="s1logo">
+      <div class="logo-circle-big">
+        <img src="./logo.png" alt="DropBest" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+      </div>
+      <div class="logo-name">DropBest</div>
+    </div>
+  </div>
+
+  <!-- SCENE 1.5: THE ORIGINAL PAGE -->
+  <div class="scene" id="s_app">
+    <!-- Points to your live frontend to show the real app UI -->
+    <iframe src="http://localhost:3000" style="width: 100%; height: 100%; border: none;"></iframe>
+    <div class="app-overlay" id="appOverlay">
+      <div class="app-overlay-text">The Original DropBest App</div>
+      <div class="app-overlay-icon">✨</div>
+    </div>
+  </div>
+
+  <!-- SCENE 2: DEALS -->
+  <div class="scene" id="s2">
+    <div class="app-header">
+      <div class="header-left">
+        <div class="hdr-logo">
+          <img src="./logo.png" alt="DB" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+        </div>
+        <span class="hdr-title">Today's Drops</span>
+      </div>
+      <span class="hdr-bell">🔔</span>
+    </div>
+    <div class="deals-body">
+      <div class="flash-bar" id="flashBar">
+        <span class="flash-text">🔥 FLASH SALE</span>
+        <span class="flash-timer">02:14</span>
+      </div>
+      <div class="deal-card" id="deal1">
+        <div class="deal-thumb" style="background:#EEEDFE;">🎧</div>
+        <div class="deal-info">
+          <div class="deal-name">Wireless Earbuds</div>
+          <div>
+            <span class="deal-price">₹899</span>
+            <span class="deal-old">₹3,299</span>
+          </div>
+        </div>
+        <div class="deal-badge-big">72% OFF</div>
+      </div>
+      <div class="deal-card" id="deal2">
+        <div class="deal-thumb" style="background:#F5C4B3;">👟</div>
+        <div class="deal-info">
+          <div class="deal-name">Running Shoes</div>
+          <div>
+            <span class="deal-price">₹1,299</span>
+            <span class="deal-old">₹2,899</span>
+          </div>
+        </div>
+        <div class="deal-badge-big">55% OFF</div>
+      </div>
+      <div class="deal-card" id="deal3">
+        <div class="deal-thumb" style="background:#9FE1CB;">🍔</div>
+        <div class="deal-info">
+          <div class="deal-name">Food Delivery</div>
+          <div>
+            <span class="deal-price">₹49</span>
+            <span class="deal-old">₹249</span>
+          </div>
+        </div>
+        <div class="deal-badge-big">80% OFF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 3: PRICE COMPARE -->
+  <div class="scene" id="s3">
+    <div class="app-header">
+      <div class="header-left">
+        <div class="hdr-logo">
+          <img src="./logo.png" alt="DB" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+        </div>
+        <span class="hdr-title">Best Price Finder</span>
+      </div>
+    </div>
+    <div class="compare-body">
+      <div class="product-preview" id="prodPreview">
+        <div class="product-img">💻</div>
+        <div>
+          <div class="product-name">Bluetooth Speaker</div>
+          <div class="product-cat">Electronics · Top Rated</div>
+        </div>
+      </div>
+      <div class="price-compare" id="priceCompare">
+        <div class="price-row">
+          <span class="price-label">Other Apps</span>
+          <span class="price-val">₹4,999</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label best">DropBest Price</span>
+          <span class="price-val best">₹2,799</span>
+        </div>
+      </div>
+      <div class="savings-pill" id="savingsPill">
+        <div class="savings-amt">You save ₹2,200!</div>
+        <div class="savings-label">Best price guaranteed</div>
+      </div>
+      <div class="goto-btn" id="gotoBtn">
+        <div class="goto-txt">Go to Partner Store →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 4: BUS BOOKING -->
+  <div class="scene" id="s4">
+    <div class="app-header">
+      <div class="header-left">
+        <div class="hdr-logo">
+          <img src="./logo.png" alt="DB" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+        </div>
+        <span class="hdr-title">Bus Booking</span>
+      </div>
+    </div>
+    <div class="bus-body">
+      <div class="route-card" id="routeCard">
+        <div class="route-cities">
+          <div class="city-name">Chennai</div>
+          <div class="route-arrow">→</div>
+          <div class="city-name">Coimbatore</div>
+        </div>
+        <div class="route-detail">
+          <span>Today · AC Sleeper</span>
+          <span class="route-tag">2 seats left</span>
+        </div>
+        <div class="seats-row" id="seatsRow">
+          <div class="seat selected">A1</div>
+          <div class="seat selected">A2</div>
+          <div class="seat taken">B1</div>
+          <div class="seat">B2</div>
+          <div class="seat">C1</div>
+          <div class="seat taken">C2</div>
+        </div>
+      </div>
+      <div class="pay-btn" id="payBtn">
+        <div class="pay-txt">Confirm & Pay ₹399</div>
+      </div>
+      <div class="ticket-confirm" id="ticketConfirm">
+        <div class="tick-icon">✅</div>
+        <div class="tick-text">Ticket Confirmed!</div>
+        <div class="tick-sub">Booked in 12 seconds · PNR: DB7842</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 5: REWARDS -->
+  <div class="scene" id="s5">
+    <div class="rewards-confetti" id="confetti5"></div>
+    <div class="big-scratch" id="bigScratch">
+      <div class="big-scratch-base">
+        <div class="big-prize">₹500</div>
+        <div class="big-prize-label">CASHBACK</div>
+      </div>
+      <div class="big-scratch-cover" id="bigCover">
+        <div class="scratch-texture"></div>
+      </div>
+    </div>
+    <div class="points-counter" id="pointsCounter">
+      <div class="points-num" id="pointsNum">0</div>
+      <div class="points-label">REWARD POINTS</div>
+    </div>
+    <div class="reward-tags" id="rewardTags">
+      <div class="rtag">🎁 Cashback</div>
+      <div class="rtag">🏆 Points</div>
+      <div class="rtag">🎟 Offers</div>
+    </div>
+  </div>
+
+  <!-- SCENE 6: CTA -->
+  <div class="scene" id="s6">
+    <div class="s6-bg-glow"></div>
+    <div class="cta-logo-wrap" id="ctaLogo">
+      <div class="cta-logo-circle">
+        <img src="./logo.png" alt="DB Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+      </div>
+      <div class="cta-brandname">DropBest</div>
+      <div class="cta-brand-sub">SHOP · SAVE · EARN</div>
+    </div>
+    <div class="store-btns" id="storeBtns">
+      <div class="store-btn-big">
+        <div class="store-name">Download on the</div>
+        <div class="store-platform">App Store</div>
+      </div>
+      <div class="store-btn-big">
+        <div class="store-name">Get it on</div>
+        <div class="store-platform">Google Play</div>
+      </div>
+    </div>
+    <div class="link-bio" id="linkBio">👇 Link in bio · Free download</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 31000;
+let startTime = null;
+let currentScene = 1;
+
+const scenes = [
+  { id: 's1', start: 0,     end: 4000  }, // Hook
+  { id: 's_app', start: 4000, end: 9000 }, // Real App
+  { id: 's2', start: 9000,  end: 14000 }, // Deals
+  { id: 's3', start: 14000, end: 19000 }, // Compare
+  { id: 's4', start: 19000, end: 23000 }, // Bus
+  { id: 's5', start: 23000, end: 28000 }, // Rewards
+  { id: 's6', start: 28000, end: 31000 }, // CTA
+];
+
+function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function animateEl(el, props, duration, delay=0) {
+  setTimeout(() => {
+    el.style.transition = `all ${duration}ms cubic-bezier(0.34,1.56,0.64,1)`;
+    Object.assign(el.style, props);
+  }, delay);
+}
+
+function animateFade(el, duration=400, delay=0) {
+  setTimeout(() => {
+    el.style.transition = `opacity ${duration}ms ease, transform ${duration}ms ease`;
+    el.style.opacity = '1';
+    el.style.transform = el.style.transform.replace(/translateY\([^)]+\)|translateX\([^)]+\)|scale\([^)]+\)/g, '').trim() || 'none';
+  }, delay);
+}
+
+function spawnConfetti(containerId, colors) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  for (let i = 0; i < 40; i++) {
+    const d = document.createElement('div');
+    d.className = 'conf';
+    d.style.cssText = `
+      left: ${Math.random()*100}%;
+      top: -10px;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      width: ${6+Math.random()*8}px;
+      height: ${6+Math.random()*8}px;
+      border-radius: ${Math.random()>0.5?'50%':'2px'};
+      opacity: 1;
+      transform: rotate(${Math.random()*360}deg);
+      transition: top ${1+Math.random()*2}s ease, opacity 0.5s ease ${1.5+Math.random()}s;
+    `;
+    c.appendChild(d);
+    setTimeout(() => { d.style.top = (80+Math.random()*110)+'%'; }, 50);
+    setTimeout(() => { d.style.opacity = '0'; }, 2000);
+  }
+}
+
+function initScene1() {
+  const label = document.getElementById('s1label');
+  const box = document.getElementById('scratchBox');
+  const layer = document.getElementById('scratchLayer');
+  const won = document.getElementById('s1won');
+  const sub = document.getElementById('s1sub');
+  const logo = document.getElementById('s1logo');
+
+  label.style.cssText = 'opacity:0;transform:translateY(20px)';
+  box.style.cssText = 'opacity:0;transform:scale(0.8)';
+  layer.style.cssText = 'transform-origin:left center';
+  won.style.cssText = 'opacity:0;transform:scale(0.5)';
+  sub.style.cssText = 'opacity:0';
+  logo.style.cssText = 'opacity:0;transform:translateX(-50%) scale(0)';
+
+  setTimeout(() => {
+    label.style.transition = 'all 0.5s ease';
+    label.style.opacity = '1';
+    label.style.transform = 'translateY(0)';
+  }, 300);
+
+  setTimeout(() => {
+    box.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    box.style.opacity = '1';
+    box.style.transform = 'scale(1)';
+  }, 600);
+
+  setTimeout(() => {
+    layer.style.transition = 'transform 1.0s cubic-bezier(0.4,0,0.2,1)';
+    layer.style.transform = 'scaleX(0)';
+    spawnConfetti('confetti1', ['#AFA9EC','#FAC775','#ffffff','#6B30B8']);
+  }, 1600);
+
+  setTimeout(() => {
+    won.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    won.style.opacity = '1';
+    won.style.transform = 'scale(1)';
+    sub.style.transition = 'opacity 0.4s ease';
+    sub.style.opacity = '1';
+  }, 2600);
+
+  setTimeout(() => {
+    logo.style.transition = 'all 0.7s cubic-bezier(0.34,1.56,0.64,1)';
+    logo.style.opacity = '1';
+    logo.style.transform = 'translateX(-50%) scale(1)';
+  }, 3000);
+}
+
+function initSceneApp() {
+  const overlay = document.getElementById('appOverlay');
+  overlay.style.opacity = '0';
+  overlay.style.transform = 'translateX(-50%) translateY(30px)';
+  
+  setTimeout(() => {
+    overlay.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    overlay.style.opacity = '1';
+    overlay.style.transform = 'translateX(-50%) translateY(0)';
+  }, 500);
+
+  setTimeout(() => {
+    overlay.style.transition = 'all 0.5s ease';
+    overlay.style.opacity = '0';
+    overlay.style.transform = 'translateX(-50%) translateY(-20px)';
+  }, 4000);
+}
+
+function initScene2() {
+  const flash = document.getElementById('flashBar');
+  const d1 = document.getElementById('deal1');
+  const d2 = document.getElementById('deal2');
+  const d3 = document.getElementById('deal3');
+
+  [flash, d1, d2, d3].forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = el === flash ? 'translateY(-30px)' : 'translateX(-40px)';
+  });
+
+  setTimeout(() => {
+    flash.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    flash.style.opacity = '1';
+    flash.style.transform = 'translateY(0)';
+  }, 200);
+
+  [[d1, 400], [d2, 600], [d3, 800]].forEach(([el, delay]) => {
+    setTimeout(() => {
+      el.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(0)';
+    }, delay);
+  });
+
+  // Flash timer countdown
+  let t = 134;
+  const timerEl = document.querySelector('.flash-timer');
+  const interval = setInterval(() => {
+    t--;
+    if (t < 0) { clearInterval(interval); return; }
+    const m = Math.floor(t/60);
+    const s = t%60;
+    if (timerEl) timerEl.textContent = `0${m}:${s.toString().padStart(2,'0')}`;
+  }, 35);
+}
+
+function initScene3() {
+  const els = ['prodPreview','priceCompare','savingsPill','gotoBtn'];
+  els.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      el.style.opacity = '0';
+      el.style.transform = id === 'savingsPill' ? 'scale(0.8)' : 'translateY(20px)';
+    }
+  });
+
+  els.forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if(el) {
+        el.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+        el.style.opacity = '1';
+        el.style.transform = id === 'savingsPill' ? 'scale(1)' : 'translateY(0)';
+      }
+    }, 200 + i * 250);
+  });
+}
+
+function initScene4() {
+  const route = document.getElementById('routeCard');
+  const seats = document.getElementById('seatsRow');
+  const pay = document.getElementById('payBtn');
+  const ticket = document.getElementById('ticketConfirm');
+
+  [route, pay, ticket].forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; });
+  seats.style.opacity = '0';
+  ticket.style.transform = 'scale(0.8)';
+  pay.style.background = 'var(--purple)'; // reset color
+
+  setTimeout(() => {
+    route.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    route.style.opacity = '1';
+    route.style.transform = 'translateY(0)';
+  }, 200);
+
+  setTimeout(() => {
+    seats.style.transition = 'opacity 0.4s ease';
+    seats.style.opacity = '1';
+  }, 600);
+
+  setTimeout(() => {
+    pay.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    pay.style.opacity = '1';
+    pay.style.transform = 'scale(1)';
+  }, 1000);
+
+  setTimeout(() => {
+    pay.style.transition = 'all 0.3s ease';
+    pay.style.background = '#4CAF50';
+    ticket.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    ticket.style.opacity = '1';
+    ticket.style.transform = 'scale(1)';
+  }, 2200);
+}
+
+function initScene5() {
+  const big = document.getElementById('bigScratch');
+  const cover = document.getElementById('bigCover');
+  const counter = document.getElementById('pointsCounter');
+  const tags = document.getElementById('rewardTags');
+  const numEl = document.getElementById('pointsNum');
+
+  big.style.opacity = '0';
+  big.style.transform = 'scale(0.7)';
+  cover.style.transform = 'scaleX(1)';
+  counter.style.opacity = '0';
+  counter.style.transform = 'translateY(20px)';
+  tags.style.opacity = '0';
+  tags.style.transform = 'translateY(10px)';
+  numEl.textContent = '0';
+
+  setTimeout(() => {
+    big.style.transition = 'all 0.7s cubic-bezier(0.34,1.56,0.64,1)';
+    big.style.opacity = '1';
+    big.style.transform = 'scale(1)';
+  }, 300);
+
+  setTimeout(() => {
+    cover.style.transition = 'transform 1.2s cubic-bezier(0.4,0,0.2,1)';
+    cover.style.transform = 'scaleX(0)';
+    spawnConfetti('confetti5', ['#AFA9EC','#FAC775','#ffffff','#7F77DD','#F5C4B3']);
+  }, 1000);
+
+  setTimeout(() => {
+    counter.style.transition = 'all 0.5s ease';
+    counter.style.opacity = '1';
+    counter.style.transform = 'translateY(0)';
+    let n = 0;
+    const target = 2450;
+    const inc = setInterval(() => {
+      n = Math.min(n + 62, target);
+      numEl.textContent = n.toLocaleString();
+      if (n >= target) clearInterval(inc);
+    }, 20);
+  }, 2400);
+
+  setTimeout(() => {
+    tags.style.transition = 'all 0.5s ease';
+    tags.style.opacity = '1';
+    tags.style.transform = 'translateY(0)';
+  }, 3000);
+}
+
+function initScene6() {
+  const logo = document.getElementById('ctaLogo');
+  const btns = document.getElementById('storeBtns');
+  const bio = document.getElementById('linkBio');
+
+  logo.style.opacity = '0';
+  logo.style.transform = 'scale(0.3)';
+  btns.style.opacity = '0';
+  btns.style.transform = 'translateY(20px)';
+  bio.style.opacity = '0';
+
+  setTimeout(() => {
+    logo.style.transition = 'all 0.8s cubic-bezier(0.34,1.56,0.64,1)';
+    logo.style.opacity = '1';
+    logo.style.transform = 'scale(1)';
+  }, 200);
+
+  setTimeout(() => {
+    btns.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    btns.style.opacity = '1';
+    btns.style.transform = 'translateY(0)';
+  }, 700);
+
+  setTimeout(() => {
+    bio.style.transition = 'opacity 0.5s ease';
+    bio.style.opacity = '1';
+  }, 1100);
+}
+
+const inits = [initScene1, initSceneApp, initScene2, initScene3, initScene4, initScene5, initScene6];
+
+function showScene(idx) {
+  document.querySelectorAll('.scene').forEach((s, i) => {
+    s.classList.toggle('active', i === idx);
+  });
+  document.getElementById('sceneInd').textContent = `Scene ${idx+1} / 7`;
+  inits[idx]();
+}
+
+function tick(ts) {
+  if (!startTime) startTime = ts;
+  const elapsed = ts - startTime;
+
+  if (elapsed >= TOTAL) {
+    startTime = null;
+    document.getElementById('progress').style.width = '0%';
+    showScene(0);
+    requestAnimationFrame(tick);
+    return;
+  }
+
+  const pct = (elapsed / TOTAL) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+
+  for (let i = scenes.length - 1; i >= 0; i--) {
+    if (elapsed >= scenes[i].start) {
+      if (currentScene !== i + 1) {
+        currentScene = i + 1;
+        showScene(i);
+      }
+      break;
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+initScene1();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

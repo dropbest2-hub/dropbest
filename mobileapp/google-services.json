@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "380069136666",
+    "project_id": "dropbest-2126",
+    "storage_bucket": "dropbest-2126.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380069136666:android:881766bb1a301c329684a3",
+        "android_client_info": {
+          "package_name": "com.dropbest.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc0mNzw6gHLk-eRI48mJD5gWj3rMXZUpg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

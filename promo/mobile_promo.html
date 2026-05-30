@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DropBest – Mobile App Promo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand: #7c3aed;
+    --brand-dark: #6d28d9;
+    --yellow: #facc15;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --white: #ffffff;
+    --bg: #0a0a0a;
+  }
+
+  body {
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+  }
+
+  .stage {
+    width: 390px;
+    height: 844px;
+    background: var(--gray-50);
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    border: 10px solid #1a1a1a;
+    box-shadow: 0 0 0 2px #333, 0 40px 80px rgba(0,0,0,0.8);
+  }
+
+  .notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 34px;
+    background: #1a1a1a;
+    border-radius: 0 0 20px 20px;
+    z-index: 100;
+  }
+
+  /* ===== SCENES ===== */
+  .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    background: var(--gray-50);
+  }
+  .scene.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ===== COMMON UI ELEMENTS ===== */
+  .hero {
+    background: var(--brand);
+    padding: 28px;
+    padding-top: 70px;
+    min-height: 280px;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-blob1 {
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 90px;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .hero-blob2 {
+    position: absolute;
+    right: 40px;
+    bottom: -30px;
+    width: 140px;
+    height: 140px;
+    border-radius: 70px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .greeting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .greeting-text {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+
+  .hero-title {
+    color: white;
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+  }
+  .hero-highlight { color: var(--yellow); }
+
+  .hero-subtitle {
+    color: rgba(255,255,255,0.8);
+    font-size: 16px;
+    margin-top: 15px;
+    line-height: 1.4;
+    max-width: 85%;
+    font-weight: 500;
+  }
+
+  .right-action {
+    position: absolute;
+    top: 50px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+  }
+
+  .coin-capsule {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 30px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .coin-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 12px;
+    color: #854D0E;
+  }
+  .coin-text {
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .search-container {
+    display: flex;
+    gap: 12px;
+    padding: 0 24px;
+    margin-top: -27px;
+    position: relative;
+    z-index: 10;
+  }
+  .search-bar {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    gap: 10px;
+    color: var(--gray-400);
+  }
+  .search-input {
+    font-size: 15px;
+    color: var(--gray-400);
+    font-weight: 500;
+  }
+  .filter-btn {
+    width: 54px;
+    height: 54px;
+    background: var(--brand);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .stores-row {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+    overflow: hidden;
+  }
+  .store-tab {
+    padding: 10px 20px;
+    border-radius: 15px;
+    background: white;
+    border: 1px solid var(--gray-100);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-600);
+    white-space: nowrap;
+  }
+  .store-tab.active {
+    background: var(--brand);
+    color: white;
+    border-color: var(--brand);
+  }
+
+  /* ===== SCENE 1: HOME SCREEN ===== */
+  .s1-scroll {
+    transform: translateY(0);
+    transition: transform 3s ease-in-out;
+  }
+
+  .flash-section {
+    padding: 0 24px;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 15px;
+  }
+  .sec-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sec-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gray-900);
+  }
+  .sec-sub {
+    font-size: 12px;
+    color: var(--gray-400);
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .flash-cards {
+    display: flex;
+    gap: 16px;
+  }
+  .flash-card {
+    min-width: 200px;
+    background: white;
+    border-radius: 25px;
+    border: 1px solid var(--gray-100);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    overflow: hidden;
+  }
+  .fc-img {
+    height: 120px;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    position: relative;
+  }
+  .fc-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .fc-info { padding: 12px; }
+  .fc-title { font-size: 14px; font-weight: 800; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fc-price-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .fc-price { color: var(--brand); font-weight: 900; font-size: 15px; }
+  .fc-off { background: #FEE2E2; color: #EF4444; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 900; }
+
+  /* ===== SCENE 2: PRODUCT SCREEN ===== */
+  #s2 .header {
+    padding: 50px 24px 15px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .s2-img {
+    height: 300px;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+  }
+  .s2-info { padding: 24px; background: white; flex: 1; border-top-left-radius: 30px; border-top-right-radius: 30px; margin-top: -20px; }
+  .s2-title { font-size: 22px; font-weight: 900; color: var(--gray-900); line-height: 1.2; }
+  .s2-price-wrap { display: flex; align-items: flex-end; gap: 10px; margin-top: 10px; }
+  .s2-price { font-size: 28px; font-weight: 900; color: var(--brand); }
+  .s2-old { font-size: 16px; color: var(--gray-400); text-decoration: line-through; margin-bottom: 4px;}
+  
+  .s2-compare { margin-top: 20px; background: var(--gray-50); border-radius: 20px; padding: 20px; border: 1px solid var(--gray-200); }
+  .cmp-row { display: flex; justify-content: space-between; padding: 10px 0; }
+  .cmp-row + .cmp-row { border-top: 1px dashed var(--gray-200); }
+  .cmp-label { font-size: 14px; font-weight: 600; color: var(--gray-600); }
+  .cmp-val { font-size: 15px; font-weight: 800; color: var(--gray-400); text-decoration: line-through; }
+  .cmp-val.best { color: var(--brand); text-decoration: none; font-size: 18px;}
+  
+  .buy-btn {
+    background: var(--brand);
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    padding: 18px;
+    border-radius: 20px;
+    margin-top: 30px;
+    box-shadow: 0 8px 20px rgba(124,58,237,0.3);
+  }
+
+  /* ===== SCENE 3: BUS BOOKING ===== */
+  #s3 .bus-card {
+    background: white;
+    margin: 24px;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    border: 1px solid var(--gray-100);
+  }
+  .bus-route { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .bus-city { font-size: 24px; font-weight: 900; color: var(--gray-900); }
+  .bus-arr { color: var(--brand); }
+  
+  .bus-seats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .seat {
+    width: 45px; height: 45px; border-radius: 12px; border: 2px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--gray-400);
+  }
+  .seat.selected { border-color: var(--brand); background: var(--brand); color: white; transform: scale(1.05); }
+
+  .ticket {
+    background: var(--gray-50);
+    border: 2px dashed var(--brand);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  .ticket-title { font-size: 18px; font-weight: 900; color: var(--brand); margin-top: 10px;}
+
+  /* ===== SCENE 4: CLAIM FORM ===== */
+  #s4 { background: var(--brand); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .s4-title { font-size: 32px; font-weight: 900; color: white; margin-bottom: 24px; letter-spacing: -1px;}
+  
+  .claim-form {
+    background: white; padding: 24px; border-radius: 24px; width: 340px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 16px;
+  }
+  .input-grp { display: flex; flex-direction: column; gap: 8px; }
+  .input-lbl { font-size: 14px; font-weight: 800; color: var(--gray-600); }
+  .input-box { border: 2px solid var(--gray-200); border-radius: 14px; padding: 14px; font-size: 16px; font-weight: 700; color: var(--gray-900); height: 52px; display: flex; align-items: center; }
+  .type-cursor { display: inline-block; width: 2px; height: 18px; background: var(--brand); animation: blink 1s infinite; margin-left: 2px;}
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .form-btn {
+    background: var(--brand); color: white; font-size: 16px; font-weight: 800; text-align: center;
+    padding: 16px; border-radius: 16px; margin-top: 10px; box-shadow: 0 8px 20px rgba(124,58,237,0.3); transition: background 0.3s ease;
+  }
+
+  .s4-coins {
+    background: rgba(255,255,255,0.1);
+    padding: 15px 30px;
+    border-radius: 20px;
+    margin-top: 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+  }
+  .s4-c-num { font-size: 40px; font-weight: 900; color: white; }
+  .s4-c-lbl { font-size: 12px; color: var(--yellow); font-weight: 800; letter-spacing: 2px;}
+
+  /* ===== SCENE 6: CTA ===== */
+  #s6 { background: #EEEDFE; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cta-logo {
+    width: 140px; height: 140px; border-radius: 40px; background: white;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 40px rgba(124,58,237,0.2);
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  .cta-text { font-size: 48px; font-weight: 900; color: var(--brand-dark); letter-spacing: -2px; }
+  .cta-sub { font-size: 16px; color: var(--brand); font-weight: 800; letter-spacing: 4px; }
+  .dl-btns { display: flex; gap: 15px; margin-top: 40px; }
+  .dl-btn { background: white; padding: 12px 20px; border-radius: 16px; text-align: center; min-width: 140px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
+  .dl-t1 { font-size: 12px; color: var(--gray-600); font-weight: 600; }
+  .dl-t2 { font-size: 18px; color: var(--gray-900); font-weight: 900; }
+
+  /* ===== PROGRESS ===== */
+  .progress-wrap { position: absolute; bottom: 20px; left: 24px; right: 24px; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; z-index: 200; }
+  .progress-fill { height: 100%; background: var(--brand); border-radius: 2px; width: 0%; transition: width 0.1s linear; }
+  .scene-indicator {
+    position: absolute; top: 45px; right: 24px; background: rgba(0,0,0,0.3); padding: 4px 10px;
+    border-radius: 10px; font-size: 10px; color: white; font-weight: 800; z-index: 200; backdrop-filter: blur(4px);
+  }
+
+  /* Animations */
+  .fade-up { opacity: 0; transform: translateY(20px); }
+  .fade-in { opacity: 0; }
+  
+  .conf {
+    position: absolute; width: 8px; height: 8px; border-radius: 2px; opacity: 0;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <audio id="bgmAudio" src="./bgm/corporate_bgm.mp3" autoplay loop></audio>
+  <div class="notch"></div>
+  <div class="scene-indicator" id="sceneInd">Scene 1 / 7</div>
+
+  <!-- SCENE 0: WELCOME -->
+  <div class="scene active" id="s0" style="background: var(--brand); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <img src="./new_logo.jpg" alt="DropBest" class="fade-up" id="s0Logo" style="width: 140px; height: 140px; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); margin-bottom: 30px; background: white; padding: 10px;" />
+    <div class="fade-up" id="s0Text" style="font-size: 40px; font-weight: 900; color: white; text-align: center; line-height: 1.1; letter-spacing: -1px;">Welcome to<br/>DropBest</div>
+  </div>
+
+  <!-- SCENE 1: HOME SCREEN UI -->
+  <div class="scene" id="s1">
+    <div class="s1-scroll" id="s1Scroll">
+      <div class="hero">
+        <div class="hero-blob1"></div>
+        <div class="hero-blob2"></div>
+        <div class="right-action">
+          <i data-lucide="menu" color="white" stroke-width="2.5"></i>
+          <div class="coin-capsule">
+            <div class="coin-circle">₹</div>
+            <div class="coin-text">1,250</div>
+          </div>
+        </div>
+        <div class="greeting">
+          <span>👋</span>
+          <span class="greeting-text">HELLO, GUEST</span>
+        </div>
+        <div class="hero-title">Curated Picks.<br><span class="hero-highlight">Smart Rewards.</span></div>
+        <div class="hero-subtitle">Earn coins for every purchase and redeem them for UPI cash.</div>
+      </div>
+
+      <div class="search-container">
+        <div class="search-bar">
+          <i data-lucide="search" color="#9ca3af"></i>
+          <span class="search-input">Search products...</span>
+        </div>
+        <div class="filter-btn">
+          <i data-lucide="filter" color="white"></i>
+        </div>
+      </div>
+
+      <div class="stores-row fade-up" id="s1Stores">
+        <div class="store-tab active">All Stores</div>
+        <div class="store-tab">Amazon</div>
+        <div class="store-tab">Flipkart</div>
+        <div class="store-tab">Myntra</div>
+      </div>
+
+      <div class="flash-section fade-up" id="s1Deals">
+        <div class="section-header">
+          <div>
+            <div class="sec-title-wrap">
+              <i data-lucide="zap" color="#facc15" fill="#facc15"></i>
+              <div class="sec-title">Today's Flash Deals</div>
+            </div>
+            <div class="sec-sub">Limited time offers refreshed daily</div>
+          </div>
+        </div>
+        <div class="flash-cards">
+          <div class="flash-card">
+            <div class="fc-img"><img src="https://hiutepcjueudehhufroi.supabase.co/storage/v1/object/public/bhuvanesh/cho-2.webp" alt="Tasrika Kurta" style="width: 100%; height: 100%; object-fit: cover;" /><div class="fc-tag">FLASH</div></div>
+            <div class="fc-info">
+              <div class="fc-title">Tasrika Kurta Set</div>
+              <div class="fc-price-row">
+                <div class="fc-price">₹899</div>
+                <div class="fc-off">72% OFF</div>
+ </div>
+            </div>
+          </div>
+          <div class="flash-card">
+            <div class="fc-img">👟<div class="fc-tag">FLASH</div></div>
+            <div class="fc-info">
+              <div class="fc-title">Running Shoes Max</div>
+              <div class="fc-price-row">
+                <div class="fc-price">₹1,299</div>
+                <div class="fc-off">55% OFF</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 2: PRODUCT SCREEN -->
+  <div class="scene" id="s2">
+    <div class="header">
+      <i data-lucide="arrow-left" color="#1f2937"></i>
+      <i data-lucide="heart" color="#1f2937"></i>
+    </div>
+    <div class="s2-img fade-in" id="s2Img"><img src="https://hiutepcjueudehhufroi.supabase.co/storage/v1/object/public/bhuvanesh/cho-2.webp" alt="Tasrika Kurta" style="width: 100%; height: 100%; object-fit: cover;" /></div>
+    <div class="s2-info fade-up" id="s2Info">
+      <div class="s2-title">Tasrika Women Georgette Kurta Dupatta Set</div>
+      <div class="s2-price-wrap">
+        <div class="s2-price">₹899</div>
+        <div class="s2-old">₹3,299</div>
+      </div>
+      
+      <div class="s2-compare fade-up" id="s2Cmp" style="padding: 15px; background: #f9fafb; border-radius: 15px; border: 1px solid #e5e7eb;">
+        <div style="font-size: 15px; font-weight: 800; color: var(--gray-800); margin-bottom: 8px;">Product Highlights</div>
+        <div style="font-size: 14px; color: var(--gray-600); line-height: 1.6;">
+          ✨ Premium Georgette material<br/>
+          👗 Beautiful flared design with dupatta<br/>
+          ⭐ Highly rated by 2,000+ happy customers<br/>
+          👌 Perfect for weddings and festivals
+        </div>
+      </div>
+      <div class="buy-btn fade-up" id="s2Btn">Go to Partner Store</div>
+    </div>
+  </div>
+
+  <!-- SCENE 3: BUS BOOKING -->
+  <div class="scene" id="s3">
+    <div class="header" style="background:var(--brand);">
+      <i data-lucide="arrow-left" color="white"></i>
+      <div style="color:white; font-weight:800; font-size:18px;">Bus Booking</div>
+      <i data-lucide="bell" color="white"></i>
+    </div>
+    <div style="padding: 20px 24px; background: var(--brand); color: white; padding-bottom: 40px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;">
+      <div style="font-size:14px; font-weight:700; opacity:0.8;">Select your seat</div>
+      <div style="font-size:24px; font-weight:900;">AC Sleeper (2+1)</div>
+    </div>
+    
+    <div class="bus-card fade-up" id="s3Card" style="margin-top:-20px; padding: 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px dashed var(--gray-200); padding-bottom: 15px; margin-bottom: 15px;">
+        <div style="display:flex; flex-direction:column;">
+          <span style="font-size:22px; font-weight:900; color:var(--gray-900);">21:30</span>
+          <span style="font-size:12px; color:var(--gray-400); font-weight:800;">CHENNAI</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; flex:1; padding: 0 10px;">
+          <span style="font-size:10px; color:var(--brand); font-weight:800; background:#f5f3ff; padding:4px 10px; border-radius:12px;">8h 30m</span>
+          <div style="width:100%; height:2px; background:var(--gray-200); margin:8px 0; position:relative;">
+            <i data-lucide="bus" size="16" color="var(--brand)" style="position:absolute; top:-7px; left:50%; transform:translateX(-50%); background:white; padding:0 4px;"></i>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; text-align:right;">
+          <span style="font-size:22px; font-weight:900; color:var(--gray-900);">06:00</span>
+          <span style="font-size:12px; color:var(--gray-400); font-weight:800;">COIMBATORE</span>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 20px;">
+         <div style="width: 44px; height: 44px; border-radius: 12px; background: #f0fdf4; display:flex; align-items:center; justify-content:center;">
+           <i data-lucide="shield-check" color="#10b981"></i>
+         </div>
+         <div>
+           <div style="font-size: 15px; font-weight: 800; color: var(--gray-900);">IntrCity SmartBus</div>
+           <div style="font-size: 13px; font-weight: 600; color: var(--gray-500);">A/C Sleeper (2+1)</div>
+         </div>
+      </div>
+      
+      <div class="bus-seats fade-in" id="s3Seats" style="background: var(--gray-50); padding: 15px; border-radius: 16px; position:relative; border: 1px solid var(--gray-200);">
+        <i data-lucide="navigation" size="18" color="var(--gray-400)" style="position:absolute; top: 15px; right: 15px; transform:rotate(45deg);"></i>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+           <div style="display:flex; gap: 10px;">
+             <div class="seat selected" style="width: 35px; height: 45px;">U1</div>
+             <div class="seat selected" style="width: 35px; height: 45px;">U2</div>
+           </div>
+           <div class="seat" style="width: 35px; height: 45px;">U3</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
+           <div style="display:flex; gap: 10px;">
+             <div class="seat" style="width: 35px; height: 45px; background:var(--gray-200); border-color:var(--gray-200); color:white;">U4</div>
+             <div class="seat" style="width: 35px; height: 45px;">U5</div>
+           </div>
+           <div class="seat" style="width: 35px; height: 45px;">U6</div>
+        </div>
+      </div>
+      
+      <div class="buy-btn fade-up" id="s3Btn" style="margin-top:15px; border-radius: 16px; padding: 16px;">Pay ₹1,598</div>
+      
+      <div class="ticket fade-up" id="s3Ticket" style="display:none; background: var(--brand); border: none; position:relative; overflow:hidden; border-radius: 16px; padding: 24px; margin-top: 15px;">
+        <div style="position:absolute; width: 24px; height: 24px; background: var(--gray-50); border-radius: 12px; left: -12px; top: 50%; transform:translateY(-50%); box-shadow: inset -2px 0 5px rgba(0,0,0,0.1);"></div>
+        <div style="position:absolute; width: 24px; height: 24px; background: var(--gray-50); border-radius: 12px; right: -12px; top: 50%; transform:translateY(-50%); box-shadow: inset 2px 0 5px rgba(0,0,0,0.1);"></div>
+        
+        <div style="border-bottom: 2px dashed rgba(255,255,255,0.3); padding-bottom: 15px; margin-bottom: 15px;">
+           <div style="display:flex; justify-content:center; align-items:center; gap: 10px;">
+             <i data-lucide="check-circle" color="white" size="28"></i>
+             <span style="color:white; font-size:20px; font-weight:900;">Ticket Confirmed!</span>
+           </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+           <div style="text-align:left;">
+             <div style="color:rgba(255,255,255,0.8); font-size:12px; font-weight:700; margin-bottom:4px;">PNR NO</div>
+             <div style="color:white; font-size:18px; font-weight:900; letter-spacing:1px;">DB-847291</div>
+           </div>
+           <i data-lucide="qr-code" color="white" size="48"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 4: CLAIM REWARDS -->
+  <div class="scene" id="s4">
+    <div id="confetti4" style="position:absolute; inset:0; pointer-events:none; overflow:hidden;"></div>
+    
+    <div class="s4-title fade-up" id="s4Title">Claim Coins</div>
+    
+    <div class="claim-form fade-up" id="claimForm">
+      <div class="input-grp">
+        <div class="input-lbl">Partner Order ID</div>
+        <div class="input-box" id="oidBox"><span id="oidText"></span><span class="type-cursor" id="oidCursor"></span></div>
+      </div>
+      <div class="input-grp">
+        <div class="input-lbl">Order Amount (₹)</div>
+        <div class="input-box" id="amtBox"><span id="amtText"></span><span class="type-cursor" id="amtCursor" style="display:none;"></span></div>
+      </div>
+      <div class="form-btn" id="claimBtn">Submit to Claim</div>
+    </div>
+
+    <div class="ticket fade-up" id="claimSuccess" style="display:none; background: white; border: none; border-radius: 24px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+      <i data-lucide="check-circle" color="#10b981" size="64"></i>
+      <div style="font-size: 24px; font-weight: 900; color: #10b981; margin-top: 15px;">Order Verified!</div>
+      <div style="font-size: 36px; font-weight: 900; color: var(--brand); margin-top: 10px;">+30 Coins</div>
+    </div>
+    
+    <div class="s4-coins fade-up" id="s4Coins">
+      <div class="s4-c-num" id="s4Points">1,250</div>
+      <div class="s4-c-lbl">TOTAL COINS</div>
+    </div>
+  </div>
+
+  <!-- SCENE 5: PAYOUT -->
+  <div class="scene" id="s5" style="background: #EEEDFE; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <div class="s4-title fade-up" id="s5Title" style="color: var(--brand); margin-bottom: 24px;">Withdraw Cash</div>
+    
+    <div class="claim-form fade-up" id="payoutForm">
+      <div style="background: var(--brand); border-radius: 16px; padding: 15px 20px; margin-bottom: 15px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 4px 15px rgba(124,58,237,0.3);">
+        <span style="font-weight: 700; color: rgba(255,255,255,0.8); font-size: 14px;">Wallet Balance</span>
+        <span style="font-weight: 900; color: white; font-size: 22px;">1,280 Coins</span>
+      </div>
+
+      <div class="input-grp">
+        <div class="input-lbl">Enter UPI ID</div>
+        <div class="input-box" id="upiBox"><span id="upiText"></span><span class="type-cursor" id="upiCursor"></span></div>
+      </div>
+      <div class="form-btn" id="payoutBtn">Withdraw 1,000 Coins</div>
+      <div style="text-align: center; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--gray-500);">100 Coins = ₹10</div>
+    </div>
+
+    <div class="ticket fade-up" id="payoutSuccess" style="display:none; background: white; border: none; border-radius: 24px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 340px; text-align:center;">
+      <i data-lucide="party-popper" color="#10b981" size="64" style="margin: 0 auto;"></i>
+      <div style="font-size: 24px; font-weight: 900; color: #10b981; margin-top: 15px;">Transfer Successful!</div>
+      <div style="font-size: 16px; font-weight: 700; color: var(--gray-600); margin-top: 10px;">₹100 sent to your bank account.</div>
+    </div>
+  </div>
+
+  <!-- SCENE 6: CTA -->
+  <div class="scene" id="s6">
+    <div class="cta-logo fade-up" id="s6Logo">
+      <img src="./new_logo.jpg" alt="DropBest" style="width: 100%; height: 100%; object-fit: contain; border-radius: 30px;" />
+    </div>
+    <div class="cta-text fade-up" id="s6Text">DropBest</div>
+    <div class="cta-sub fade-up" id="s6Sub">SHOP. SAVE. EARN.</div>
+    
+    <div class="dl-btns fade-up" id="s6Btns">
+      <div class="dl-btn">
+        <div class="dl-t1">Download on the</div>
+        <div class="dl-t2">App Store</div>
+      </div>
+      <div class="dl-btn">
+        <div class="dl-t1">Get it on</div>
+        <div class="dl-t2">Google Play</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+// TOTAL DURATION = 36 SECONDS
+const TOTAL = 36000;
+let startTime = null;
+let currentScene = 0;
+
+const scenes = [
+  { id: 's0', start: 0,     end: 3000  }, // 3s Welcome
+  { id: 's1', start: 3000,  end: 8000  }, // 5s Home
+  { id: 's2', start: 8000,  end: 13000 }, // 5s Product
+  { id: 's3', start: 13000, end: 18000 }, // 5s Bus
+  { id: 's4', start: 18000, end: 26000 }, // 8s Claim Rewards
+  { id: 's5', start: 26000, end: 32000 }, // 6s Payout
+  { id: 's6', start: 32000, end: 36000 }, // 4s CTA
+];
+
+function applyStyle(id, props, duration=500, delay=0) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if(el) {
+      el.style.transition = `all ${duration}ms cubic-bezier(0.34,1.56,0.64,1)`;
+      Object.assign(el.style, props);
+    }
+  }, delay);
+}
+
+function spawnConfetti(containerId, colors) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  for (let i = 0; i < 50; i++) {
+    const d = document.createElement('div');
+    d.className = 'conf';
+    d.style.cssText = `
+      left: ${Math.random()*100}%;
+      top: -10px;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      width: ${6+Math.random()*8}px;
+      height: ${6+Math.random()*8}px;
+      border-radius: ${Math.random()>0.5?'50%':'4px'};
+      opacity: 1;
+      transform: rotate(${Math.random()*360}deg);
+      transition: top ${1+Math.random()*2}s ease, opacity 0.5s ease ${1.5+Math.random()}s;
+    `;
+    c.appendChild(d);
+    setTimeout(() => { d.style.top = (80+Math.random()*110)+'%'; }, 50);
+    setTimeout(() => { d.style.opacity = '0'; }, 2000);
+  }
+}
+
+// Resets
+function resetEls(ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      el.style.transition = 'none';
+      if(el.classList.contains('fade-up')) { el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; }
+      if(el.classList.contains('fade-in')) { el.style.opacity = '0'; }
+    }
+  });
+}
+
+function initScene1() {
+  document.getElementById('sceneInd').style.color = 'var(--gray-900)';
+  document.querySelector('.progress-wrap').style.background = 'rgba(0,0,0,0.1)';
+  
+  resetEls(['s1Stores', 's1Deals']);
+  document.getElementById('s1Scroll').style.transition = 'none';
+  document.getElementById('s1Scroll').style.transform = 'translateY(0)';
+  
+  applyStyle('s1Stores', { opacity: 1, transform: 'translateY(0)' }, 600, 300);
+  applyStyle('s1Deals', { opacity: 1, transform: 'translateY(0)' }, 600, 600);
+  
+  // scroll animation
+  setTimeout(() => {
+    document.getElementById('s1Scroll').style.transition = 'transform 2.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    document.getElementById('s1Scroll').style.transform = 'translateY(-120px)';
+  }, 1800);
+}
+
+function initScene2() {
+  resetEls(['s2Img', 's2Info', 's2Cmp', 's2Btn']);
+  
+  applyStyle('s2Img', { opacity: 1 }, 500, 200);
+  applyStyle('s2Info', { opacity: 1, transform: 'translateY(0)' }, 600, 400);
+  applyStyle('s2Cmp', { opacity: 1, transform: 'translateY(0)' }, 600, 1000);
+  applyStyle('s2Btn', { opacity: 1, transform: 'translateY(0)' }, 600, 1600);
+}
+
+function initScene3() {
+  resetEls(['s3Card', 's3Seats', 's3Btn']);
+  const btn = document.getElementById('s3Btn');
+  const seats = document.getElementById('s3Seats');
+  const ticket = document.getElementById('s3Ticket');
+  
+  btn.style.display = 'block';
+  btn.textContent = 'Pay ₹1,598';
+  btn.style.background = 'var(--brand)';
+  seats.style.display = 'block';
+  
+  ticket.style.display = 'none';
+  ticket.style.opacity = '0';
+  ticket.style.transform = 'translateY(20px)';
+
+  applyStyle('s3Card', { opacity: 1, transform: 'translateY(0)' }, 600, 200);
+  applyStyle('s3Seats', { opacity: 1 }, 500, 600);
+  applyStyle('s3Btn', { opacity: 1, transform: 'translateY(0)' }, 600, 1000);
+
+  // Click pay
+  setTimeout(() => {
+    btn.style.background = '#10b981'; // success color
+    btn.textContent = 'Processing...';
+  }, 2500);
+
+  // Show ticket
+  setTimeout(() => {
+    btn.style.display = 'none';
+    seats.style.display = 'none';
+    ticket.style.display = 'block';
+    setTimeout(() => {
+      ticket.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+      ticket.style.opacity = '1';
+      ticket.style.transform = 'translateY(0)';
+    }, 50);
+  }, 3500);
+}
+
+function initScene4() {
+  document.getElementById('sceneInd').style.color = 'white';
+  document.querySelector('.progress-wrap').style.background = 'rgba(255,255,255,0.2)';
+  document.querySelector('.progress-fill').style.background = 'white';
+
+  const form = document.getElementById('claimForm');
+  const success = document.getElementById('claimSuccess');
+  const btn = document.getElementById('claimBtn');
+  const oidText = document.getElementById('oidText');
+  const amtText = document.getElementById('amtText');
+  const oidCursor = document.getElementById('oidCursor');
+  const amtCursor = document.getElementById('amtCursor');
+  const header = document.getElementById('s4Title');
+  const points = document.getElementById('s4Points');
+
+  // Resets
+  form.style.display = 'flex';
+  form.style.opacity = '0';
+  form.style.transform = 'translateY(20px)';
+  success.style.display = 'none';
+  success.style.opacity = '0';
+  success.style.transform = 'scale(0.8)';
+  btn.style.background = 'var(--brand)';
+  btn.textContent = 'Submit to Claim';
+  oidText.textContent = '';
+  amtText.textContent = '';
+  oidCursor.style.display = 'inline-block';
+  amtCursor.style.display = 'none';
+  header.style.opacity = '0';
+  header.style.transform = 'translateY(20px)';
+  points.textContent = '1,250';
+  document.getElementById('s4Coins').style.opacity = '0';
+
+  // Entry animations
+  applyStyle('s4Title', { opacity: 1, transform: 'translateY(0)' }, 600, 200);
+  applyStyle('claimForm', { opacity: 1, transform: 'translateY(0)' }, 600, 400);
+  applyStyle('s4Coins', { opacity: 1, transform: 'translateY(0)' }, 600, 600);
+
+  // Type Order ID
+  setTimeout(() => {
+    const oid = "OD123987456";
+    let i = 0;
+    const typeInt = setInterval(() => {
+      oidText.textContent += oid[i];
+      i++;
+      if(i >= oid.length) {
+        clearInterval(typeInt);
+        oidCursor.style.display = 'none';
+        amtCursor.style.display = 'inline-block';
+      }
+    }, 70);
+  }, 1200);
+
+  // Type Amount
+  setTimeout(() => {
+    const amt = "899";
+    let i = 0;
+    const typeInt = setInterval(() => {
+      amtText.textContent += amt[i];
+      i++;
+      if(i >= amt.length) clearInterval(typeInt);
+    }, 100);
+  }, 2500);
+
+  // Click Submit
+  setTimeout(() => {
+    btn.style.background = '#10b981';
+    btn.textContent = 'Verifying...';
+  }, 3500);
+
+  // Show Success and Credit Coins
+  setTimeout(() => {
+    form.style.opacity = '0';
+    setTimeout(() => {
+      form.style.display = 'none';
+      success.style.display = 'flex';
+      success.style.flexDirection = 'column';
+      success.style.alignItems = 'center';
+      
+      // small delay to let display:flex apply before opacity transition
+      setTimeout(() => {
+        success.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+        success.style.opacity = '1';
+        success.style.transform = 'scale(1)';
+        spawnConfetti('confetti4', ['#ffffff', '#facc15', '#f9a8d4', '#6EE7B7']);
+      }, 50);
+
+      // Increment coins
+      let n = 1250;
+      const target = 1280; // 1250 + 30
+      const inc = setInterval(() => {
+        n = Math.min(n + 1, target);
+        points.textContent = n.toLocaleString();
+        if(n >= target) clearInterval(inc);
+      }, 20);
+
+    }, 400); // Wait for form to fade out
+  }, 4500);
+}
+
+function initScene5() {
+  document.getElementById('sceneInd').style.color = 'var(--gray-900)';
+  document.querySelector('.progress-wrap').style.background = 'rgba(0,0,0,0.1)';
+  document.querySelector('.progress-fill').style.background = 'var(--brand)';
+
+  const form = document.getElementById('payoutForm');
+  const success = document.getElementById('payoutSuccess');
+  const btn = document.getElementById('payoutBtn');
+  const upiText = document.getElementById('upiText');
+  const upiCursor = document.getElementById('upiCursor');
+
+  // Resets
+  form.style.display = 'flex';
+  form.style.opacity = '0';
+  form.style.transform = 'translateY(20px)';
+  success.style.display = 'none';
+  success.style.opacity = '0';
+  success.style.transform = 'scale(0.8)';
+  btn.style.background = 'var(--brand)';
+  btn.textContent = 'Withdraw 1,000 Coins';
+  upiText.textContent = '';
+  upiCursor.style.display = 'inline-block';
+  document.getElementById('s5Title').style.opacity = '0';
+  document.getElementById('s5Title').style.transform = 'translateY(20px)';
+
+  applyStyle('s5Title', { opacity: 1, transform: 'translateY(0)' }, 600, 200);
+  applyStyle('payoutForm', { opacity: 1, transform: 'translateY(0)' }, 600, 400);
+
+  // Type UPI
+  setTimeout(() => {
+    const upi = "user@upi";
+    let i = 0;
+    const typeInt = setInterval(() => {
+      upiText.textContent += upi[i];
+      i++;
+      if(i >= upi.length) {
+        clearInterval(typeInt);
+        upiCursor.style.display = 'none';
+      }
+    }, 100);
+  }, 1200);
+
+  // Click Submit
+  setTimeout(() => {
+    btn.style.background = '#10b981';
+    btn.textContent = 'Processing...';
+  }, 2500);
+
+  // Show Success
+  setTimeout(() => {
+    form.style.opacity = '0';
+    setTimeout(() => {
+      form.style.display = 'none';
+      success.style.display = 'block';
+      
+      setTimeout(() => {
+        success.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+        success.style.opacity = '1';
+        success.style.transform = 'scale(1)';
+        spawnConfetti('s5', ['#7c3aed', '#facc15', '#f9a8d4', '#6EE7B7']);
+      }, 50);
+    }, 400);
+  }, 3500);
+}
+
+function initScene6() {
+  document.getElementById('sceneInd').style.color = 'white';
+  document.querySelector('.progress-wrap').style.background = 'rgba(255,255,255,0.2)';
+  document.querySelector('.progress-fill').style.background = 'white';
+  resetEls(['s6Logo', 's6Text', 's6Sub', 's6Btns']);
+  applyStyle('s6Logo', { opacity: 1, transform: 'translateY(0)' }, 600, 200);
+  applyStyle('s6Text', { opacity: 1, transform: 'translateY(0)' }, 600, 500);
+  applyStyle('s6Sub', { opacity: 1, transform: 'translateY(0)' }, 600, 700);
+  applyStyle('s6Btns', { opacity: 1, transform: 'translateY(0)' }, 600, 1100);
+}
+
+function initScene0() {
+  document.getElementById('sceneInd').style.color = 'white';
+  document.querySelector('.progress-wrap').style.background = 'rgba(255,255,255,0.2)';
+  document.querySelector('.progress-fill').style.background = 'white';
+  resetEls(['s0Logo', 's0Text']);
+  applyStyle('s0Logo', { opacity: 1, transform: 'translateY(0)' }, 600, 200);
+  applyStyle('s0Text', { opacity: 1, transform: 'translateY(0)' }, 600, 500);
+}
+
+const inits = [initScene0, initScene1, initScene2, initScene3, initScene4, initScene5, initScene6];
+
+function showScene(idx) {
+  document.querySelectorAll('.scene').forEach((s, i) => {
+    s.classList.toggle('active', i === idx);
+  });
+  document.getElementById('sceneInd').textContent = `Scene ${idx+1} / 7`;
+  inits[idx]();
+}
+
+function tick(ts) {
+  if (!startTime) startTime = ts;
+  const elapsed = ts - startTime;
+
+  if (elapsed >= TOTAL) {
+    startTime = null;
+    document.getElementById('progress').style.width = '0%';
+    showScene(0);
+    requestAnimationFrame(tick);
+    return;
+  }
+
+  const pct = (elapsed / TOTAL) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+
+  for (let i = scenes.length - 1; i >= 0; i--) {
+    if (elapsed >= scenes[i].start) {
+      if (currentScene !== i + 1) {
+        currentScene = i + 1;
+        showScene(i);
+      }
+      break;
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// Autoplay BGM (Browsers often block this without interaction)
+const bgm = document.getElementById('bgmAudio');
+if(bgm) {
+  bgm.volume = 1.0; // Max volume
+  bgm.play().catch(e => console.log('Autoplay blocked. User needs to tap the screen.'));
+}
+
+// Play audio on first tap/click anywhere on the screen
+document.body.addEventListener('click', function() {
+  if(bgm && bgm.paused) {
+    bgm.play();
+  }
+}, { once: true });
+
+initScene0();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

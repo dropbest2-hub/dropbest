@@ -5,7 +5,7 @@ import { useAuthStore } from './src/store/authStore';
 import { COLORS } from './src/constants/theme';
 import AppNavigator from './src/navigation/AppNavigator';
 
-import { requestUserPermission, notificationListener } from './src/services/NotificationService';
+// import { requestUserPermission, notificationListener } from './src/services/NotificationService';
 import { ThemeProvider } from './src/context/ThemeContext';
 
 export default function App() {
@@ -17,9 +17,9 @@ export default function App() {
 
   useEffect(() => {
     if (initialized && user) {
-        requestUserPermission();
-        const unsubscribe = notificationListener();
-        return () => unsubscribe();
+        // requestUserPermission();
+        // const unsubscribe = notificationListener();
+        // return () => unsubscribe();
     }
   }, [initialized, user]);
 

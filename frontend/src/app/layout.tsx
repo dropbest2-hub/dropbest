@@ -53,6 +53,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                  var script = document.createElement("script");
+                  script.async = 1;
+                  script.src = 'https://tpembars.com/NTMzNzk3.js?t=533797';
+                  document.head.appendChild(script);
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
