@@ -205,19 +205,28 @@ export const syncPrices = async (req: Request, res: Response) => {
                     product.ajio_link
                 ].filter(Boolean);
                 
+                let bestPrice: number | null = null;
+                let bestRating: number | null = null;
+                let bestReviewCount: string | null = null;
+
                 for (const link of links) {
                     try {
                         const result = await scrapePrice(link);
-                        if (result.success) {
-                            scrapedPrice = result.price;
-                            scrapedRating = result.rating;
-                            scrapedReviewCount = result.reviewCount;
-                            if (scrapedPrice) break;
+                        if (result.success && result.price !== null) {
+                            if (bestPrice === null || result.price < bestPrice) {
+                                bestPrice = result.price;
+                                bestRating = result.rating;
+                                bestReviewCount = result.reviewCount;
+                            }
                         }
                     } catch (err) {
                         console.error(`Failed to scrape ${link}:`, err);
                     }
                 }
+
+                scrapedPrice = bestPrice;
+                scrapedRating = bestRating;
+                scrapedReviewCount = bestReviewCount;
 
                 if (scrapedPrice !== null) {
                     const oldPrice = product.price;
@@ -233,7 +242,7 @@ export const syncPrices = async (req: Request, res: Response) => {
 
                     if (isPriceDrop) {
                         const expiryDate = new Date();
-                        expiryDate.setHours(expiryDate.getHours() + 10);
+                        expiryDate.setHours(expiryDate.getHours() + 24);
                         const discountPercent = Math.round(((oldPrice - scrapedPrice) / oldPrice) * 100);
                         
                         updatePayload.is_daily_deal = true;

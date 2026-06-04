@@ -1,14 +1,20 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import axiosRetry from 'axios-retry';
+import { URL } from 'url';
 
 // Configure axios to retry on failure
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
-const USER_AGENTS = [
+const USER_AGENTS = {
+    mobileSafari: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Mobile/15E148 Safari/604.1',
+    chromeWindows: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    chromeMac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+};
+
+const RANDOM_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 ];
 
@@ -20,6 +26,60 @@ interface ScrapeResult {
     error?: string;
 }
 
+/**
+ * Resolves short URLs (like fktr.in, amzn.to) and extracts target product URLs
+ * from affiliate redirection pages (like linkredirect.in).
+ */
+export const resolveUrl = async (url: string): Promise<string> => {
+    try {
+        // Quick check if input URL already has dl param
+        try {
+            const urlObj = new URL(url);
+            const dl = urlObj.searchParams.get('dl');
+            if (dl) {
+                return decodeURIComponent(dl);
+            }
+        } catch (e) {}
+
+        const isShortOrRedirect = url.includes('fktr.in') || url.includes('amzn.to') || url.includes('linkredirect.in');
+        if (!isShortOrRedirect) {
+            return url;
+        }
+
+        const response = await axios.get(url, {
+            headers: { 'User-Agent': USER_AGENTS.chromeWindows },
+            maxRedirects: 5,
+            timeout: 10000,
+            validateStatus: () => true
+        });
+
+        const finalUrl = response.request?.res?.responseUrl || url;
+        
+        // If redirected to linkredirect.in (EarnKaro/Affiliate gate), extract the 'dl' parameter
+        if (finalUrl.includes('linkredirect.in')) {
+            try {
+                const urlObj = new URL(finalUrl);
+                const dl = urlObj.searchParams.get('dl');
+                if (dl) {
+                    return decodeURIComponent(dl);
+                }
+            } catch (e) {}
+
+            // Fallback: extract from script tags in HTML
+            const html = response.data || '';
+            const match = html.match(/var cashbackUrl = "(.*?)";/);
+            if (match && match[1]) {
+                return match[1];
+            }
+        }
+
+        return finalUrl;
+    } catch (err: any) {
+        console.error(`Error resolving URL ${url}:`, err.message);
+        return url;
+    }
+};
+
 const extractJsonLd = ($: cheerio.CheerioAPI) => {
     const scripts = $('script[type="application/ld+json"]');
     for (let i = 0; i < scripts.length; i++) {
@@ -28,9 +88,9 @@ const extractJsonLd = ($: cheerio.CheerioAPI) => {
             const data = JSON.parse(content);
             const products = Array.isArray(data) ? data : [data];
             for (const p of products) {
-                // Some sites use @type: "Product", others might have an array
-                const type = p['@type'];
-                if (type === 'Product' || (Array.isArray(type) && type.includes('Product'))) {
+                const type = p['@type']?.toString().toLowerCase() || '';
+                // Matches Product, ProductGroup, etc.
+                if (type.includes('product')) {
                     return p;
                 }
             }
@@ -39,39 +99,43 @@ const extractJsonLd = ($: cheerio.CheerioAPI) => {
     return null;
 };
 
-export const scrapePrice = async (url: string): Promise<ScrapeResult> => {
+export const scrapePrice = async (rawUrl: string): Promise<ScrapeResult> => {
     try {
+        const url = await resolveUrl(rawUrl);
         const isAmazon = url.includes('amazon.in') || url.includes('amzn.to');
         const isFlipkart = url.includes('flipkart.com');
         const isMyntra = url.includes('myntra.com');
         const isAjio = url.includes('ajio.com');
         const isShopsy = url.includes('shopsy.in');
 
-        const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+        // Use Mobile Safari for Ajio, Flipkart, and Shopsy to bypass Akamai/reCAPTCHA blocking
+        const useMobile = isAjio || isFlipkart || isShopsy;
+        const userAgent = useMobile ? USER_AGENTS.mobileSafari : RANDOM_AGENTS[Math.floor(Math.random() * RANDOM_AGENTS.length)];
 
-        // Enhanced headers to look like a real browser
+        // Enhanced headers
         const headers: any = {
             'User-Agent': userAgent,
             'Accept-Language': 'en-US,en;q=0.9',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-            'Referer': 'https://www.google.com/',
-            'Cache-Control': 'max-age=0',
-            'sec-ch-ua': '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
         };
 
-        // Site specific header tweaks
         if (isFlipkart || isShopsy) {
-            headers['X-Requested-With'] = 'XMLHttpRequest'; // Sometimes helps with Flipkart
+            headers['Referer'] = 'https://linkredirect.in/';
+        } else {
+            headers['Referer'] = 'https://www.google.com/';
         }
 
-        const { data } = await axios.get(url, {
+        const { data, status } = await axios.get(url, {
             headers,
             timeout: 20000,
-            validateStatus: (status) => status < 500 // Accept 403 etc to handle gracefully
+            validateStatus: (s) => s < 500
         });
+
+        if (status !== 200) {
+            return { price: null, rating: null, reviewCount: null, success: false, error: `HTTP status ${status}` };
+        }
 
         const $ = cheerio.load(data);
         const jsonLd = extractJsonLd($);
@@ -87,14 +151,15 @@ export const scrapePrice = async (url: string): Promise<ScrapeResult> => {
                 const priceValue = Array.isArray(offers) ? (offers[0].price || offers[0].lowPrice) : (offers.price || offers.lowPrice);
                 if (priceValue) price = parseFloat(priceValue.toString().replace(/[^\d.]/g, ''));
             }
-            if (jsonLd.aggregateRating) {
-                rating = parseFloat(jsonLd.aggregateRating.ratingValue);
-                reviewCount = jsonLd.aggregateRating.reviewCount?.toString() || jsonLd.aggregateRating.ratingCount?.toString();
+            const aggRating = jsonLd.aggregateRating || jsonLd.AggregateRating;
+            if (aggRating) {
+                rating = parseFloat(aggRating.ratingValue);
+                reviewCount = aggRating.reviewCount?.toString() || aggRating.ratingCount?.toString();
             }
         }
 
         // Fallback to selectors if JSON-LD failed or partially failed
-        if (price === null) {
+        if (price === null || isNaN(price)) {
             let priceStr = '';
             if (isAmazon) {
                 priceStr = $('.a-price-whole').first().text() || $('.a-offscreen').first().text();

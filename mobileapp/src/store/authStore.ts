@@ -135,9 +135,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                     }
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Google Auth Error:', error);
-            Alert.alert("Login Failed", "Could not complete Google Sign-In. Please try again.");
+            Alert.alert("Error Debug", String(error.message || error));
         } finally {
             set({ loading: false });
         }
